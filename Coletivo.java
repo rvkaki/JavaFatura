@@ -3,7 +3,7 @@
  * Write a description of class Coletivo here.
  *
  * @author RV
- * @version 15/04/2018
+ * @version 24/04/2018
  */ 
 
 import java.util.ArrayList;
