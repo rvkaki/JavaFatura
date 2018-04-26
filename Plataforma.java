@@ -12,8 +12,6 @@ import java.util.HashMap;
 import java.lang.System;
 import java.util.Arrays;
 
-/* Despesas gerais familiares, saude, educaçao, habitaçao, lares, reparaçao de automoveis, reparacao de motociclos, restauraçao e alojamento, cabeleireiros, atividades veterinarias, transportes*/
-
 public class Plataforma{
     
     private ArrayList<Fatura> totalFaturas;
