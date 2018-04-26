@@ -137,15 +137,26 @@ public class Plataforma{
     }
 
     public void logIn(){
-    	String nif;
+        String nif;
+        String tentativa;
 
         do{
             nif = ler("NIF");
         }while(nif.length() != 9 || nif.charAt(0) != '1' || nif.charAt(0) != '2' || nif.charAt(0) != '5' || nif.charAt(0) != '0');
 
         
-        if(this.totalEntidades.containsKey(nif) == false){
-        	System.out.println("NIF não existente!")
+        if(! this.totalEntidades.containsKey(nif)){
+            System.out.println("NIF não existente!\nRegiste-se primeiro");
+            this.registar();
+        }
+        else{
+            Entidade e = this.totalEntidades.get(nif);
+            String password = e.getPassword();
+            do{
+                tentativa = ler("password");
+            }while(! password.equals(tentativa));
+
+            this.utilizador = e;
         }
     }
 }
