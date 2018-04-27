@@ -110,6 +110,7 @@ public class Plataforma{
     }
 
     private void registarColetivo(String nif, String email, String nome, String morada, String password, Entidade utilizador){
+        String designacao = ler("designacao");
         double coeficiente = Double.parseDouble(ler("coeficiente Fiscal"));
         ArrayList<String> informacaoAtividades = new ArrayList<String>();
         for(String s: this.atividades){
@@ -118,7 +119,8 @@ public class Plataforma{
         }
         if(utilizador == null){
             utilizador = new Coletivo(nif, email, nome, morada, password, 
-                                        new ArrayList<Integer>(), informacaoAtividades, coeficiente);
+                                      new ArrayList<Integer>(), designacao,
+                                      informacaoAtividades, coeficiente);
             this.totalEntidades.put(nif, utilizador);
         }else{
         	Coletivo util = (Coletivo) utilizador;

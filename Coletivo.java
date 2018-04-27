@@ -51,7 +51,7 @@ public class Coletivo extends Entidade{
         return this.coeficienteFiscal;
     }
 
-    public void setCoeficienteFiscal(String designacao){
+    public void setDesignacao(String designacao){
         this.designacao = designacao;
     }
 
