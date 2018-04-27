@@ -1,33 +1,55 @@
 
 /**
  * Write a description of class Interface here.
- *
  * @author (your name)
  * @version (a version number or a date)
  */
-public class Interface
-{
-    // instance variables - replace the example below with your own
-    private int x;
 
-    /**
-     * Constructor for objects of class Interface
-     */
-    public Interface()
-    {
-        // initialise instance variables
-        x = 0;
+import java.lang.System;
+import java.util.Scanner;
+
+public class Interface{
+    
+    public void printMenu(){
+        StringBuilder menu = new Stringbuilder();
+
+        menu.append("               ##############################################              \n");
+        menu.append("               #                JavaFatura                  #              \n");
+        menu.append("               ##############################################              \n");
+        menu.append("               #                                            #              \n");
+        menu.append("               #             Opção 1 --> Login              #              \n");
+        menu.append("               #             Opção 2 --> Registar           #              \n");
+        menu.append("               #                                            #              \n");
+        menu.append("               ##############################################              \n");
+        System.out.println(menu);
+
+        Scanner s = new Scanner(in);
+        do{
+            int escolha = s.nextInt();
+        }while(escolha != 1 || escolha != 2);
+        s.close();
+
+        if(escolha == 1)
+            this.printMenuLogin();
+        
+        if(escolha == 2)
+            this.printMenuRegistar();
+
     }
 
-    /**
-     * An example of a method - replace this comment with your own
-     *
-     * @param  y  a sample parameter for a method
-     * @return    the sum of x and y
-     */
-    public int sampleMethod(int y)
-    {
-        // put your code here
-        return x + y;
+    public void printMenuLogin(){
+        StringBuilder menu = new Stringbuilder();
+
+        menu.append("               ##############################################              \n");
+        menu.append("               #                  Login                     #              \n");
+        menu.append("               ##############################################              \n");
+        menu.append("               #                                            #              \n");
+        menu.append("               #              Introduza o NIF:              #              \n");
+        menu.append("               #                                            #              \n");
+        menu.append("               #                                            #              \n");
+        menu.append("               ##############################################              \n");
+        System.out.println(menu);
     }
+
+
 }
