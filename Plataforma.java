@@ -24,20 +24,25 @@ public class Plataforma{
                                                                    "restauraçao e alojamento", "cabeleireiros",
                                                                    "atividades veterinarias", "transportes"));
 
-    private Plataforma(){
+    public Plataforma(){
         this.totalFaturas = new ArrayList<Fatura>();
         this.totalEntidades = new HashMap<String,Entidade>();
         this.utilizador = null;
     }
+    
+    public void main(){
+        this.printMenu();
+    }
 
-    private String ler(String pedido){
+    public String ler(String pedido){
         System.out.println("Escreva " + pedido);
         Scanner ler = new Scanner(System.in);
         String res = ler.nextLine();
+        ler.close();
         return res;
     }
 
-    private boolean lerAtividade(String pedido){
+    public boolean lerAtividade(String pedido){
         System.out.println("Desconta para " + pedido + "? (s/n)");
         Scanner ler = new Scanner(System.in);
         String res = ler.nextLine();
@@ -46,20 +51,64 @@ public class Plataforma{
         return false;
     }
     
-    private boolean registar(){ 
+    public void printMenu(){
+        StringBuilder menu = new StringBuilder();
+        int escolha;
+
+        menu.append("               ##############################################              \n");
+        menu.append("               #                JavaFatura                  #              \n");
+        menu.append("               ##############################################              \n");
+        menu.append("               #                                            #              \n");
+        menu.append("               #             Opção 1 --> Login              #              \n");
+        menu.append("               #             Opção 2 --> Registar           #              \n");
+        menu.append("               #                                            #              \n");
+        menu.append("               ##############################################              \n");
+        System.out.print('\u000C');
+        System.out.println(menu);
+
+        Scanner s = new Scanner(System.in);
+        do{
+            escolha = s.nextInt();
+        }while(escolha != 1 || escolha != 2);
+        s.close();
+
+        if(escolha == 1)
+            this.logIn();
+        
+        if(escolha == 2)
+            this.registar();
+
+    }
+
+    public boolean registar(){ 
         String nif;
+        StringBuilder menu = new StringBuilder();
+
+        menu.append("               ##############################################              \n");
+        menu.append("               #                 Registar                   #              \n");
+        menu.append("               ##############################################              \n");
+        menu.append("               #                                            #              \n");
+        menu.append("               #             NIF:                           #              \n");
+        menu.append("               #             Nome:                          #              \n");
+        menu.append("               #             Email:                         #              \n");
+        menu.append("               #             Morada:                        #              \n");
+        menu.append("               #             Password:                      #              \n");
+        menu.append("               #                                            #              \n");
+        menu.append("               ##############################################              \n");
+        System.out.print('\u000C');
+        System.out.println(menu);
 
         do{
             nif = ler("NIF");
         }while(nif.length() != 9 || nif.charAt(0) != '1' || nif.charAt(0) != '2' || nif.charAt(0) != '5');
 
         if(this.totalEntidades.containsKey(nif)){
-        	Entidade e = this.totalEntidades.get(nif);
+            Entidade e = this.totalEntidades.get(nif);
             if(e.getPassword().equals(""))
                 this.utilizador = e;
             else{
-            	System.out.println("NIF já registado");
-            	return false;
+                System.out.println("NIF já registado");
+                return false;
             }
         }
         
@@ -77,7 +126,22 @@ public class Plataforma{
         return true;
     }
 
-    private void registarIndividual(String nif, String email, String nome, String morada, String password, Entidade utilizador){
+    public void registarIndividual(String nif, String email, String nome, String morada, String password, Entidade utilizador){
+        StringBuilder menu = new StringBuilder();
+
+        menu.append("               ##############################################              \n");
+        menu.append("               #            RegistarIndividual              #              \n");
+        menu.append("               ##############################################              \n");
+        menu.append("               #                                            #              \n");
+        menu.append("               #       Número de elementos agregado:        #              \n");
+        menu.append("               #       NIF dos elementos agregado:          #              \n");
+        menu.append("               #       Atividades Económica:                #              \n");
+        menu.append("               #       Coeficiente Fiscal:                  #              \n");
+        menu.append("               #                                            #              \n");
+        menu.append("               ##############################################              \n");
+        System.out.print('\u000C');
+        System.out.println(menu);
+        
         int numeroAgregado = Integer.parseInt(ler("numero de elementos do Agregado Familiar"));
         ArrayList<String> nifAgregado = new ArrayList<String>(numeroAgregado);
         for(int i=0; i<numeroAgregado; i++){
@@ -109,7 +173,21 @@ public class Plataforma{
 
     }
 
-    private void registarColetivo(String nif, String email, String nome, String morada, String password, Entidade utilizador){
+    public void registarColetivo(String nif, String email, String nome, String morada, String password, Entidade utilizador){
+        StringBuilder menu = new StringBuilder();
+
+        menu.append("               ##############################################              \n");
+        menu.append("               #            RegistarColetivo                #              \n");
+        menu.append("               ##############################################              \n");
+        menu.append("               #                                            #              \n");
+        menu.append("               #       Designação:                          #              \n");
+        menu.append("               #       Coeficiente Fiscal:                  #              \n");
+        menu.append("               #       Atividades Económica:                #              \n");
+        menu.append("               #                                            #              \n");
+        menu.append("               ##############################################              \n");
+        System.out.print('\u000C');
+        System.out.println(menu);
+        
         String designacao = ler("designacao");
         double coeficiente = Double.parseDouble(ler("coeficiente Fiscal"));
         ArrayList<String> informacaoAtividades = new ArrayList<String>();
@@ -123,7 +201,7 @@ public class Plataforma{
                                       informacaoAtividades, coeficiente);
             this.totalEntidades.put(nif, utilizador);
         }else{
-        	Coletivo util = (Coletivo) utilizador;
+            Coletivo util = (Coletivo) utilizador;
             util.setEmail(email);
             util.setNome(nome);
             util.setMorada(morada);
@@ -133,13 +211,25 @@ public class Plataforma{
         }
     }
 
-    private void logOut(){
-    	this.utilizador = null;
+    public void logOut(){
+        this.utilizador = null;
     }
 
-    private void logIn(){
+    public void logIn(){
         String nif;
         String tentativa;
+        StringBuilder menu = new StringBuilder();
+
+        menu.append("               ##############################################              \n");
+        menu.append("               #                  Login                     #              \n");
+        menu.append("               ##############################################              \n");
+        menu.append("               #                                            #              \n");
+        menu.append("               #             NIF:                           #              \n");
+        menu.append("               #             Password:                      #              \n");
+        menu.append("               #                                            #              \n");
+        menu.append("               ##############################################              \n");
+        System.out.print('\u000C');
+        System.out.println(menu);
 
         do{
             nif = ler("NIF");
@@ -154,14 +244,14 @@ public class Plataforma{
             Entidade e = this.totalEntidades.get(nif);
             String password = e.getPassword();
             do{
-                tentativa = ler("password");
+                tentativa = ler("Password");
             }while(! password.equals(tentativa));
 
             this.utilizador = e;
         }
     }
 
-    private void emitirFatura(String nifEmitente, String nifCliente, String descricao, double valor) {
+    public void emitirFatura(String nifEmitente, String nifCliente, String descricao, double valor) {
         Entidade e = this.totalEntidades.get(nifEmitente);
         if (!(e instanceof Coletivo))
             return;
