@@ -71,14 +71,14 @@ public class Plataforma{
         Scanner s = new Scanner(System.in);
         do{
             escolha = s.nextInt();
-        }while(escolha != 1 || escolha != 2);
+        }while(escolha != 1 && escolha != 2);
         s.close();
 
         if(escolha == 1)
             this.logIn();
-        
-        if(escolha == 2)
-            this.registar();
+        else
+            if(escolha == 2)
+                this.registar();
 
     }
 
@@ -102,7 +102,7 @@ public class Plataforma{
 
         do{
             nif = ler("NIF");
-        }while(nif.length() != 9 || nif.charAt(0) != '1' || nif.charAt(0) != '2' || nif.charAt(0) != '5');
+        }while(nif.length() != 9 && (nif.charAt(0) != '1' && nif.charAt(0) != '2' && nif.charAt(0) != '5' && nif.charAt(0) != '0'));
 
         if(this.totalEntidades.containsKey(nif)){
             Entidade e = this.totalEntidades.get(nif);
@@ -235,7 +235,7 @@ public class Plataforma{
 
         do{
             nif = ler("NIF");
-        }while(nif.length() != 9 || nif.charAt(0) != '1' || nif.charAt(0) != '2' || nif.charAt(0) != '5' || nif.charAt(0) != '0');
+        }while(nif.length() != 9 && (nif.charAt(0) != '1' && nif.charAt(0) != '2' && nif.charAt(0) != '5' && nif.charAt(0) != '0'));
 
         
         if(! this.totalEntidades.containsKey(nif)){
