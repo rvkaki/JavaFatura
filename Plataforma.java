@@ -14,7 +14,7 @@ import java.util.Arrays;
 
 public class Plataforma{
     
-    private ArrayList<Fatura> totalFaturas;
+    private ArrayList<Fatura> totalFaturas; 
     private HashMap<String,Entidade> totalEntidades;
     private Entidade utilizador;
     private static ArrayList<String> atividades = new ArrayList<>(Arrays.asList("despesas gerais familiares", "saude", "educaçao", "habitaçao", "lares", "reparaçao de automoveis", 
