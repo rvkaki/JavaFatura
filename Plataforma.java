@@ -23,13 +23,13 @@ public class Plataforma{
                                                                    "cabeleireiros", "atividades veterinarias", 
                                                                    "transportes"));
 
-    public Plataforma(){
+    private Plataforma(){
         this.totalFaturas = new ArrayList<Fatura>();
         this.totalEntidades = new HashMap<String,Entidade>();
         this.utilizador = null;
     }
 
-    public String ler(String pedido){
+    private String ler(String pedido){
         System.out.println("Escreva " + pedido);
         Scanner ler = new Scanner(System.in);
         String res = ler.nextLine();
@@ -45,7 +45,7 @@ public class Plataforma{
         return false;
     }
     
-    public boolean registar(){
+    private boolean registar(){
         String nif;
 
         do{
@@ -76,7 +76,7 @@ public class Plataforma{
         return true;
     }
 
-    public void registarIndividual(String nif, String email, String nome, String morada, String password, Entidade utilizador){
+    private void registarIndividual(String nif, String email, String nome, String morada, String password, Entidade utilizador){
         int numeroAgregado = Integer.parseInt(ler("numero de elementos do Agregado Familiar"));
         ArrayList<String> nifAgregado = new ArrayList<String>(numeroAgregado);
         for(int i=0; i<numeroAgregado; i++){
@@ -108,7 +108,7 @@ public class Plataforma{
 
     }
 
-    public void registarColetivo(String nif, String email, String nome, String morada, String password, Entidade utilizador){
+    private void registarColetivo(String nif, String email, String nome, String morada, String password, Entidade utilizador){
         double coeficiente = Double.parseDouble(ler("coeficiente Fiscal"));
         ArrayList<String> informacaoAtividades = new ArrayList<String>();
         for(String s: this.atividades){
@@ -130,11 +130,11 @@ public class Plataforma{
         }
     }
 
-    public void logOut(){
+    private void logOut(){
     	this.utilizador = null;
     }
 
-    public void logIn(){
+    private void logIn(){
         String nif;
         String tentativa;
 
