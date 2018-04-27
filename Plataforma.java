@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.HashMap;
 import java.lang.System;
+import java.time.LocalDate;
 import java.util.Arrays;
 
 public class Plataforma{
@@ -17,11 +18,11 @@ public class Plataforma{
     private ArrayList<Fatura> totalFaturas; 
     private HashMap<String,Entidade> totalEntidades;
     private Entidade utilizador;
-    private static ArrayList<String> atividades = new ArrayList<>(Arrays.asList("despesas gerais familiares", "saude", "educaçao", "habitaçao", "lares", "reparaçao de automoveis", 
-                                                                   "reparacao de motociclos", 
-                                                                   "restauraçao e alojamento", 
-                                                                   "cabeleireiros", "atividades veterinarias", 
-                                                                   "transportes"));
+    private static ArrayList<String> atividades = new ArrayList<>(Arrays.asList("despesas gerais familiares",
+                                                                   "saude", "educaçao", "habitaçao", "lares",
+                                                                   "reparaçao de automoveis", "reparacao de motociclos", 
+                                                                   "restauraçao e alojamento", "cabeleireiros",
+                                                                   "atividades veterinarias", "transportes"));
 
     private Plataforma(){
         this.totalFaturas = new ArrayList<Fatura>();
@@ -156,5 +157,19 @@ public class Plataforma{
 
             this.utilizador = e;
         }
+    }
+
+    private void emitirFatura(String nifEmitente, String nifCliente, String descricao, double valor) {
+        Entidade e = this.totalEntidades.get(nifEmitente);
+        if (!(e instanceof Coletivo))
+            return;
+
+        Coletivo empresa = (Coletivo) e;
+        String atividade = "";
+        if (empresa.getInformacaoAtividades().size() == 1)
+            atividade = empresa.getInformacaoAtividades().get(0);
+
+        Fatura f = new Fatura(nifEmitente, LocalDate.now(), nifCliente, descricao, atividade, valor);
+        this.totalFaturas.add(f.clone());
     }
 }

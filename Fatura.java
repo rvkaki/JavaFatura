@@ -10,7 +10,6 @@ import java.time.LocalDate;
 
 public class Fatura{
     private String nifEmitente;
-    private String designacaoEmitente;
     private LocalDate data;
     private String nifCliente;
     private String descricao;
@@ -19,7 +18,6 @@ public class Fatura{
 
     public Fatura(){
     	this.nifEmitente = "";
-    	this.designacaoEmitente = "";
     	this.data = LocalDate.now();
     	this.nifCliente = "";
     	this.descricao = "";
@@ -27,9 +25,8 @@ public class Fatura{
     	this.valor = 0.0;
     }
 
-    public Fatura(String nifEmitente, String designacaoEmitente, LocalDate data, String nifCliente, String descricao, String atividade, double valor){
+    public Fatura(String nifEmitente, LocalDate data, String nifCliente, String descricao, String atividade, double valor){
     	this.nifEmitente = nifEmitente;
-    	this.designacaoEmitente = designacaoEmitente;
     	this.data = data;
     	this.nifCliente = nifCliente;
     	this.descricao = descricao;
@@ -39,7 +36,6 @@ public class Fatura{
 
     public Fatura(Fatura f){
     	this.nifEmitente = f.getNIFEmitente();
-    	this.designacaoEmitente = f.getDesignacaoEmitente();
     	this.data = f.getData();
     	this.nifCliente = f.getNIFCliente();
     	this.descricao = f.getDescricao();
@@ -49,10 +45,6 @@ public class Fatura{
 
     public String getNIFEmitente(){
     	return this.nifEmitente;
-    }
-
-    public String getDesignacaoEmitente(){
-    	return this.designacaoEmitente;
     }
 
     public LocalDate getData(){
@@ -92,7 +84,6 @@ public class Fatura{
 
         Fatura f = (Fatura) o;
         return(this.nifEmitente.equals(f.getNIFEmitente()) &&
-        	   this.designacaoEmitente.equals(f.getDesignacaoEmitente()) &&
         	   this.data.equals(f.getData()) &&
         	   this.nifCliente.equals(f.getNIFCliente()) &&
         	   this.descricao.equals(f.getDescricao()) &&
