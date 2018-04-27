@@ -1,6 +1,5 @@
 #BlueJ class context
 comment0.target=Plataforma
-comment0.text=Despesas\ gerais\ familiares,\ saude,\ educa\u00E7ao,\ habita\u00E7ao,\ lares,\ repara\u00E7ao\ de\ automoveis,\ reparacao\ de\ motociclos,\ restaura\u00E7ao\ e\ alojamento,\ cabeleireiros,\ atividades\ veterinarias,\ transportes
 comment1.params=
 comment1.target=Plataforma()
 comment2.params=pedido
