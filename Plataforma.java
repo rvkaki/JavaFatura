@@ -45,7 +45,7 @@ public class Plataforma{
         return false;
     }
     
-    private boolean registar(){
+    private boolean registar(){ 
         String nif;
 
         do{
