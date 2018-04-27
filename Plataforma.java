@@ -14,7 +14,6 @@ import java.time.LocalDate;
 import java.util.Arrays;
 
 public class Plataforma{
-    
     private ArrayList<Fatura> totalFaturas; 
     private HashMap<String,Entidade> totalEntidades;
     private Entidade utilizador;
@@ -30,8 +29,10 @@ public class Plataforma{
         this.utilizador = null;
     }
     
-    public void main(){
-        this.printMenu();
+    public static void main(String[] args){
+        Plataforma plataforma = new Plataforma();
+        // No futuro, ler de ficheiros o conteúdo das faturas/entidades e fazer setFaturas/setEntidades
+        plataforma.printMenu();
     }
 
     public String ler(String pedido){
@@ -46,7 +47,8 @@ public class Plataforma{
         System.out.println("Desconta para " + pedido + "? (s/n)");
         Scanner ler = new Scanner(System.in);
         String res = ler.nextLine();
-        if(ler.equals("s"))
+        ler.close();
+        if(res.equals("s"))
             return true;
         return false;
     }
