@@ -29,6 +29,16 @@ public class Plataforma{
         this.utilizador = null;
     }
     
+    public String lerNIF(String pedido){
+        String nif;
+        do{
+            nif = ler(pedido);
+        }while(nif.length() != 9 || (nif.charAt(0) != '1' && nif.charAt(0) != '2' && nif.charAt(0) != '5' && nif.charAt(0) != '0'));
+        //posteriormente remover nif.charAt(0) == '0'
+
+        return nif;
+    }
+
     public static void main(String[] args){
         Plataforma plataforma = new Plataforma();
         // No futuro, ler de ficheiros o conteúdo das faturas/entidades e fazer setFaturas/setEntidades
@@ -100,10 +110,7 @@ public class Plataforma{
         System.out.print('\u000C');
         System.out.println(menu);
 
-        do{
-            nif = ler("NIF");
-        }while(nif.length() != 9 || (nif.charAt(0) != '1' && nif.charAt(0) != '2' && nif.charAt(0) != '5' && nif.charAt(0) != '0'));
-        //posteriormente remover nif.charAt(0) == '0'
+        nif = lerNIF("NIF");
 
         if(this.totalEntidades.containsKey(nif)){
             Entidade e = this.totalEntidades.get(nif);
@@ -148,7 +155,7 @@ public class Plataforma{
         int numeroAgregado = Integer.parseInt(ler("numero de elementos do Agregado Familiar"));
         ArrayList<String> nifAgregado = new ArrayList<String>(numeroAgregado);
         for(int i=0; i<numeroAgregado; i++){
-            String nifFamiliar = ler("nif " + i);
+            String nifFamiliar = lerNIF("NIF " + i+1);
             nifAgregado.add(nifFamiliar);
         }
         ArrayList<String> codigosAtividades = new ArrayList<String>();
@@ -252,6 +259,57 @@ public class Plataforma{
 
             this.utilizador = e;
         }
+
+        //O que será o Admin?
+        if(this.utilizador instanceof Individual)
+            printMenuIndividual();
+        else
+            if(this.utilizador instanceof Individual)
+                printMenuColetivo();
+    }
+
+    public void printMenuIndividual(){
+        int escolha;
+        StringBuilder menu = new StringBuilder();
+
+        menu.append("               ##############################################              \n");
+        menu.append("               #           Contribuinte Individual          #              \n");
+        menu.append("               ##############################################              \n");
+        menu.append("               #                                            #              \n");
+        menu.append("               #           1 --> Ver Faturas:               #              \n");
+        menu.append("               #           2 --> Validar Faturas:           #              \n");
+        menu.append("               #           3 --> Valor Dedução Fiscal:      #              \n");
+        menu.append("               #                                            #              \n");
+        menu.append("               ##############################################              \n");
+        System.out.print('\u000C');
+        System.out.println(menu);
+
+        Scanner s = new Scanner(System.in);
+        do{
+            escolha = s.nextInt();
+        }while(escolha != 1 && escolha != 2);
+        s.close();
+    }
+
+    public void printMenuColetivo(){
+        int escolha;
+        StringBuilder menu = new StringBuilder();
+
+        menu.append("               ##############################################              \n");
+        menu.append("               #           Contribuinte Coletivo            #              \n");
+        menu.append("               ##############################################              \n");
+        menu.append("               #                                            #              \n");
+        menu.append("               #           1 --> Emitir Fatura:             #              \n");
+        menu.append("               #                                            #              \n");
+        menu.append("               ##############################################              \n");
+        System.out.print('\u000C');
+        System.out.println(menu);
+
+        Scanner s = new Scanner(System.in);
+        do{
+            escolha = s.nextInt();
+        }while(escolha != 1 && escolha != 2);
+        s.close();
     }
 
     public void emitirFatura(String nifCliente, String descricao, double valor) {
