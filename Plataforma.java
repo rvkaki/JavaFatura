@@ -254,9 +254,12 @@ public class Plataforma{
         }
     }
 
-    public void emitirFatura(String nifEmitente, String nifCliente, String descricao, double valor) {
+    public void emitirFatura(String nifCliente, String descricao, double valor) {
+        String nifEmitente = this.utilizador.getNIF();
         Entidade e = this.totalEntidades.get(nifEmitente);
-        if (!(e instanceof Coletivo))
+
+        // Entidades individuais não podem emitir faturas
+        if (e instanceof Individual)
             return;
 
         Coletivo empresa = (Coletivo) e;
@@ -266,5 +269,16 @@ public class Plataforma{
 
         Fatura f = new Fatura(nifEmitente, LocalDate.now(), nifCliente, descricao, atividade, valor);
         this.totalFaturas.add(f.clone());
+        int indiceFatura = this.totalFaturas.indexOf(f);
+
+        this.totalEntidades.get(nifEmitente).adicionarFatura(indiceFatura);
+        if (this.totalEntidades.containsKey(nifCliente))
+            this.totalEntidades.get(nifCliente).adicionarFatura(indiceFatura);
+        else {
+            Individual i = new Individual();
+            i.setNIF(nifCliente);
+            i.adicionarFatura(indiceFatura);
+            this.totalEntidades.put(nifCliente, i.clone());
+        }
     }
 }

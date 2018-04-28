@@ -90,6 +90,10 @@ public class Entidade{
         this.password = password;
     }
 
+    public void adicionarFatura(int fatura){
+        this.listaFaturas.add(fatura);
+    }
+
     public boolean equals(Object o){
         if(this == o)
             return true;
