@@ -265,12 +265,27 @@ public class Plataforma{
             this.utilizador = e;
         }
 
-        //O que será o Admin?
-        if(this.utilizador instanceof Individual)
-            printMenuIndividual();
+        if(this.utilizador instanceof Admin)
+            printMenuAdmin();
         else
-            if(this.utilizador instanceof Coletivo)
-                printMenuColetivo();
+            if(this.utilizador instanceof Individual)
+                printMenuIndividual();
+            else
+                if(this.utilizador instanceof Coletivo)
+                    printMenuColetivo();
+    }
+
+    public void printMenuAdmin(){
+        StringBuilder menu = new StringBuilder();
+
+        menu.append("               ##############################################              \n");
+        menu.append("               #                  Admin                     #              \n");
+        menu.append("               ##############################################              \n");
+        menu.append("               #                                            #              \n");
+        menu.append("               #                                            #              \n");
+        menu.append("               ##############################################              \n");
+        System.out.print('\u000C');
+        System.out.println(menu);
     }
 
     public void printMenuIndividual(){
