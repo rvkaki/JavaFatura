@@ -99,7 +99,9 @@ public class Plataforma{
         if (escolha == 1) {
             boolean sucesso = this.login();
             if (sucesso) {
-                if (this.utilizador instanceof Individual)
+                if (this.utilizador instanceof Admin)
+                    printMenuAdmin();
+                else if (this.utilizador instanceof Individual)
                     printMenuIndividual();
                 else if (this.utilizador instanceof Coletivo)
                     printMenuColetivo();
@@ -344,6 +346,19 @@ public class Plataforma{
             emitirFatura(nifCliente, descricao, valor);
         } else if (escolha == 2)
             logout();
+    }
+
+    public void printMenuAdmin(){
+        StringBuilder menu = new StringBuilder();
+
+        menu.append("               ##############################################              \n");
+        menu.append("               #                  Admin                     #              \n");
+        menu.append("               ##############################################              \n");
+        menu.append("               #                                            #              \n");
+        menu.append("               #                                            #              \n");
+        menu.append("               ##############################################              \n");
+        System.out.print('\u000C');
+        System.out.println(menu);
     }
 
     public void verFaturas(Entidade e){
