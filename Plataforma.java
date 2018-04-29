@@ -96,17 +96,9 @@ public class Plataforma{
         }while(escolha != 1 && escolha != 2 && escolha != 3);
         s.close();
 
-        if (escolha == 1) {
-            boolean sucesso = this.login();
-            if (sucesso) {
-                if (this.utilizador instanceof Admin)
-                    printMenuAdmin();
-                else if (this.utilizador instanceof Individual)
-                    printMenuIndividual();
-                else if (this.utilizador instanceof Coletivo)
-                    printMenuColetivo();
-            }
-        } else if(escolha == 2) {
+        if (escolha == 1)
+            this.login();
+        else if(escolha == 2) {
             this.registar();
             this.login();
         } else if (escolha == 3)
@@ -171,6 +163,9 @@ public class Plataforma{
 
         this.totalEntidades.put(nif, e.clone());
         this.utilizador = e;
+
+        System.out.println("Por favor, faça login");
+        pausaParaLer();
     }
 
     public void registarIndividual(Individual e){
@@ -240,7 +235,7 @@ public class Plataforma{
         this.utilizador = null;
     }
 
-    public boolean login(){
+    public void login(){
         String nif;
         StringBuilder menu = new StringBuilder();
 
@@ -259,7 +254,7 @@ public class Plataforma{
             nif = ler("NIF");
         }while(nif.length() != 9 || (nif.charAt(0) != '1' && nif.charAt(0) != '2' && nif.charAt(0) != '5' && !nif.equals("000000000")));
 
-        if (this.totalEntidades.containsKey(nif) && this.totalEntidades.get(nif).getPassword().equals("")) {
+        if (this.totalEntidades.containsKey(nif) && !this.totalEntidades.get(nif).getPassword().equals("")) {
             Entidade e = this.totalEntidades.get(nif);
             String password = e.getPassword();
             String tentativa;
@@ -272,10 +267,17 @@ public class Plataforma{
             System.out.println("NIF não existente!");
             System.out.println("Confirme se o NIF que introduziu está correto e se estiver registe-se");
             pausaParaLer();
-            return false;
+            return;
         }
 
-        return true;
+        while (this.utilizador != null) { // Enquanto não fizer logout
+            if (this.utilizador instanceof Admin)
+                printMenuAdmin();
+            else if (this.utilizador instanceof Individual)
+                printMenuIndividual();
+            else if (this.utilizador instanceof Coletivo)
+                printMenuColetivo();
+        }
     }
 
     public void printMenuIndividual(){
