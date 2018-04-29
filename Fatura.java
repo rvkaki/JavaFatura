@@ -91,4 +91,13 @@ public class Fatura{
         	   this.valor == f.getValor());
 
     }
+
+    public String toString(){
+        StringBuilder s = new StringBuilder();
+        s.append("Fatura emitida por " + this.nifEmitente + " em " + this.data + "\n");
+        s.append("Ao contribuinte " + this.nifCliente + " no valor de " + this.valor + "\n");
+        s.append("Atividade Económica: " + this.atividade + "\n");
+        s.append("Descrição do emitente: " + this.descricao + "\n");
+        return s.toString();
+    }
 }

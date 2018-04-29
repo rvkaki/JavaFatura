@@ -181,6 +181,8 @@ public class Plataforma{
             util.setCodigosAtividades(codigosAtividades);
         }
 
+        printMenuIndividual();
+
     }
 
     public void registarColetivo(String nif, String email, String nome, String morada, String password, Entidade utilizador){
@@ -219,10 +221,13 @@ public class Plataforma{
             util.setInformacaoAtividades(informacaoAtividades);
             util.setCoeficienteFiscal(coeficiente);
         }
+
+        printMenuColetivo();
     }
 
     public void logOut(){
         this.utilizador = null;
+        printMenu();
     }
 
     public void logIn(){
@@ -264,7 +269,7 @@ public class Plataforma{
         if(this.utilizador instanceof Individual)
             printMenuIndividual();
         else
-            if(this.utilizador instanceof Individual)
+            if(this.utilizador instanceof Coletivo)
                 printMenuColetivo();
     }
 
@@ -289,6 +294,9 @@ public class Plataforma{
             escolha = s.nextInt();
         }while(escolha != 1 && escolha != 2);
         s.close();
+
+        if(escolha == 1)
+            verFaturas(this.utilizador);
     }
 
     public void printMenuColetivo(){
@@ -309,7 +317,26 @@ public class Plataforma{
         do{
             escolha = s.nextInt();
         }while(escolha != 1 && escolha != 2);
-        s.close();
+        
+
+        if(escolha == 1){
+            String nifCliente = lerNIF("NIF Cliente");
+            String descricao = ler("Descricao Empresa");
+            double valor;
+            do{
+                System.out.println("Escreva valor da Fatura");
+                valor = s.nextDouble();
+            }while(valor < 0);
+            s.close();
+            emitirFatura(nifCliente, descricao, valor);
+        }
+    }
+
+    public void verFaturas(Entidade e){
+        ArrayList<Integer> listaFaturas = e.getListaFaturas();
+        for(Integer i: listaFaturas){
+            System.out.println(this.totalFaturas.get(i).toString());
+        }
     }
 
     public void emitirFatura(String nifCliente, String descricao, double valor) {
