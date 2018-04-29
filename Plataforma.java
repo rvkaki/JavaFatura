@@ -33,8 +33,8 @@ public class Plataforma{
         String nif;
         do{
             nif = ler(pedido);
-        }while(nif.length() != 9 || (nif.charAt(0) != '1' && nif.charAt(0) != '2' && nif.charAt(0) != '5' && nif.charAt(0) != '0'));
-        //posteriormente remover nif.charAt(0) == '0'
+        }while(nif.length() != 9 || (nif.charAt(0) != '1' && nif.charAt(0) != '2' && nif.charAt(0) != '5' && !nif.equals("000000000")));
+        //posteriormente remover nif.equals("000000000")
 
         return nif;
     }
@@ -42,7 +42,11 @@ public class Plataforma{
     public static void main(String[] args){
         Plataforma plataforma = new Plataforma();
         // No futuro, ler de ficheiros o conteúdo das faturas/entidades e fazer setFaturas/setEntidades
-        plataforma.printMenu();
+
+        boolean exit = false;
+        while (!exit) {
+            exit = plataforma.printMenu();
+        }
     }
 
     public String ler(String pedido){
@@ -51,6 +55,13 @@ public class Plataforma{
         String res = ler.nextLine();
         ler.close();
         return res;
+    }
+
+    public void pausaParaLer(){
+        System.out.println("Pressione Enter para continuar...");
+        Scanner s = new Scanner(System.in);
+        s.nextLine();
+        s.close();
     }
 
     public boolean lerAtividade(String pedido){
@@ -63,7 +74,7 @@ public class Plataforma{
         return false;
     }
     
-    public void printMenu(){
+    public boolean printMenu(){
         StringBuilder menu = new StringBuilder();
         int escolha;
 
@@ -71,8 +82,9 @@ public class Plataforma{
         menu.append("               #                JavaFatura                  #              \n");
         menu.append("               ##############################################              \n");
         menu.append("               #                                            #              \n");
-        menu.append("               #             Opção 1 --> Login              #              \n");
-        menu.append("               #             Opção 2 --> Registar           #              \n");
+        menu.append("               #               1 --> Login                  #              \n");
+        menu.append("               #               2 --> Registar               #              \n");
+        menu.append("               #               3 --> Sair                   #              \n");
         menu.append("               #                                            #              \n");
         menu.append("               ##############################################              \n");
         System.out.print('\u000C');
@@ -81,18 +93,27 @@ public class Plataforma{
         Scanner s = new Scanner(System.in);
         do{
             escolha = s.nextInt();
-        }while(escolha != 1 && escolha != 2);
+        }while(escolha != 1 && escolha != 2 && escolha != 3);
         s.close();
 
-        if(escolha == 1)
-            this.logIn();
-        else
-            if(escolha == 2)
-                this.registar();
+        if (escolha == 1) {
+            boolean sucesso = this.login();
+            if (sucesso) {
+                if (this.utilizador instanceof Individual)
+                    printMenuIndividual();
+                else if (this.utilizador instanceof Coletivo)
+                    printMenuColetivo();
+            }
+        } else if(escolha == 2) {
+            this.registar();
+            this.login();
+        } else if (escolha == 3)
+            return true;
 
+        return false;
     }
 
-    public boolean registar(){ 
+    public void registar(){ 
         String nif;
         StringBuilder menu = new StringBuilder();
 
@@ -112,31 +133,45 @@ public class Plataforma{
 
         nif = lerNIF("NIF");
 
-        if(this.totalEntidades.containsKey(nif)){
-            Entidade e = this.totalEntidades.get(nif);
-            if(e.getPassword().equals(""))
-                this.utilizador = e;
-            else{
-                System.out.println("NIF já registado");
-                return false;
+        Entidade e = null;
+        if (this.totalEntidades.containsKey(nif)) {
+            e = this.totalEntidades.get(nif);
+            if (!e.getPassword().equals("")) {
+                System.out.println("NIF já registado!");
+                pausaParaLer();
+                return;
             }
+        } else {
+            if (nif.charAt(0) == '1' || nif.charAt(0) == '2')
+                e = new Individual();
+            else if (nif.charAt(0) == '5')
+                e = new Coletivo();
+            else if (nif.equals("000000000"))
+                e = new Admin();
+            
+            e.setNIF(nif);
         }
         
         String nome = ler("nome");
+        e.setNome(nome);
         String email = ler("email");
+        e.setEmail(email);
         String morada = ler("morada");
+        e.setMorada(morada);
         String password = ler("password");
+        e.setPassword(password);
 
         if(nif.charAt(0) == '1' || nif.charAt(0) == '2')
-            registarIndividual(nif, email, nome, morada, password, this.utilizador);
+            registarIndividual((Individual) e);
         
         else if(nif.charAt(0) == '5')
-            registarColetivo(nif, email, nome, morada, password, this.utilizador);
-        
-        return true;
+            registarColetivo((Coletivo) e);
+
+        this.totalEntidades.put(nif, e.clone());
+        this.utilizador = e;
     }
 
-    public void registarIndividual(String nif, String email, String nome, String morada, String password, Entidade utilizador){
+    public void registarIndividual(Individual e){
         StringBuilder menu = new StringBuilder();
 
         menu.append("               ##############################################              \n");
@@ -155,7 +190,7 @@ public class Plataforma{
         int numeroAgregado = Integer.parseInt(ler("numero de elementos do Agregado Familiar"));
         ArrayList<String> nifAgregado = new ArrayList<String>(numeroAgregado);
         for(int i=0; i<numeroAgregado; i++){
-            String nifFamiliar = lerNIF("NIF " + i+1);
+            String nifFamiliar = lerNIF("NIF " + (i+1));
             nifAgregado.add(nifFamiliar);
         }
         ArrayList<String> codigosAtividades = new ArrayList<String>();
@@ -164,28 +199,14 @@ public class Plataforma{
                 codigosAtividades.add(s);
         }
         double coeficiente = Double.parseDouble(ler("coeficiente Fiscal"));
-        if(utilizador == null){
-            utilizador = new Individual(nif, email, nome, morada, password, 
-                                        new ArrayList<Integer>(), numeroAgregado, 
-                                                nifAgregado, coeficiente, codigosAtividades);
-            this.totalEntidades.put(nif, utilizador);
-        }else{
-            Individual util = (Individual) utilizador;
-            util.setEmail(email);
-            util.setNome(nome);
-            util.setMorada(morada);
-            util.setPassword(password);
-            util.setNumeroAgregadoFamiliar(numeroAgregado);
-            util.setNIFAgregado(nifAgregado);
-            util.setCoeficienteFiscal(coeficiente);
-            util.setCodigosAtividades(codigosAtividades);
-        }
-
-        printMenuIndividual();
-
+        
+        e.setNumeroAgregadoFamiliar(numeroAgregado);
+        e.setNIFAgregado(nifAgregado);
+        e.setCoeficienteFiscal(coeficiente);
+        e.setCodigosAtividades(codigosAtividades);
     }
 
-    public void registarColetivo(String nif, String email, String nome, String morada, String password, Entidade utilizador){
+    public void registarColetivo(Coletivo e){
         StringBuilder menu = new StringBuilder();
 
         menu.append("               ##############################################              \n");
@@ -194,7 +215,7 @@ public class Plataforma{
         menu.append("               #                                            #              \n");
         menu.append("               #       Designação:                          #              \n");
         menu.append("               #       Coeficiente Fiscal:                  #              \n");
-        menu.append("               #       Atividades Económica:                #              \n");
+        menu.append("               #       Atividades Económicas:               #              \n");
         menu.append("               #                                            #              \n");
         menu.append("               ##############################################              \n");
         System.out.print('\u000C');
@@ -207,32 +228,18 @@ public class Plataforma{
             if(lerAtividade(s))
                 informacaoAtividades.add(s);
         }
-        if(utilizador == null){
-            utilizador = new Coletivo(nif, email, nome, morada, password, 
-                                      new ArrayList<Integer>(), designacao,
-                                      informacaoAtividades, coeficiente);
-            this.totalEntidades.put(nif, utilizador);
-        }else{
-            Coletivo util = (Coletivo) utilizador;
-            util.setEmail(email);
-            util.setNome(nome);
-            util.setMorada(morada);
-            util.setPassword(password);
-            util.setInformacaoAtividades(informacaoAtividades);
-            util.setCoeficienteFiscal(coeficiente);
-        }
 
-        printMenuColetivo();
+        e.setDesignacao(designacao);
+        e.setInformacaoAtividades(informacaoAtividades);
+        e.setCoeficienteFiscal(coeficiente);
     }
 
-    public void logOut(){
+    public void logout(){
         this.utilizador = null;
-        printMenu();
     }
 
-    public void logIn(){
+    public boolean login(){
         String nif;
-        String tentativa;
         StringBuilder menu = new StringBuilder();
 
         menu.append("               ##############################################              \n");
@@ -248,29 +255,25 @@ public class Plataforma{
 
         do{
             nif = ler("NIF");
-        }while(nif.length() != 9 || (nif.charAt(0) != '1' && nif.charAt(0) != '2' && nif.charAt(0) != '5' && nif.charAt(0) != '0'));
+        }while(nif.length() != 9 || (nif.charAt(0) != '1' && nif.charAt(0) != '2' && nif.charAt(0) != '5' && !nif.equals("000000000")));
 
-        
-        if(! this.totalEntidades.containsKey(nif)){
-            System.out.println("NIF não existente!\nRegiste-se primeiro");
-            this.registar();
-        }
-        else{
+        if (this.totalEntidades.containsKey(nif) && this.totalEntidades.get(nif).getPassword().equals("")) {
             Entidade e = this.totalEntidades.get(nif);
             String password = e.getPassword();
+            String tentativa;
             do{
                 tentativa = ler("Password");
             }while(! password.equals(tentativa));
 
             this.utilizador = e;
+        } else {
+            System.out.println("NIF não existente!");
+            System.out.println("Confirme se o NIF que introduziu está correto e se estiver registe-se");
+            pausaParaLer();
+            return false;
         }
 
-        //O que será o Admin?
-        if(this.utilizador instanceof Individual)
-            printMenuIndividual();
-        else
-            if(this.utilizador instanceof Coletivo)
-                printMenuColetivo();
+        return true;
     }
 
     public void printMenuIndividual(){
@@ -281,9 +284,10 @@ public class Plataforma{
         menu.append("               #           Contribuinte Individual          #              \n");
         menu.append("               ##############################################              \n");
         menu.append("               #                                            #              \n");
-        menu.append("               #           1 --> Ver Faturas:               #              \n");
-        menu.append("               #           2 --> Validar Faturas:           #              \n");
-        menu.append("               #           3 --> Valor Dedução Fiscal:      #              \n");
+        menu.append("               #           1 --> Ver Faturas                #              \n");
+        menu.append("               #           2 --> Validar Faturas            #              \n");
+        menu.append("               #           3 --> Valor Dedução Fiscal       #              \n");
+        menu.append("               #           4 --> Logout                     #              \n");
         menu.append("               #                                            #              \n");
         menu.append("               ##############################################              \n");
         System.out.print('\u000C');
@@ -292,11 +296,19 @@ public class Plataforma{
         Scanner s = new Scanner(System.in);
         do{
             escolha = s.nextInt();
-        }while(escolha != 1 && escolha != 2);
+        }while(escolha != 1 && escolha != 2 && escolha != 3 && escolha != 4);
         s.close();
 
         if(escolha == 1)
             verFaturas(this.utilizador);
+        else if (escolha == 2)
+            // Fazer
+            ;
+        else if (escolha == 3)
+            // Fazer
+            ;
+        else if (escolha == 4)
+            logout();
     }
 
     public void printMenuColetivo(){
@@ -307,7 +319,8 @@ public class Plataforma{
         menu.append("               #           Contribuinte Coletivo            #              \n");
         menu.append("               ##############################################              \n");
         menu.append("               #                                            #              \n");
-        menu.append("               #           1 --> Emitir Fatura:             #              \n");
+        menu.append("               #           1 --> Emitir Fatura              #              \n");
+        menu.append("               #           2 --> Logout                     #              \n");
         menu.append("               #                                            #              \n");
         menu.append("               ##############################################              \n");
         System.out.print('\u000C');
@@ -320,8 +333,8 @@ public class Plataforma{
         
 
         if(escolha == 1){
-            String nifCliente = lerNIF("NIF Cliente");
-            String descricao = ler("Descricao Empresa");
+            String nifCliente = lerNIF("NIF do cliente");
+            String descricao = ler("descricao da fatura");
             double valor;
             do{
                 System.out.println("Escreva valor da Fatura");
@@ -329,7 +342,8 @@ public class Plataforma{
             }while(valor < 0);
             s.close();
             emitirFatura(nifCliente, descricao, valor);
-        }
+        } else if (escolha == 2)
+            logout();
     }
 
     public void verFaturas(Entidade e){
@@ -356,14 +370,12 @@ public class Plataforma{
         this.totalFaturas.add(f.clone());
         int indiceFatura = this.totalFaturas.indexOf(f);
 
-        this.totalEntidades.get(nifEmitente).adicionarFatura(indiceFatura);
-        if (this.totalEntidades.containsKey(nifCliente))
-            this.totalEntidades.get(nifCliente).adicionarFatura(indiceFatura);
-        else {
+        empresa.adicionarFatura(indiceFatura);
+        if (!this.totalEntidades.containsKey(nifCliente)) {
             Individual i = new Individual();
             i.setNIF(nifCliente);
-            i.adicionarFatura(indiceFatura);
             this.totalEntidades.put(nifCliente, i.clone());
         }
+        this.totalEntidades.get(nifCliente).adicionarFatura(indiceFatura);
     }
 }

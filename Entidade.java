@@ -94,6 +94,10 @@ public class Entidade{
         this.listaFaturas.add(fatura);
     }
 
+    public Entidade clone(){
+    	return new Entidade(this);
+    }
+
     public boolean equals(Object o){
         if(this == o)
             return true;
