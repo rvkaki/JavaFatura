@@ -6,11 +6,11 @@
  * @version 15/04/2018  
  */
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 public class Fatura{
     private String nifEmitente;
-    private LocalDate data;
+    private LocalDateTime data;
     private String nifCliente;
     private String descricao;
     private String atividade;
@@ -18,14 +18,14 @@ public class Fatura{
 
     public Fatura(){
     	this.nifEmitente = "";
-    	this.data = LocalDate.now();
+    	this.data = LocalDateTime.now();
     	this.nifCliente = "";
     	this.descricao = "";
     	this.atividade = "";
     	this.valor = 0.0;
     }
 
-    public Fatura(String nifEmitente, LocalDate data, String nifCliente, String descricao, String atividade, double valor){
+    public Fatura(String nifEmitente, LocalDateTime data, String nifCliente, String descricao, String atividade, double valor){
     	this.nifEmitente = nifEmitente;
     	this.data = data;
     	this.nifCliente = nifCliente;
@@ -47,7 +47,7 @@ public class Fatura{
     	return this.nifEmitente;
     }
 
-    public LocalDate getData(){
+    public LocalDateTime getData(){
     	return this.data;
     }
 
@@ -96,7 +96,10 @@ public class Fatura{
         StringBuilder s = new StringBuilder();
         s.append("Fatura emitida por " + this.nifEmitente + " em " + this.data + "\n");
         s.append("Ao contribuinte " + this.nifCliente + " no valor de " + this.valor + "\n");
-        s.append("Atividade Económica: " + this.atividade + "\n");
+        if (this.estaPendente())
+            s.append("Atividade Económica: (PENDENTE)\n");
+        else
+            s.append("Atividade Económica: " + this.atividade + "\n");
         s.append("Descrição do emitente: " + this.descricao + "\n");
         return s.toString();
     }

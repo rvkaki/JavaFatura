@@ -66,6 +66,13 @@ public class Coletivo extends Entidade{
         this.coeficienteFiscal = coeficiente;
     }
 
+    public String getAtividadeSeUnica() {
+        if (this.informacaoAtividades.size() == 1)
+            return this.informacaoAtividades.get(0);
+        else
+            return "";
+    }
+
     public Coletivo clone(){
         return new Coletivo(this);
     }

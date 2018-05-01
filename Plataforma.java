@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.HashMap;
 import java.lang.System;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 
 public class Plataforma{
@@ -58,20 +58,39 @@ public class Plataforma{
     }
 
     public void pausaParaLer(){
+        System.out.println();
         System.out.println("Pressione Enter para continuar...");
         Scanner s = new Scanner(System.in);
         s.nextLine();
         s.close();
     }
 
-    public boolean lerAtividade(String pedido){
-        System.out.println("Desconta para " + pedido + "? (s/n)");
+    public ArrayList<String> lerAtividadesIndividual() {
+        ArrayList<String> codigosAtividades = new ArrayList<String>();
         Scanner ler = new Scanner(System.in);
-        String res = ler.nextLine();
+        for (String atividade: this.atividades) {
+            System.out.println("Desconta para " + atividade + "? (s/n)");
+            String res = ler.nextLine();
+            if (res.equals("s"))
+                codigosAtividades.add(atividade);
+        }
         ler.close();
-        if(res.equals("s"))
-            return true;
-        return false;
+
+        return codigosAtividades;
+    }
+
+    public ArrayList<String> lerAtividadesColetivo() {
+        ArrayList<String> codigosAtividades = new ArrayList<String>();
+        Scanner ler = new Scanner(System.in);
+        for (String atividade: this.atividades) {
+            System.out.println("Atua na área de " + atividade + "? (s/n)");
+            String res = ler.nextLine();
+            if (res.equals("s"))
+                codigosAtividades.add(atividade);
+        }
+        ler.close();
+
+        return codigosAtividades;
     }
     
     public boolean printMenu(){
@@ -190,11 +209,7 @@ public class Plataforma{
             String nifFamiliar = lerNIF("NIF " + (i+1));
             nifAgregado.add(nifFamiliar);
         }
-        ArrayList<String> codigosAtividades = new ArrayList<String>();
-        for(String s: this.atividades){
-            if(lerAtividade(s))
-                codigosAtividades.add(s);
-        }
+        ArrayList<String> codigosAtividades = lerAtividadesIndividual();
         double coeficiente = Double.parseDouble(ler("coeficiente Fiscal"));
         
         e.setNumeroAgregadoFamiliar(numeroAgregado);
@@ -220,11 +235,7 @@ public class Plataforma{
         
         String designacao = ler("designacao");
         double coeficiente = Double.parseDouble(ler("coeficiente Fiscal"));
-        ArrayList<String> informacaoAtividades = new ArrayList<String>();
-        for(String s: this.atividades){
-            if(lerAtividade(s))
-                informacaoAtividades.add(s);
-        }
+        ArrayList<String> informacaoAtividades = lerAtividadesColetivo();
 
         e.setDesignacao(designacao);
         e.setInformacaoAtividades(informacaoAtividades);
@@ -364,26 +375,21 @@ public class Plataforma{
     }
 
     public void verFaturas(Entidade e){
-        ArrayList<Integer> listaFaturas = e.getListaFaturas();
-        for(Integer i: listaFaturas){
+        for(Integer i: e.getListaFaturas()){
             System.out.println(this.totalFaturas.get(i).toString());
         }
+        pausaParaLer();
     }
 
     public void emitirFatura(String nifCliente, String descricao, double valor) {
-        String nifEmitente = this.utilizador.getNIF();
-        Entidade e = this.totalEntidades.get(nifEmitente);
-
         // Entidades individuais não podem emitir faturas
-        if (e instanceof Individual)
+        if (this.utilizador instanceof Individual)
             return;
 
-        Coletivo empresa = (Coletivo) e;
-        String atividade = "";
-        if (empresa.getInformacaoAtividades().size() == 1)
-            atividade = empresa.getInformacaoAtividades().get(0);
+        Coletivo empresa = (Coletivo) this.utilizador;
+        String atividade = empresa.getAtividadeSeUnica();
 
-        Fatura f = new Fatura(nifEmitente, LocalDate.now(), nifCliente, descricao, atividade, valor);
+        Fatura f = new Fatura(empresa.getNIF(), LocalDateTime.now(), nifCliente, descricao, atividade, valor);
         this.totalFaturas.add(f.clone());
         int indiceFatura = this.totalFaturas.indexOf(f);
 
