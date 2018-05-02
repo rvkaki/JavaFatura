@@ -302,7 +302,8 @@ public class Plataforma{
         menu.append("               #           1 --> Ver Faturas                #              \n");
         menu.append("               #           2 --> Validar Faturas            #              \n");
         menu.append("               #           3 --> Valor Dedução Fiscal       #              \n");
-        menu.append("               #           4 --> Logout                     #              \n");
+        menu.append("               #           4 --> Definições da conta        #              \n");
+        menu.append("               #           5 --> Logout                     #              \n");
         menu.append("               #                                            #              \n");
         menu.append("               ##############################################              \n");
         System.out.print('\u000C');
@@ -311,23 +312,26 @@ public class Plataforma{
         Scanner s = new Scanner(System.in);
         do{
             escolha = s.nextInt();
-        }while(escolha != 1 && escolha != 2 && escolha != 3 && escolha != 4);
+        }while(escolha != 1 && escolha != 2 && escolha != 3 && escolha != 4 && escolha != 5);
         s.close();
 
         if(escolha == 1)
-            verFaturas(this.utilizador);
+            verFaturas();
         else if (escolha == 2)
             // Fazer
             ;
         else if (escolha == 3)
             // Fazer
             ;
-        else if (escolha == 4)
+        else if (escolha == 4) {
+            boolean exit = false;
+            while (!exit)
+                exit = definicoesDaConta();
+        } else if (escolha == 5)
             logout();
     }
 
     public void printMenuColetivo(){
-        int escolha;
         StringBuilder menu = new StringBuilder();
 
         menu.append("               ##############################################              \n");
@@ -335,16 +339,18 @@ public class Plataforma{
         menu.append("               ##############################################              \n");
         menu.append("               #                                            #              \n");
         menu.append("               #           1 --> Emitir Fatura              #              \n");
-        menu.append("               #           2 --> Logout                     #              \n");
+        menu.append("               #           2 --> Definições da conta        #              \n");
+        menu.append("               #           3 --> Logout                     #              \n");
         menu.append("               #                                            #              \n");
         menu.append("               ##############################################              \n");
         System.out.print('\u000C');
         System.out.println(menu);
 
         Scanner s = new Scanner(System.in);
+        int escolha;
         do{
             escolha = s.nextInt();
-        }while(escolha != 1 && escolha != 2);
+        }while(escolha != 1 && escolha != 2 && escolha != 3);
         
 
         if(escolha == 1){
@@ -357,8 +363,63 @@ public class Plataforma{
             }while(valor < 0);
             s.close();
             emitirFatura(nifCliente, descricao, valor);
-        } else if (escolha == 2)
+        } else if (escolha == 2) {
+            boolean exit = false;
+            while (!exit)
+                exit = definicoesDaConta();
+        } else if (escolha == 3)
             logout();
+    }
+
+    public boolean definicoesDaConta() {
+        StringBuilder menu = new StringBuilder();
+
+        menu.append("               ##############################################              \n");
+        menu.append("               #            Definições da Conta             #              \n");
+        menu.append("               ##############################################              \n");
+        menu.append("               #                                            #              \n");
+        menu.append("               #            1 --> Nome                      #              \n");
+        menu.append("               #            2 --> Email                     #              \n");
+        menu.append("               #            3 --> Morada                    #              \n");
+        menu.append("               #            4 --> Password                  #              \n");
+        menu.append("               #            5 --> Voltar ao menu            #              \n");
+        menu.append("               #                                            #              \n");
+        menu.append("               ##############################################              \n");
+        System.out.print('\u000C');
+        System.out.println(menu);
+
+        Scanner s = new Scanner(System.in);
+        int escolha;
+        do {
+            escolha = s.nextInt();
+        } while (escolha != 1 && escolha != 2 && escolha != 3 && escolha != 4 && escolha != 5);
+        s.close();
+
+        Scanner novasDefinicoes = new Scanner(System.in);
+        if (escolha == 1) {
+            System.out.println("Introduza o novo nome");
+            this.utilizador.setNome(novasDefinicoes.nextLine());
+        } else if (escolha == 2) {
+            System.out.println("Introduza o novo email");
+            this.utilizador.setEmail(novasDefinicoes.nextLine());
+        } else if (escolha == 3) {
+            System.out.println("Introduza a nova morada");
+            this.utilizador.setMorada(novasDefinicoes.nextLine());
+        } else if (escolha == 4) {
+            String tentativa;
+            do {
+                System.out.println("Introduza a password atual");
+                tentativa = novasDefinicoes.nextLine();
+            } while (!this.utilizador.getPassword().equals(tentativa));
+            System.out.println("Introduza a nova password");
+            this.utilizador.setPassword(novasDefinicoes.nextLine());
+        } else if (escolha == 5) {
+            novasDefinicoes.close();
+            return true;
+        }
+
+        novasDefinicoes.close();
+        return false;
     }
 
     public void printMenuAdmin(){
@@ -374,8 +435,8 @@ public class Plataforma{
         System.out.println(menu);
     }
 
-    public void verFaturas(Entidade e){
-        for(Integer i: e.getListaFaturas()){
+    public void verFaturas() {
+        for (Integer i: this.utilizador.getListaFaturas()) {
             System.out.println(this.totalFaturas.get(i).toString());
         }
         pausaParaLer();
