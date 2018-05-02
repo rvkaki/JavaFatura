@@ -1,12 +1,15 @@
 
 /**
- * Write a description of class Admin here.
+ * Subclasse que representa a entidade de admnistrador
  *
  * @author (your name)
  * @version (a version number or a date)
  */
-public class Admin extends Entidade{
 
+public class Admin extends Entidade{
+    /**
+    * Construtor por omissão
+    */
     public Admin(){
         super();
         this.setNIF("000000000");
