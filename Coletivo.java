@@ -2,7 +2,7 @@
 /**
  * Write a description of class Coletivo here.
  *
- * @author RV
+ * @author GONÇALINHO DAS BABES
  * @version 24/04/2018
  */ 
 
