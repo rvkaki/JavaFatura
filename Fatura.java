@@ -1,6 +1,6 @@
 
 /**
- * Write a description of class Fatura here.
+ * Classe que representa a fatura de uma entidade
  *
  * @author RV
  * @version 15/04/2018  
@@ -9,23 +9,39 @@
 import java.time.LocalDateTime;
 
 public class Fatura{
+    /** Nif do emitente */
     private String nifEmitente;
-    private LocalDateTime data;
+    /** Data da fatura  */
+    private LocalDate data;
+    /** Nif do cliente */
     private String nifCliente;
+    /** Descrição da fatura */
     private String descricao;
+    /** Atividade económica da fatura */
     private String atividade;
+    /** Valor da fatura */
     private double valor;
-
+    /**
+     * Construtor por omissão
+     */
     public Fatura(){
     	this.nifEmitente = "";
-    	this.data = LocalDateTime.now();
+    	this.data = LocalDate.now();
     	this.nifCliente = "";
     	this.descricao = "";
     	this.atividade = "";
     	this.valor = 0.0;
     }
-
-    public Fatura(String nifEmitente, LocalDateTime data, String nifCliente, String descricao, String atividade, double valor){
+    /**
+     * Construtor por parametro
+     * @param nifEmitente
+     * @param data
+     * @param nifCliente
+     * @param descricao
+     * @param atividade
+     * @param valor
+     */
+    public Fatura(String nifEmitente, LocalDate data, String nifCliente, String descricao, String atividade, double valor){
     	this.nifEmitente = nifEmitente;
     	this.data = data;
     	this.nifCliente = nifCliente;
@@ -33,7 +49,10 @@ public class Fatura{
     	this.atividade = atividade;
     	this.valor = valor;
     }
-
+    /**
+     * Contrutor por cópia
+     * @param f Fatura original
+     */
     public Fatura(Fatura f){
     	this.nifEmitente = f.getNIFEmitente();
     	this.data = f.getData();
@@ -42,39 +61,67 @@ public class Fatura{
     	this.atividade = f.getAtividade();
     	this.valor = f.getValor();
     }
-
+    /**
+     * Devolve o nif do emitente
+     * @return nif
+     */
     public String getNIFEmitente(){
     	return this.nifEmitente;
     }
-
-    public LocalDateTime getData(){
+    /**
+     * Devolve a data da emissão 
+     * @return data
+     */
+    public LocalDate getData(){
     	return this.data;
     }
-
+    /**
+     * Devolve o nif do cliente
+     * @return nif
+     */
 	public String getNIFCliente(){
     	return this.nifCliente;
     }    
-
+    /**
+     * Devolve a descrição da fatura
+     * @return descrição
+     */
     public String getDescricao(){
     	return this.descricao;
     }
-
+    /**
+     * Devolve a atividade económica
+     * @return atividade económica
+     */
     public String getAtividade(){
     	return this.atividade;
     }
-
+    /**
+     * Devolve o valor
+     * @return valor
+     */
     public double getValor(){
     	return this.valor;
     }
-
+    /**
+     * Verifica se esta pedente????????
+     * @return true se esta pendente, false se não estiver
+     */
     public boolean estaPendente(){
     	return this.atividade.equals("");
     }
-
+    /**
+     * Cria uma cópia do objecto
+     * @return cópia do objeto
+     */
     public Fatura clone(){
     	return new Fatura(this);
     }
-
+    /**
+     * Verifica a igualdade de dois objectos
+     * @param o
+     * @return true se existe igualdade, false se não houver igualdade
+     */
     public boolean equals(Object o){
     	if(this == o)
             return true;
@@ -91,7 +138,10 @@ public class Fatura{
         	   this.valor == f.getValor());
 
     }
-
+    /**
+     * Contrói a fatura em String
+     * @return fatura em String
+     */
     public String toString(){
         StringBuilder s = new StringBuilder();
         s.append("Fatura emitida por " + this.nifEmitente + " em " + this.data + "\n");
