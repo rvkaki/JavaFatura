@@ -6,9 +6,10 @@
  * @version 15/04/2018  
  */
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
-public class Fatura{
+public class Fatura implements Serializable{
     /** Nif do emitente */
     private String nifEmitente;
     /** Data da fatura  */
@@ -103,6 +104,15 @@ public class Fatura{
     public double getValor(){
     	return this.valor;
     }
+
+    /**
+     * Atualiza valor de atividade
+     * @param atividade
+     */
+    public void setAtividade(String atividade){
+        this.atividade = atividade;
+    }
+
     /**
      * Verifica se esta pedente????????
      * @return true se esta pendente, false se não estiver
@@ -145,12 +155,12 @@ public class Fatura{
     public String toString(){
         StringBuilder s = new StringBuilder();
         s.append("Fatura emitida por " + this.nifEmitente + " em " + this.data + "\n");
-        s.append("Ao contribuinte " + this.nifCliente + " no valor de " + this.valor + "\n");
+        s.append("Ao contribuinte " + this.nifCliente + " no valor de " + this.valor + "€\n");
         if (this.estaPendente())
             s.append("Atividade Económica: (PENDENTE)\n");
         else
             s.append("Atividade Económica: " + this.atividade + "\n");
-        s.append("Descrição do emitente: " + this.descricao + "\n");
+        s.append("Descrição: " + this.descricao + "\n");
         return s.toString();
     }
 }

@@ -178,10 +178,9 @@ public class Plataforma{
 
         if (escolha == 1)
             this.login();
-        else if(escolha == 2) {
+        else if(escolha == 2)
             this.registar();
-            this.login();
-        } else if (escolha == 3)
+        else if (escolha == 3)
             return true;
 
         return false;
@@ -245,8 +244,6 @@ public class Plataforma{
 
         this.totalEntidades.put(nif, e.clone());
 
-        System.out.println("Por favor, faça login");
-        pausaParaLer();
     }
     /**
      * Registar uma entidade individual
@@ -392,8 +389,7 @@ public class Plataforma{
         if(escolha == 1)
             verFaturas();
         else if (escolha == 2)
-            // Fazer
-            ;
+            validarFaturas();
         else if (escolha == 3)
             // Fazer
             ;
@@ -404,6 +400,67 @@ public class Plataforma{
         } else if (escolha == 5)
             logout();
     }
+
+    public boolean validarFaturas(){
+        ArrayList<Fatura> faturasPendentes = new ArrayList<Fatura>();
+        for(int i: this.utilizador.getListaFaturas()){
+            Fatura f = this.totalFaturas.get(i);
+            if(f.estaPendente() && f.getNIFCliente().equals(this.utilizador.getNIF()))
+                faturasPendentes.add(f);
+        }
+
+        StringBuilder menu = new StringBuilder();
+
+        menu.append("               ##############################################              \n");
+        menu.append("               #               Validar Faturas              #              \n");
+        menu.append("               ##############################################              \n");
+        menu.append("               #                                            #              \n");
+        menu.append("               #           Tem " + faturasPendentes.size() + " faturas pendente(s)        #              \n");
+        menu.append("               #           Deseja validá-las?               #              \n");
+        menu.append("               #           1 --> Sim                        #              \n");
+        menu.append("               #           2 --> Não, regressar ao menu     #              \n");
+        menu.append("               #                                            #              \n");
+        menu.append("               ##############################################              \n");
+        System.out.print('\u000C');
+        System.out.println(menu);
+
+        int escolha;
+        Scanner s = new Scanner(System.in);
+        do{
+            escolha = s.nextInt();
+        }while(escolha != 1 && escolha != 2);
+        s.close();
+
+        if(escolha == 1){
+            for(Fatura f: faturasPendentes){
+                System.out.print('\u000C');
+                ArrayList<String> atividades = ((Coletivo) this.totalEntidades.get(f.getNIFEmitente())).getInformacaoAtividades();
+
+                System.out.println(f.toString());
+                System.out.println("Pode associar esta fatura a:");
+                int i = 0;
+                for(String a: atividades){
+                    System.out.println(i + " --> " + a);
+                    i++;
+                }
+
+                s = new Scanner(System.in);
+                do{
+                    escolha = s.nextInt();
+                }while(escolha >= atividades.size());
+                s.close();
+
+                f.setAtividade(atividades.get(escolha));
+
+            }
+                
+        }
+        else if(escolha == 2)
+            return true;
+        
+        return false;
+    }
+
     /**
      * Imprimir o menu de uma entidade coletiva
      */
@@ -415,8 +472,10 @@ public class Plataforma{
         menu.append("               ##############################################              \n");
         menu.append("               #                                            #              \n");
         menu.append("               #           1 --> Emitir Fatura              #              \n");
-        menu.append("               #           2 --> Definições da conta        #              \n");
-        menu.append("               #           3 --> Logout                     #              \n");
+        menu.append("               #           2 --> Ver Faturas                #              \n");
+        menu.append("               #           3 --> Validar Faturas            #              \n");
+        menu.append("               #           4 --> Definições da conta        #              \n");
+        menu.append("               #           5 --> Logout                     #              \n");
         menu.append("               #                                            #              \n");
         menu.append("               ##############################################              \n");
         System.out.print('\u000C');
@@ -426,7 +485,7 @@ public class Plataforma{
         int escolha;
         do{
             escolha = s.nextInt();
-        }while(escolha != 1 && escolha != 2 && escolha != 3);
+        }while(escolha != 1 && escolha != 2 && escolha != 3 && escolha != 4 && escolha != 5);
         
 
         if(escolha == 1){
@@ -439,11 +498,15 @@ public class Plataforma{
             }while(valor < 0);
             s.close();
             emitirFatura(nifCliente, descricao, valor);
-        } else if (escolha == 2) {
+        }else if(escolha == 2)
+            verFaturas();
+        else if(escolha == 3)
+            validarFaturas();
+        else if (escolha == 4) {
             boolean exit = false;
             while (!exit)
                 exit = definicoesDaConta();
-        } else if (escolha == 3)
+        } else if (escolha == 5)
             logout();
     }
     /**
@@ -501,7 +564,7 @@ public class Plataforma{
         return false;
     }
     /**
-     * Imprimir o menu do admnistrador
+     * Imprimir o menu do administrador
      */
     public void printMenuAdmin(){
         StringBuilder menu = new StringBuilder();
