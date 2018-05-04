@@ -1,8 +1,8 @@
 
 /**
- * Write a description of class Plataforma here.
+ * Classe que representa a interface
  *
- * @author RV
+ * @author GC-JRI-RV
  * @version 16/04/2018
  */
 
@@ -19,21 +19,32 @@ import java.io.ObjectOutputStream;
 import java.lang.Exception;
 
 public class Plataforma{
-    private ArrayList<Fatura> totalFaturas; 
+    /**Lista de todas as faturas */
+    private ArrayList<Fatura> totalFaturas;
+    /** Lista de todas as entidades*/ 
     private HashMap<String,Entidade> totalEntidades;
+    /**Identificação da entidade */
     private Entidade utilizador;
+    /**Lista das atividades económicas */
     private static ArrayList<String> atividades = new ArrayList<>(Arrays.asList("despesas gerais familiares",
                                                                    "saude", "educaçao", "habitaçao", "lares",
                                                                    "reparaçao de automoveis", "reparacao de motociclos", 
                                                                    "restauraçao e alojamento", "cabeleireiros",
                                                                    "atividades veterinarias", "transportes"));
-
-    public Plataforma(){
+    /**
+     * Construtor por omissão
+     */                                                              
+   public Plataforma(){
         this.totalFaturas = new ArrayList<Fatura>();
         this.totalEntidades = new HashMap<String,Entidade>();
         this.utilizador = null;
     }
 
+    /**
+     * Ler o NIF
+     * @param pedido
+     * @return nif
+     */
     public String lerNIF(String pedido){
         String nif;
         do{
@@ -43,7 +54,10 @@ public class Plataforma{
 
         return nif;
     }
-
+    /**
+     * Dá início ao menu
+     * @param????
+     */
     public static void main(String[] args){
         Plataforma plataforma = new Plataforma();
 
@@ -80,7 +94,11 @@ public class Plataforma{
             exc.printStackTrace();
         }
     }
-
+    /**
+     * Ler pedido
+     * @param pedido
+     * @return leitura do input
+     */
     public String ler(String pedido){
         System.out.println("Escreva " + pedido);
         Scanner ler = new Scanner(System.in);
@@ -88,7 +106,9 @@ public class Plataforma{
         ler.close();
         return res;
     }
-
+    /**
+     * ???
+     */
     public void pausaParaLer(){
         System.out.println();
         System.out.println("Pressione Enter para continuar...");
@@ -96,7 +116,10 @@ public class Plataforma{
         s.nextLine();
         s.close();
     }
-
+    /**
+     * Ler atividade económica do individual
+     * @return lista com as atividades do individual
+     */
     public ArrayList<String> lerAtividadesIndividual() {
         ArrayList<String> codigosAtividades = new ArrayList<String>();
         Scanner ler = new Scanner(System.in);
@@ -110,7 +133,10 @@ public class Plataforma{
 
         return codigosAtividades;
     }
-
+    /**
+     * Ler atividades económicas do coletivo
+     * @return lista com as atividades do coletivo
+     */
     public ArrayList<String> lerAtividadesColetivo() {
         ArrayList<String> codigosAtividades = new ArrayList<String>();
         Scanner ler = new Scanner(System.in);
@@ -124,7 +150,10 @@ public class Plataforma{
 
         return codigosAtividades;
     }
-    
+    /**
+     * Imprime o meuno inicial
+     * @return true se o input for '3' ou false se o input não for nem '1', nem '2' nem '3' ?????
+     */
     public boolean printMenu(){
         StringBuilder menu = new StringBuilder();
         int escolha;
@@ -157,7 +186,9 @@ public class Plataforma{
 
         return false;
     }
-
+    /**
+     * Registar no site
+     */
     public void registar(){ 
         String nif;
         StringBuilder menu = new StringBuilder();
@@ -218,7 +249,10 @@ public class Plataforma{
         System.out.println("Por favor, faça login");
         pausaParaLer();
     }
-
+    /**
+     * Registar uma entidade individual
+     * @param e
+     */
     public void registarIndividual(Individual e){
         StringBuilder menu = new StringBuilder();
 
@@ -249,7 +283,10 @@ public class Plataforma{
         e.setCoeficienteFiscal(coeficiente);
         e.setCodigosAtividades(codigosAtividades);
     }
-
+    /**
+     * Registar uma entidade coletivo
+     * @param e
+     */
     public void registarColetivo(Coletivo e){
         StringBuilder menu = new StringBuilder();
 
@@ -273,11 +310,15 @@ public class Plataforma{
         e.setInformacaoAtividades(informacaoAtividades);
         e.setCoeficienteFiscal(coeficiente);
     }
-
+    /**
+     * Fazer o log out
+     */
     public void logout(){
         this.utilizador = null;
     }
-
+    /**
+     * Fazer o log in
+     */
     public void login(){
         String nif;
         StringBuilder menu = new StringBuilder();
@@ -322,7 +363,9 @@ public class Plataforma{
                 printMenuColetivo();
         }
     }
-
+    /**
+     * Imprimir o menu de uma entidade individual
+     */
     public void printMenuIndividual(){
         int escolha;
         StringBuilder menu = new StringBuilder();
@@ -362,7 +405,9 @@ public class Plataforma{
         } else if (escolha == 5)
             logout();
     }
-
+    /**
+     * Imprimir o menu de uma entidade coletiva
+     */
     public void printMenuColetivo(){
         StringBuilder menu = new StringBuilder();
 
@@ -402,7 +447,10 @@ public class Plataforma{
         } else if (escolha == 3)
             logout();
     }
-
+    /**
+     * Ver ou mudar as definições de conta
+     * @return ???
+     */
     public boolean definicoesDaConta() {
         StringBuilder menu = new StringBuilder();
 
@@ -453,7 +501,9 @@ public class Plataforma{
         novasDefinicoes.close();
         return false;
     }
-
+    /**
+     * Imprimir o menu do admnistrador
+     */
     public void printMenuAdmin(){
         StringBuilder menu = new StringBuilder();
 
@@ -466,14 +516,21 @@ public class Plataforma{
         System.out.print('\u000C');
         System.out.println(menu);
     }
-
+    /**
+     * Ver as faturas
+     */
     public void verFaturas() {
         for (Integer i: this.utilizador.getListaFaturas()) {
             System.out.println(this.totalFaturas.get(i).toString());
         }
         pausaParaLer();
     }
-
+    /**
+     * Emitir as faturas
+     * @param nifCliente
+     * @param descricao
+     * @param valor
+     */
     public void emitirFatura(String nifCliente, String descricao, double valor) {
         // Entidades individuais não podem emitir faturas
         if (this.utilizador instanceof Individual)
