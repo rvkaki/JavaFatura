@@ -54,11 +54,29 @@ public class Plataforma{
 
         return nif;
     }
+
     /**
-     * Dá início ao menu
-     * @param????
+     * Grava os dados para um ficheiro
      */
-    public static void main(String[] args){
+    public void save(){
+        try{
+            FileOutputStream novoEstado = new FileOutputStream("estado.sav");
+            ObjectOutputStream save = new ObjectOutputStream(novoEstado);
+            save.writeObject(this.totalFaturas);
+            save.writeObject(this.totalEntidades);
+            save.close();
+            novoEstado.close();
+        }
+        catch(Exception exc){
+            exc.printStackTrace();
+        }
+    }
+
+    /**
+     * Carrega os dados de um ficheiro
+     * @return plataforma com os dados carregados
+     */
+    public Plataforma load(){
         Plataforma plataforma = new Plataforma();
 
         try{
@@ -77,22 +95,22 @@ public class Plataforma{
             exc.printStackTrace();;
         }
 
+        return plataforma;
+    }
+
+    /**
+     * Dá início ao menu
+     * @param????
+     */
+    public static void main(String[] args){
+        Plataforma plataforma = new Plataforma().load();
+
         boolean exit = false;
         while (!exit) {
             exit = plataforma.printMenu();
         }
 
-        try{
-            FileOutputStream novoEstado = new FileOutputStream("estado.sav");
-            ObjectOutputStream save = new ObjectOutputStream(novoEstado);
-            save.writeObject(plataforma.totalFaturas);
-            save.writeObject(plataforma.totalEntidades);
-            save.close();
-            novoEstado.close();
-        }
-        catch(Exception exc){
-            exc.printStackTrace();
-        }
+        plataforma.save();
     }
     /**
      * Ler pedido
@@ -310,6 +328,7 @@ public class Plataforma{
      * Fazer o log out
      */
     public void logout(){
+        this.save();
         this.utilizador = null;
     }
     /**
