@@ -355,7 +355,7 @@ public class Plataforma{
         }
 
         while (this.utilizador != null) { // Enquanto não fizer logout
-            if (this.utilizador instanceof Admin)
+            if (nif.equals("000000000"))
                 printMenuAdmin();
             else if (this.utilizador instanceof Individual)
                 printMenuIndividual();
@@ -511,10 +511,21 @@ public class Plataforma{
         menu.append("               #                  Admin                     #              \n");
         menu.append("               ##############################################              \n");
         menu.append("               #                                            #              \n");
+        menu.append("               #           1 --> Logout                     #              \n");
         menu.append("               #                                            #              \n");
         menu.append("               ##############################################              \n");
         System.out.print('\u000C');
         System.out.println(menu);
+
+        Scanner s = new Scanner(System.in);
+        int escolha;
+        do {
+            escolha = s.nextInt();
+        } while (escolha != 1);
+        s.close();
+
+        if(escolha == 1)
+            logout();
     }
     /**
      * Ver as faturas
