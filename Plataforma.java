@@ -70,11 +70,11 @@ public class Plataforma{
                 plataforma.totalFaturas = totalFaturas;
                 plataforma.totalEntidades = totalEntidades;
                 restore.close();
-                estado.close();
             }
+            estado.close();
         }
         catch(Exception exc){
-            exc.printStackTrace();
+            exc.printStackTrace();;
         }
 
         boolean exit = false;
@@ -223,7 +223,7 @@ public class Plataforma{
             else if (nif.charAt(0) == '5')
                 e = new Coletivo();
             else if (nif.equals("000000000"))
-                e = new Admin();
+                e = new Entidade();
             
             e.setNIF(nif);
         }
@@ -244,7 +244,6 @@ public class Plataforma{
             registarColetivo((Coletivo) e);
 
         this.totalEntidades.put(nif, e.clone());
-        this.utilizador = e;
 
         System.out.println("Por favor, faça login");
         pausaParaLer();
