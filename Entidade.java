@@ -6,9 +6,10 @@
  * @version 16/04/2018
  */
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Entidade{
+public class Entidade implements Serializable{
     private String nif;
     private String email;
     private String nome;

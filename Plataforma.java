@@ -12,6 +12,11 @@ import java.util.HashMap;
 import java.lang.System;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.lang.Exception;
 
 public class Plataforma{
     private ArrayList<Fatura> totalFaturas; 
@@ -28,7 +33,7 @@ public class Plataforma{
         this.totalEntidades = new HashMap<String,Entidade>();
         this.utilizador = null;
     }
-    
+
     public String lerNIF(String pedido){
         String nif;
         do{
@@ -41,11 +46,38 @@ public class Plataforma{
 
     public static void main(String[] args){
         Plataforma plataforma = new Plataforma();
-        // No futuro, ler de ficheiros o conteúdo das faturas/entidades e fazer setFaturas/setEntidades
+
+        try{
+            FileInputStream estado = new FileInputStream("estado.sav");
+            if(estado.available() > 0){
+                ObjectInputStream restore = new ObjectInputStream(estado);
+                ArrayList<Fatura> totalFaturas = (ArrayList<Fatura>) restore.readObject();
+                HashMap<String,Entidade> totalEntidades = (HashMap<String,Entidade>) restore.readObject();
+                plataforma.totalFaturas = totalFaturas;
+                plataforma.totalEntidades = totalEntidades;
+                restore.close();
+                estado.close();
+            }
+        }
+        catch(Exception exc){
+            exc.printStackTrace();
+        }
 
         boolean exit = false;
         while (!exit) {
             exit = plataforma.printMenu();
+        }
+
+        try{
+            FileOutputStream novoEstado = new FileOutputStream("estado.sav");
+            ObjectOutputStream save = new ObjectOutputStream(novoEstado);
+            save.writeObject(plataforma.totalFaturas);
+            save.writeObject(plataforma.totalEntidades);
+            save.close();
+            novoEstado.close();
+        }
+        catch(Exception exc){
+            exc.printStackTrace();
         }
     }
 
