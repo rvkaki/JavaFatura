@@ -2,8 +2,8 @@
 /**
  * Subclasse que representa a entidade de admnistrador
  *
- * @author (your name)
- * @version (a version number or a date)
+ * @author GC-JRI-RV
+ * @version 04/05/2018
  */
 
 public class Admin extends Entidade{

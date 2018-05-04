@@ -2,7 +2,7 @@
 /**
  * Subclasse que representa a entidade do coletivo
  *
- * @author RV
+ * @author GC-JRI-RV
  * @version 24/04/2018
  */ 
 

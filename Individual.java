@@ -2,7 +2,7 @@
 /**
  * Subclasse que representa a entidade individual
  *
- * @author RV
+ * @author GC-JRI-RV
  * @version 15/04/2018
  */
 

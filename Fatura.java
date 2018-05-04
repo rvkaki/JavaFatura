@@ -2,7 +2,7 @@
 /**
  * Classe que representa a fatura de uma entidade
  *
- * @author RV
+ * @author GC-JRI-RV
  * @version 15/04/2018  
  */
 

@@ -2,7 +2,7 @@
 /**
  * Classe que representa a entidade
  *
- * @author RV
+ * @author GC-JRI-RV
  * @version 16/04/2018
  */
 
