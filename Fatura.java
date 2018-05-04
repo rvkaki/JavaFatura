@@ -12,7 +12,7 @@ public class Fatura{
     /** Nif do emitente */
     private String nifEmitente;
     /** Data da fatura  */
-    private LocalDate data;
+    private LocalDateTime data;
     /** Nif do cliente */
     private String nifCliente;
     /** Descrição da fatura */
@@ -26,7 +26,7 @@ public class Fatura{
      */
     public Fatura(){
     	this.nifEmitente = "";
-    	this.data = LocalDate.now();
+    	this.data = LocalDateTime.now();
     	this.nifCliente = "";
     	this.descricao = "";
     	this.atividade = "";
@@ -41,7 +41,7 @@ public class Fatura{
      * @param atividade
      * @param valor
      */
-    public Fatura(String nifEmitente, LocalDate data, String nifCliente, String descricao, String atividade, double valor){
+    public Fatura(String nifEmitente, LocalDateTime data, String nifCliente, String descricao, String atividade, double valor){
     	this.nifEmitente = nifEmitente;
     	this.data = data;
     	this.nifCliente = nifCliente;
@@ -72,7 +72,7 @@ public class Fatura{
      * Devolve a data da emissão 
      * @return data
      */
-    public LocalDate getData(){
+    public LocalDateTime getData(){
     	return this.data;
     }
     /**
