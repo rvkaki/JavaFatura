@@ -8,6 +8,7 @@
 
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.TreeSet;
 import java.util.HashMap;
 import java.lang.System;
 import java.time.LocalDateTime;
@@ -133,23 +134,6 @@ public class Plataforma{
         Scanner s = new Scanner(System.in);
         s.nextLine();
         s.close();
-    }
-    /**
-     * Ler atividade económica do individual
-     * @return lista com as atividades do individual
-     */
-    public ArrayList<String> lerAtividadesIndividual() {
-        ArrayList<String> codigosAtividades = new ArrayList<String>();
-        Scanner ler = new Scanner(System.in);
-        for (String atividade: this.atividades) {
-            System.out.println("Desconta para " + atividade + "? (s/n)");
-            String res = ler.nextLine();
-            if (res.equals("s"))
-                codigosAtividades.add(atividade);
-        }
-        ler.close();
-
-        return codigosAtividades;
     }
     /**
      * Ler atividades económicas do coletivo
@@ -289,13 +273,11 @@ public class Plataforma{
             String nifFamiliar = lerNIF("NIF " + (i+1));
             nifAgregado.add(nifFamiliar);
         }
-        ArrayList<String> codigosAtividades = lerAtividadesIndividual();
         double coeficiente = Double.parseDouble(ler("coeficiente Fiscal"));
         
         e.setNumeroAgregadoFamiliar(numeroAgregado);
         e.setNIFAgregado(nifAgregado);
         e.setCoeficienteFiscal(coeficiente);
-        e.setCodigosAtividades(codigosAtividades);
     }
     /**
      * Registar uma entidade coletivo
@@ -420,6 +402,9 @@ public class Plataforma{
             logout();
     }
 
+    /**
+     * Valida as faturas pendentes
+     */
     public boolean validarFaturas(){
         ArrayList<Fatura> faturasPendentes = new ArrayList<Fatura>();
         for(int i: this.utilizador.getListaFaturas()){
@@ -470,6 +455,10 @@ public class Plataforma{
                 s.close();
 
                 f.setAtividade(atividades.get(escolha));
+                HashMap<String,Double> codigos = ((Individual) this.utilizador).getCodigosAtividades();
+                String chave = atividades.get(escolha);
+                double valor = codigos.getOrDefault(chave, 0.0) + f.getValor();
+                ((Individual) this.utilizador).atualizaCodigosAtividades(chave, valor);
 
             }
                 
@@ -642,5 +631,57 @@ public class Plataforma{
             this.totalEntidades.put(nifCliente, i.clone());
         }
         this.totalEntidades.get(nifCliente).adicionarFatura(indiceFatura);
+    }
+
+    /**
+     * Método que ordena as faturas de uma entidade por valor (decrescente)
+     * @param nif do cliente ou emissor
+     * @return res TreeSet de faturas ordenado decrescentemente
+     */
+    public TreeSet<Fatura> sortValor(String nif){
+        ArrayList<Fatura> faturas = new ArrayList<Fatura>();
+        if(this.utilizador instanceof Individual){
+            for(int i: this.utilizador.getListaFaturas()){
+                if(this.totalFaturas.get(i).getNIFEmitente().equals(nif))
+                    faturas.add(this.totalFaturas.get(i));
+            }
+        }
+        else if(this.utilizador instanceof Coletivo){
+            for(int i: this.utilizador.getListaFaturas()){
+                if(this.totalFaturas.get(i).getNIFCliente().equals(nif))
+                    faturas.add(this.totalFaturas.get(i));
+            }
+        }
+
+        TreeSet<Fatura> res = new TreeSet<Fatura>((f1,f2) -> (int) (f2.getValor() - f1.getValor()));
+        for(Fatura f: faturas)
+            res.add(f);
+        return res;
+    }
+
+    /**
+     * Método que ordena as faturas de uma entidade por data (decrescente)
+     * @param nif do cliente ou emissor
+     * @return res TreeSet de faturas ordenado decrescentemente
+     */
+    public TreeSet<Fatura> sortData(String nif){
+        ArrayList<Fatura> faturas = new ArrayList<Fatura>();
+        if(this.utilizador instanceof Individual){
+            for(int i: this.utilizador.getListaFaturas()){
+                if(this.totalFaturas.get(i).getNIFEmitente().equals(nif))
+                    faturas.add(this.totalFaturas.get(i));
+            }
+        }
+        else if(this.utilizador instanceof Coletivo){
+            for(int i: this.utilizador.getListaFaturas()){
+                if(this.totalFaturas.get(i).getNIFCliente().equals(nif))
+                    faturas.add(this.totalFaturas.get(i));
+            }
+        }
+        
+        TreeSet<Fatura> res = new TreeSet<Fatura>((f1,f2) -> f1.getData().compareTo(f2.getData()));
+        for(Fatura f: faturas)
+            res.add(f);
+        return res;
     }
 }

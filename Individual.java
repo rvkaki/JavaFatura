@@ -7,6 +7,7 @@
  */
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Individual extends Entidade{
     /** Número do agregado familiar*/
@@ -15,8 +16,8 @@ public class Individual extends Entidade{
     private ArrayList<String> nifAgregado;
     /** Numero do coeficiente fiscal */
     private double coeficienteFiscal;
-    /** Lista dos codigos das atividades */
-    private ArrayList<String> codigosAtividades;
+    /** Map com atividades e valor deduzido para cada */
+    private HashMap<String, Double> codigosAtividades;
 
     /**
      * Construtor por omissão
@@ -26,7 +27,7 @@ public class Individual extends Entidade{
         this.numeroAgregadoFamiliar = 0;
         this.nifAgregado = new ArrayList<String>();
         this.coeficienteFiscal = 0.0;
-        this.codigosAtividades = new ArrayList<String>();
+        this.codigosAtividades = new HashMap<String,Double>();
     }
     /**
      * Construtor por parametro
@@ -41,16 +42,16 @@ public class Individual extends Entidade{
      * @param coeficienteFiscal
      * @param codigosAtividades
      */
-    public Individual(String nif, String email, String nome, String morada, String password, ArrayList<Integer> listaFaturas, int numeroAgregadoFamiliar, ArrayList<String> nifAgregado, double coeficienteFiscal, ArrayList<String> codigosAtividades){
+    public Individual(String nif, String email, String nome, String morada, String password, ArrayList<Integer> listaFaturas, int numeroAgregadoFamiliar, ArrayList<String> nifAgregado, double coeficienteFiscal, HashMap<String,Double> codigosAtividades){
         super(nif, email, nome, morada, password, listaFaturas);
         this.numeroAgregadoFamiliar = numeroAgregadoFamiliar;
         this.nifAgregado = new ArrayList<String>();
         for(String s: nifAgregado)
             this.nifAgregado.add(s);
         this.coeficienteFiscal = coeficienteFiscal;
-        this.codigosAtividades = new ArrayList<String>();
-        for(String s: codigosAtividades)
-            this.codigosAtividades.add(s);
+        this.codigosAtividades = new HashMap<String,Double>();
+        for(String s: codigosAtividades.keySet())
+            this.codigosAtividades.put(s, codigosAtividades.get(s));
     }
     /**
      * Contrutor por cópia 
@@ -91,10 +92,10 @@ public class Individual extends Entidade{
      * Devolve os codigos das atividades
      * @return codigos das atividades
      */
-    public ArrayList<String> getCodigosAtividades(){
-        ArrayList<String> res = new ArrayList<String>();
-        for(String s: this.codigosAtividades)
-            res.add(s);
+    public HashMap<String,Double> getCodigosAtividades(){
+        HashMap<String,Double> res = new HashMap<String,Double>();
+        for(String s: this.codigosAtividades.keySet())
+            res.put(s, this.codigosAtividades.get(s));
         return res;
     }
     /**
@@ -125,11 +126,24 @@ public class Individual extends Entidade{
      * Define os codigos de atividades
      * @param codigos
      */
-    public void setCodigosAtividades(ArrayList<String> codigos){
-        ArrayList<String> res = new ArrayList<String>();
-        for(String s: codigos)
-            res.add(s);
+    public void setCodigosAtividades(HashMap<String,Double> codigos){
+        HashMap<String,Double> res = new HashMap<String,Double>();
+        for(String s: codigos.keySet())
+            res.put(s, codigos.get(s));
         this.codigosAtividades = res;
+    }
+
+    /**
+     * Atualiza a entrada de uma determinada atividade no codigosAtividades
+     * @param key chave 
+     * @param value valor 
+     */
+    public void atualizaCodigosAtividades(String key, double valor){
+        if(this.codigosAtividades.containsKey(key)){
+            this.codigosAtividades.replace(key, valor);
+        }else{
+            this.codigosAtividades.put(key, valor);
+        }
     }
     /** 
      * Cria uma cópia do objecto
