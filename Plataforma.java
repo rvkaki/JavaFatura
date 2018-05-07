@@ -9,9 +9,6 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.TreeSet;
-
-import javax.lang.model.util.ElementScanner6;
-
 import java.util.HashMap;
 import java.lang.System;
 import java.time.LocalDateTime;
@@ -72,7 +69,8 @@ public class Plataforma{
             novoEstado.close();
         }
         catch(Exception exc){
-            exc.printStackTrace();
+            System.out.println("Não foi possível guardar o estado no ficheiro");
+            pausaParaLer();
         }
     }
 
@@ -80,26 +78,23 @@ public class Plataforma{
      * Carrega os dados de um ficheiro
      * @return plataforma com os dados carregados
      */
-    public Plataforma load(){
-        Plataforma plataforma = new Plataforma();
-
+    public void load(){
         try{
             FileInputStream estado = new FileInputStream("estado.sav");
             if(estado.available() > 0){
                 ObjectInputStream restore = new ObjectInputStream(estado);
                 ArrayList<Fatura> totalFaturas = (ArrayList<Fatura>) restore.readObject();
                 HashMap<String,Entidade> totalEntidades = (HashMap<String,Entidade>) restore.readObject();
-                plataforma.totalFaturas = totalFaturas;
-                plataforma.totalEntidades = totalEntidades;
+                this.totalFaturas = totalFaturas;
+                this.totalEntidades = totalEntidades;
                 restore.close();
             }
             estado.close();
         }
         catch(Exception exc){
-            exc.printStackTrace();;
+            System.out.println("Não foi possível ler o estado do ficheiro");
+            pausaParaLer();
         }
-
-        return plataforma;
     }
 
     /**
@@ -107,12 +102,12 @@ public class Plataforma{
      * @param????
      */
     public static void main(String[] args){
-        Plataforma plataforma = new Plataforma().load();
+        Plataforma plataforma = new Plataforma();
+        plataforma.load();
 
         boolean exit = false;
-        while (!exit) {
+        while (!exit)
             exit = plataforma.printMenu();
-        }
 
         plataforma.save();
     }
@@ -156,8 +151,8 @@ public class Plataforma{
         return codigosAtividades;
     }
     /**
-     * Imprime o meuno inicial
-     * @return true se o input for '3' ou false se o input não for nem '1', nem '2' nem '3' ?????
+     * Imprime o menu inicial
+     * @return true se o utilizador quiser sair da plataforma, false caso queira continuar a utilizá-la
      */
     public boolean printMenu(){
         StringBuilder menu = new StringBuilder();
@@ -263,8 +258,8 @@ public class Plataforma{
         menu.append("               #                                            #              \n");
         menu.append("               #       Número de elementos agregado:        #              \n");
         menu.append("               #       NIF dos elementos agregado:          #              \n");
-        menu.append("               #       Atividades Económica:                #              \n");
         menu.append("               #       Coeficiente Fiscal:                  #              \n");
+        menu.append("               #       Rendimento anual agregado:           #              \n");
         menu.append("               #                                            #              \n");
         menu.append("               ##############################################              \n");
         System.out.print('\u000C');
@@ -272,10 +267,12 @@ public class Plataforma{
         
         int numeroAgregado = Integer.parseInt(ler("numero de elementos do Agregado Familiar"));
         ArrayList<String> nifAgregado = new ArrayList<String>(numeroAgregado);
-        System.out.println("Escreva o NIF dos restantes elementos do agregado familiar");
-        for(int i=1; i<numeroAgregado; i++){
-            String nifFamiliar = lerNIF("NIF " + i);
-            nifAgregado.add(nifFamiliar);
+        if (numeroAgregado > 1) {
+            System.out.println("Escreva o NIF dos restantes elementos do agregado familiar");
+            for(int i=1; i<numeroAgregado; i++){
+                String nifFamiliar = lerNIF("NIF " + i);
+                nifAgregado.add(nifFamiliar);
+            }
         }
         double coeficiente = Double.parseDouble(ler("coeficiente Fiscal"));
         double rendimentoAtual;
@@ -296,17 +293,18 @@ public class Plataforma{
                 System.out.println("Confirma que o rendimento anual do seu agregado é " + rendimentoAtual + "? (s/n)");
                 resposta = s.nextLine();
             }while(!resposta.equals("s") && !resposta.equals("n"));
-            
+            s.close();
+
             if(resposta.equals("n")){
                 rendimentoAgregado = Double.parseDouble(ler("rendimento anual do agregado familiar"));
                 for(String n: nifAgregado)
                     ((Individual) this.totalEntidades.get(n)).setRendimentoAgregado(rendimentoAgregado);
             }
-            else if(resposta.equals("s")){
+            else {
                 e.setRendimentoAgregado(rendimentoAtual);
             }
         }
-        else if(nif == null){
+        else {
             rendimentoAgregado = Double.parseDouble(ler("rendimento anual do agregado familiar"));
             e.setRendimentoAgregado(rendimentoAgregado);
         }
@@ -441,12 +439,19 @@ public class Plataforma{
     /**
      * Valida as faturas pendentes
      */
-    public boolean validarFaturas(){
+    public void validarFaturas(){
         ArrayList<Fatura> faturasPendentes = new ArrayList<Fatura>();
         for(int i: this.utilizador.getListaFaturas()){
             Fatura f = this.totalFaturas.get(i);
             if(f.estaPendente() && f.getNIFCliente().equals(this.utilizador.getNIF()))
                 faturasPendentes.add(f);
+        }
+
+        if (faturasPendentes.size() == 0) {
+            System.out.println("Não tem faturas para validar. Por favor, volte mais tarde");
+            pausaParaLer();
+
+            return;
         }
 
         StringBuilder menu = new StringBuilder();
@@ -500,9 +505,7 @@ public class Plataforma{
                 
         }
         else if(escolha == 2)
-            return true;
-        
-        return false;
+            return;
     }
 
     /**
@@ -517,9 +520,8 @@ public class Plataforma{
         menu.append("               #                                            #              \n");
         menu.append("               #           1 --> Emitir Fatura              #              \n");
         menu.append("               #           2 --> Ver Faturas                #              \n");
-        menu.append("               #           3 --> Validar Faturas            #              \n");
-        menu.append("               #           4 --> Definições da conta        #              \n");
-        menu.append("               #           5 --> Logout                     #              \n");
+        menu.append("               #           3 --> Definições da conta        #              \n");
+        menu.append("               #           4 --> Logout                     #              \n");
         menu.append("               #                                            #              \n");
         menu.append("               ##############################################              \n");
         System.out.print('\u000C');
@@ -529,7 +531,7 @@ public class Plataforma{
         int escolha;
         do{
             escolha = s.nextInt();
-        }while(escolha != 1 && escolha != 2 && escolha != 3 && escolha != 4 && escolha != 5);
+        }while(escolha != 1 && escolha != 2 && escolha != 3 && escolha != 4);
         
 
         if(escolha == 1){
@@ -544,13 +546,11 @@ public class Plataforma{
             emitirFatura(nifCliente, descricao, valor);
         }else if(escolha == 2)
             verFaturas();
-        else if(escolha == 3)
-            validarFaturas();
-        else if (escolha == 4) {
+        else if (escolha == 3) {
             boolean exit = false;
             while (!exit)
                 exit = definicoesDaConta();
-        } else if (escolha == 5)
+        } else if (escolha == 4)
             logout();
     }
     /**
@@ -637,6 +637,9 @@ public class Plataforma{
      * Ver as faturas
      */
     public void verFaturas() {
+        if (this.utilizador.getListaFaturas().size() == 0)
+            System.out.println("Não tem faturas emitidas em seu nome. Por favor, volte mais tarde");
+
         for (Integer i: this.utilizador.getListaFaturas()) {
             System.out.println(this.totalFaturas.get(i).toString());
         }
@@ -649,10 +652,6 @@ public class Plataforma{
      * @param valor
      */
     public void emitirFatura(String nifCliente, String descricao, double valor) {
-        // Entidades individuais não podem emitir faturas
-        if (this.utilizador instanceof Individual)
-            return;
-
         Coletivo empresa = (Coletivo) this.utilizador;
         String atividade = empresa.getAtividadeSeUnica();
 

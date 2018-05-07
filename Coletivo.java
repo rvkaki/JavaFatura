@@ -39,7 +39,7 @@ public class Coletivo extends Entidade{
     public Coletivo(String nif, String email, String nome, String morada, String password, ArrayList<Integer> listaFaturas, String designacao, ArrayList<String> informacaoAtividades, double coeficienteFiscal){
         super(nif, email, nome, morada, password, listaFaturas);
         this.designacao = designacao;
-        this.informacaoAtividades = new ArrayList<String>();
+        this.informacaoAtividades = new ArrayList<String>(informacaoAtividades.size());
         for(String s: informacaoAtividades)
             this.informacaoAtividades.add(s);
         this.coeficienteFiscal = coeficienteFiscal;
@@ -66,7 +66,7 @@ public class Coletivo extends Entidade{
      * @return a informacao das atividades
      */
     public ArrayList<String> getInformacaoAtividades(){
-        ArrayList<String> res = new ArrayList<String>();
+        ArrayList<String> res = new ArrayList<String>(this.informacaoAtividades.size());
         for(String s: this.informacaoAtividades)
             res.add(s);
         return res;

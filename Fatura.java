@@ -154,7 +154,7 @@ public class Fatura implements Serializable{
      */
     public String toString(){
         StringBuilder s = new StringBuilder();
-        s.append("Fatura emitida por " + this.nifEmitente + " em " + this.data + "\n");
+        s.append("Fatura emitida por " + this.nifEmitente + " em " + this.data.toLocalDate() + " às " + this.data.toLocalTime() + "\n");
         s.append("Ao contribuinte " + this.nifCliente + " no valor de " + this.valor + "€\n");
         if (this.estaPendente())
             s.append("Atividade Económica: (PENDENTE)\n");

@@ -48,7 +48,9 @@ public class Entidade implements Serializable{
         this.nome = nome;
         this.morada = morada;
         this.password = password;
-        this.listaFaturas = listaFaturas;
+        this.listaFaturas = new ArrayList<>(listaFaturas.size());
+        for (Integer i: listaFaturas)
+            this.listaFaturas.add(i);
     }
     /**
      * Construtor por cópia
@@ -102,7 +104,7 @@ public class Entidade implements Serializable{
      * @return a lista de faturas
      */
     public ArrayList<Integer> getListaFaturas(){
-        ArrayList<Integer> res = new ArrayList<Integer>();
+        ArrayList<Integer> res = new ArrayList<Integer>(this.listaFaturas.size());
         for(Integer x: this.listaFaturas)
             res.add(x);
         return res;
