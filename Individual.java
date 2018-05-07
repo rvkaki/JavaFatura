@@ -18,6 +18,8 @@ public class Individual extends Entidade{
     private double coeficienteFiscal;
     /** Map com atividades e valor deduzido para cada */
     private HashMap<String, Double> codigosAtividades;
+    /** Rendimento do Agregado Familiar */
+    private double rendimentoAgregado;
 
     /**
      * Construtor por omissão
@@ -28,6 +30,7 @@ public class Individual extends Entidade{
         this.nifAgregado = new ArrayList<String>();
         this.coeficienteFiscal = 0.0;
         this.codigosAtividades = new HashMap<String,Double>();
+        this.rendimentoAgregado = 0.0;
     }
     /**
      * Construtor por parametro
@@ -41,8 +44,9 @@ public class Individual extends Entidade{
      * @param nifAgregado
      * @param coeficienteFiscal
      * @param codigosAtividades
+     * @param rendimentoAgregado
      */
-    public Individual(String nif, String email, String nome, String morada, String password, ArrayList<Integer> listaFaturas, int numeroAgregadoFamiliar, ArrayList<String> nifAgregado, double coeficienteFiscal, HashMap<String,Double> codigosAtividades){
+    public Individual(String nif, String email, String nome, String morada, String password, ArrayList<Integer> listaFaturas, int numeroAgregadoFamiliar, ArrayList<String> nifAgregado, double coeficienteFiscal, HashMap<String,Double> codigosAtividades, double rendimentoAgregado){
         super(nif, email, nome, morada, password, listaFaturas);
         this.numeroAgregadoFamiliar = numeroAgregadoFamiliar;
         this.nifAgregado = new ArrayList<String>();
@@ -52,6 +56,7 @@ public class Individual extends Entidade{
         this.codigosAtividades = new HashMap<String,Double>();
         for(String s: codigosAtividades.keySet())
             this.codigosAtividades.put(s, codigosAtividades.get(s));
+        this.rendimentoAgregado = rendimentoAgregado;
     }
     /**
      * Contrutor por cópia 
@@ -63,6 +68,7 @@ public class Individual extends Entidade{
         this.nifAgregado = c.getNIFAgregadoFamiliar();
         this.coeficienteFiscal = c.getCoeficienteFiscal();
         this.codigosAtividades = c.getCodigosAtividades();
+        this.rendimentoAgregado = c.getRendimentoAgregado();
     }
     /**
      * Devolve o numero do agregado familiar
@@ -99,6 +105,13 @@ public class Individual extends Entidade{
         return res;
     }
     /**
+     * Devolve o rendimento do agregado
+     * @return rendimento do agregado
+     */
+    public double getRendimentoAgregado(){
+        return this.rendimentoAgregado;
+    }
+    /**
      * Define o numero do agregado familiar
      * @param numero
      */
@@ -131,6 +144,13 @@ public class Individual extends Entidade{
         for(String s: codigos.keySet())
             res.put(s, codigos.get(s));
         this.codigosAtividades = res;
+    }
+    /**
+     * Define o rendimento do Agregado
+     * @param rendimentoAgregado
+     */
+    public void setRendimentoAgregado(double rendimentoAgregado){
+        this.rendimentoAgregado = rendimentoAgregado;
     }
 
     /**

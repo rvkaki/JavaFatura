@@ -9,6 +9,9 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.TreeSet;
+
+import javax.lang.model.util.ElementScanner6;
+
 import java.util.HashMap;
 import java.lang.System;
 import java.time.LocalDateTime;
@@ -269,11 +272,44 @@ public class Plataforma{
         
         int numeroAgregado = Integer.parseInt(ler("numero de elementos do Agregado Familiar"));
         ArrayList<String> nifAgregado = new ArrayList<String>(numeroAgregado);
-        for(int i=0; i<numeroAgregado; i++){
-            String nifFamiliar = lerNIF("NIF " + (i+1));
+        System.out.println("Escreva o NIF dos restantes elementos do agregado familiar");
+        for(int i=1; i<numeroAgregado; i++){
+            String nifFamiliar = lerNIF("NIF " + i);
             nifAgregado.add(nifFamiliar);
         }
         double coeficiente = Double.parseDouble(ler("coeficiente Fiscal"));
+        double rendimentoAtual;
+        double rendimentoAgregado;
+        String nif = null;
+
+        for(String nif1: nifAgregado)
+            if(this.totalEntidades.containsKey(nif1)){
+                nif = nif1;
+                break;
+            }
+        
+        if(nif != null){
+            rendimentoAtual = ((Individual) this.totalEntidades.get(nif)).getRendimentoAgregado();
+            Scanner s = new Scanner(System.in);
+            String resposta;
+            do{
+                System.out.println("Confirma que o rendimento anual do seu agregado é " + rendimentoAtual + "? (s/n)");
+                resposta = s.nextLine();
+            }while(!resposta.equals("s") && !resposta.equals("n"));
+            
+            if(resposta.equals("n")){
+                rendimentoAgregado = Double.parseDouble(ler("rendimento anual do agregado familiar"));
+                for(String n: nifAgregado)
+                    ((Individual) this.totalEntidades.get(n)).setRendimentoAgregado(rendimentoAgregado);
+            }
+            else if(resposta.equals("s")){
+                e.setRendimentoAgregado(rendimentoAtual);
+            }
+        }
+        else if(nif == null){
+            rendimentoAgregado = Double.parseDouble(ler("rendimento anual do agregado familiar"));
+            e.setRendimentoAgregado(rendimentoAgregado);
+        }
         
         e.setNumeroAgregadoFamiliar(numeroAgregado);
         e.setNIFAgregado(nifAgregado);
