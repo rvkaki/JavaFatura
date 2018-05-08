@@ -9,6 +9,7 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.TreeSet;
+import javafx.util.Pair;
 import java.util.HashMap;
 import java.lang.System;
 import java.time.LocalDateTime;
@@ -32,6 +33,39 @@ public class Plataforma{
                                                                    "reparaçao de automoveis", "reparacao de motociclos", 
                                                                    "restauraçao e alojamento", "cabeleireiros",
                                                                    "atividades veterinarias", "transportes"));
+    /**Tabela para Cálculo do IRS baseando em rendimento anual e número do agregado*/                                                                   
+    private static final HashMap<Integer,double[]> irs;
+        static{
+            HashMap<Integer,double[]> myMap = new HashMap<Integer,double[]>();
+            myMap.put(8400, new double[] {2.5,0.0,0.0,0.0,0.0,0.0});
+            myMap.put(12000, new double[] {8.5,5.8,4.0,1.2,0.0,0.0});
+            myMap.put(18000, new double[] {12.2,10.4,8.5,6.6,4.8,2.9});
+            myMap.put(24000, new double[] {16.6,14.9,14.1,11.4,10.6,8.9});
+            myMap.put(36000, new double[] {22.0,21.9,20.3,18.9,17.5,17.1});
+            myMap.put(60000, new double[] {27.5,26.9,26.5,24.1,23.7,23.3});
+            myMap.put(120000, new double[] {34.0,33.9,33.7,32.5,32.3,30.8});
+            myMap.put(240000, new double[] {37.3,37.3,37.1,36.0,35.8,34.6});
+            myMap.put(300000, new double[] {39.3,39.3,39.1,38.4,38.2,36.6});
+            myMap.put(300001, new double[] {41.3,41.3,41.1,40.4,40.2,39.0});
+            irs = myMap;
+        }
+    /**Tabela de Descontos por Atividade Económica */
+    private static final HashMap<String,Pair<Double, Integer>> descontos;
+        static{
+            HashMap<String,Pair<Double,Integer>> myMap = new HashMap<String,Pair<Double,Integer>>();
+            myMap.put("despesas gerais familiares", new Pair(35, 500));
+            myMap.put("saude", new Pair(15, 1000));
+            myMap.put("educaçao", new Pair(30, 800));
+            myMap.put("habitaçao", new Pair(15, 500));
+            myMap.put("lares", new Pair(25, 400));
+            myMap.put("reparaçao de automoveis", new Pair(15, 200));
+            myMap.put("reparaçao de motociclos", new Pair(15, 200));
+            myMap.put("restauraçao e alojamento", new Pair(15, 200));
+            myMap.put("cabeleireiros", new Pair(10, 100));
+            myMap.put("atividades veterinarias", new Pair(15, 200));
+            myMap.put("transportes", new Pair(20, 100));
+            descontos = myMap;
+        }
     /**
      * Construtor por omissão
      */                                                              
@@ -666,6 +700,12 @@ public class Plataforma{
             this.totalEntidades.put(nifCliente, i.clone());
         }
         this.totalEntidades.get(nifCliente).adicionarFatura(indiceFatura);
+        
+        if(!atividade.equals("")){
+            HashMap<String,Double> codigos = ((Individual) this.totalEntidades.get(nifCliente)).getCodigosAtividades();
+            valor += codigos.getOrDefault(atividade, 0.0);
+            ((Individual) this.totalEntidades.get(nifCliente)).atualizaCodigosAtividades(atividade, valor);
+        }
     }
 
     /**
@@ -718,5 +758,56 @@ public class Plataforma{
         for(Fatura f: faturas)
             res.add(f);
         return res;
+    }
+
+    /**
+     * Arredonda o rendimento para aceder ao Map irs
+     * @param rendimento
+     * @return rendimento arredondado
+     */
+    public static round(double rendimento){
+        double res;
+        double minimo = rendimento;
+        for(double v: irs.keySet()){
+            if(v - rendimento >= 0)
+                if(v - rendimento < minimo)
+                    res = v;
+                else
+                    break;
+        }
+        if(minimo == rendimento)
+            res = 300001;
+        
+        return res;
+    }
+
+    /**
+     * Devolve o valor de dedução fiscal associado ao utilizador atual
+     * @return valor
+     */
+    public double getDeducaoFiscal(){
+        //Nota: Temos de verificar se o valor acumulado das faturas não ultrapassa o valor do rendimento anual - valor pago de IRS
+        //      Os descontos devem incidir apenas sobre o valor(rendimento - valorPagoIRS), como verificar esta situação?
+        Individual utilizador = ((Individual) this.utilizador);
+        double coeficiente = utilizador.getCoeficienteFiscal();
+        int numeroAgregado = utilizador.getNumeroAgregadoFamiliar();
+        if(numeroAgregado > 5) numeroAgregado = 5;
+        double rendimento = utilizador.getRendimentoAgregado();
+        double valorPagoIRS = irs.get(round(rendimento))[numeroAgregado] * rendimento;
+
+        double valorADeduzir = 0.0;
+        HashMap<String,Double> atividades = utilizador.getCodigosAtividades();
+        for(String a: atividades.keySet()){
+            double desconto = atividades.get(a) * descontos.get(a).getKey();
+            if(desconto > descontos.get(a).getValue())
+                desconto = descontos.get(a).getValue();
+            valorADeduzir += desconto;
+        }
+        
+        valorADeduzir /= coeficiente;
+
+        valorADeduzir = Math.min(valorADeduzir, valorPagoIRS);
+
+        return valorADeduzir;
     }
 }
