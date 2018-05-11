@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.TreeSet;
 import javafx.util.Pair;
+import sun.reflect.generics.tree.Tree;
+
 import java.util.HashMap;
 import java.lang.System;
 import java.time.LocalDateTime;
@@ -53,17 +55,17 @@ public class Plataforma{
     private static final HashMap<String,Pair<Double, Integer>> descontos;
         static{
             HashMap<String,Pair<Double,Integer>> myMap = new HashMap<String,Pair<Double,Integer>>();
-            myMap.put("despesas gerais familiares", new Pair(35, 500));
-            myMap.put("saude", new Pair(15, 1000));
-            myMap.put("educaçao", new Pair(30, 800));
-            myMap.put("habitaçao", new Pair(15, 500));
-            myMap.put("lares", new Pair(25, 400));
-            myMap.put("reparaçao de automoveis", new Pair(15, 200));
-            myMap.put("reparaçao de motociclos", new Pair(15, 200));
-            myMap.put("restauraçao e alojamento", new Pair(15, 200));
-            myMap.put("cabeleireiros", new Pair(10, 100));
-            myMap.put("atividades veterinarias", new Pair(15, 200));
-            myMap.put("transportes", new Pair(20, 100));
+            myMap.put("despesas gerais familiares", new Pair(35.0, 500));
+            myMap.put("saude", new Pair(15.0, 1000));
+            myMap.put("educaçao", new Pair(30.0, 800));
+            myMap.put("habitaçao", new Pair(15.0, 500));
+            myMap.put("lares", new Pair(25.0, 400));
+            myMap.put("reparaçao de automoveis", new Pair(15.0, 200));
+            myMap.put("reparaçao de motociclos", new Pair(15.0, 200));
+            myMap.put("restauraçao e alojamento", new Pair(15.0, 200));
+            myMap.put("cabeleireiros", new Pair(10.0, 100));
+            myMap.put("atividades veterinarias", new Pair(15.0, 200));
+            myMap.put("transportes", new Pair(20.0, 100));
             descontos = myMap;
         }
     /**
@@ -456,12 +458,16 @@ public class Plataforma{
         s.close();
 
         if(escolha == 1)
-            verFaturas();
+            verFaturasIndividual();
         else if (escolha == 2)
             validarFaturas();
-        else if (escolha == 3)
-            // Fazer
-            ;
+        else if (escolha == 3){
+            Pair<Double,Double> valor = this.getDeducaoFiscal();
+            double irs = valor.getKey();
+            double dedução = valor.getValue();
+            System.out.println("O valor pago de IRS foi " + irs + " e o valor de dedução é " + dedução);
+            pausaParaLer();
+        }
         else if (escolha == 4) {
             boolean exit = false;
             while (!exit)
@@ -579,7 +585,7 @@ public class Plataforma{
             s.close();
             emitirFatura(nifCliente, descricao, valor);
         }else if(escolha == 2)
-            verFaturas();
+            verFaturasColetivo();
         else if (escolha == 3) {
             boolean exit = false;
             while (!exit)
@@ -668,15 +674,128 @@ public class Plataforma{
             logout();
     }
     /**
-     * Ver as faturas
+     * Ver as faturas por parte dos Contribuintes Individuais
      */
-    public void verFaturas() {
-        if (this.utilizador.getListaFaturas().size() == 0)
+    public void verFaturasIndividual() {
+        if (this.utilizador.getListaFaturas().size() == 0){
             System.out.println("Não tem faturas emitidas em seu nome. Por favor, volte mais tarde");
-
-        for (Integer i: this.utilizador.getListaFaturas()) {
-            System.out.println(this.totalFaturas.get(i).toString());
+            pausaParaLer();
+            return;
         }
+
+        HashMap<String,String> empresas = new HashMap<String,String>();
+        for (Integer i: this.utilizador.getListaFaturas()) {
+            String nifEmpresa = this.totalFaturas.get(i).getNIFEmitente();
+            String nomeEmpresa = this.totalEntidades.get(nifEmpresa).getNome();
+            empresas.put(nifEmpresa, nomeEmpresa);
+        }
+        System.out.println("Tem faturas emitidas pelas seguintes empresas:");
+        for(String n: empresas.keySet())
+            System.out.println(n + " --> " + empresas.get(n));
+
+        Scanner s = new Scanner(System.in);
+        String nifE;
+        do{
+            System.out.println("\nEscreva o nif da empresa que deseja ver");
+            nifE = s.nextLine();
+        }while(!empresas.containsKey(nifE));
+        s.close();
+
+        s = new Scanner(System.in);
+        int escolha;
+        do{
+            System.out.println("Deseja imprimir por 1 --> valor ou 2 --> data?");
+            escolha = s.nextInt();
+        }while(escolha != 1 && escolha != 2);
+        s.close();
+        System.out.println();
+
+        TreeSet<Fatura> res = null;
+        if(escolha == 1)
+            res = sortValor(nifE);
+        
+        else if(escolha == 2){
+            s = new Scanner(System.in);
+            do{
+                System.out.println("Deseja imprimir por data 1 --> ascendente ou 2 --> descendente");
+                escolha = s.nextInt();
+            }while(escolha != 1 && escolha != 2);
+            System.out.println();
+            s.close();
+
+            if(escolha == 1)
+                res = sortData(nifE, false);
+            
+            else if(escolha == 2)
+                res = sortData(nifE, true);
+        }
+
+        for(Fatura f: res)
+            System.out.println(f.toString());
+
+        pausaParaLer();
+    }
+
+    /**
+     * Ver as faturas por parte das Empresas
+     */
+    public void verFaturasColetivo() {
+        if (this.utilizador.getListaFaturas().size() == 0){
+            System.out.println("Não tem faturas emitidas em seu nome. Por favor, volte mais tarde");
+            pausaParaLer();
+            return;
+        }
+
+        HashMap<String,String> contribuintes = new HashMap<String,String>();
+        for (Integer i: this.utilizador.getListaFaturas()) {
+            String nifContribuinte = this.totalFaturas.get(i).getNIFCliente();
+            String nomeContribuinte = this.totalEntidades.get(nifContribuinte).getNome();
+            contribuintes.put(nifContribuinte, nomeContribuinte);
+        }
+        System.out.println("Tem faturas emitidas para os seguintes contribuintes:");
+        for(String n: contribuintes.keySet())
+            System.out.println(n + " --> " + contribuintes.get(n));
+
+        Scanner s = new Scanner(System.in);
+        String nifC;
+        do{
+            System.out.println("\nEscreva o nif do contribuinte que deseja ver");
+            nifC = s.nextLine();
+        }while(!contribuintes.containsKey(nifC));
+        s.close();
+
+        s = new Scanner(System.in);
+        int escolha;
+        do{
+            System.out.println("Deseja imprimir por 1 --> valor ou 2 --> data?");
+            escolha = s.nextInt();
+        }while(escolha != 1 && escolha != 2);
+        s.close();
+        System.out.println();
+
+        TreeSet<Fatura> res = null;
+        if(escolha == 1)
+            res = sortValor(nifC);
+        
+        else if(escolha == 2){
+            s = new Scanner(System.in);
+            do{
+                System.out.println("Deseja imprimir por data 1 --> ascendente ou 2 --> descendente");
+                escolha = s.nextInt();
+            }while(escolha != 1 && escolha != 2);
+            System.out.println();
+            s.close();
+
+            if(escolha == 1)
+                res = sortData(nifC, false);
+            
+            else if(escolha == 2)
+                res = sortData(nifC, true);
+        }
+
+        for(Fatura f: res)
+            System.out.println(f.toString());
+
         pausaParaLer();
     }
     /**
@@ -714,49 +833,46 @@ public class Plataforma{
      * @return res TreeSet de faturas ordenado decrescentemente
      */
     public TreeSet<Fatura> sortValor(String nif){
-        ArrayList<Fatura> faturas = new ArrayList<Fatura>();
+        TreeSet<Fatura> res = new TreeSet<Fatura>((f1,f2) -> (int) (f2.getValor() - f1.getValor()));
         if(this.utilizador instanceof Individual){
             for(int i: this.utilizador.getListaFaturas()){
                 if(this.totalFaturas.get(i).getNIFEmitente().equals(nif))
-                    faturas.add(this.totalFaturas.get(i));
+                    res.add(this.totalFaturas.get(i));
             }
         }
         else if(this.utilizador instanceof Coletivo){
             for(int i: this.utilizador.getListaFaturas()){
                 if(this.totalFaturas.get(i).getNIFCliente().equals(nif))
-                    faturas.add(this.totalFaturas.get(i));
+                    res.add(this.totalFaturas.get(i));
             }
         }
 
-        TreeSet<Fatura> res = new TreeSet<Fatura>((f1,f2) -> (int) (f2.getValor() - f1.getValor()));
-        for(Fatura f: faturas)
-            res.add(f);
         return res;
     }
 
     /**
-     * Método que ordena as faturas de uma entidade por data (decrescente)
+     * Método que ordena as faturas de uma entidade por data (crescente se bool decrescente == false)
      * @param nif do cliente ou emissor
      * @return res TreeSet de faturas ordenado decrescentemente
      */
-    public TreeSet<Fatura> sortData(String nif){
-        ArrayList<Fatura> faturas = new ArrayList<Fatura>();
+    public TreeSet<Fatura> sortData(String nif, boolean decrescente){
+        TreeSet<Fatura> res = new TreeSet<Fatura>((f1,f2) -> f1.getData().compareTo(f2.getData()));
         if(this.utilizador instanceof Individual){
             for(int i: this.utilizador.getListaFaturas()){
                 if(this.totalFaturas.get(i).getNIFEmitente().equals(nif))
-                    faturas.add(this.totalFaturas.get(i));
+                    res.add(this.totalFaturas.get(i));
             }
         }
         else if(this.utilizador instanceof Coletivo){
             for(int i: this.utilizador.getListaFaturas()){
                 if(this.totalFaturas.get(i).getNIFCliente().equals(nif))
-                    faturas.add(this.totalFaturas.get(i));
+                    res.add(this.totalFaturas.get(i));
             }
         }
         
-        TreeSet<Fatura> res = new TreeSet<Fatura>((f1,f2) -> f1.getData().compareTo(f2.getData()));
-        for(Fatura f: faturas)
-            res.add(f);
+        if(decrescente)
+            res = (TreeSet<Fatura>) res.descendingSet();
+        
         return res;
     }
 
@@ -765,40 +881,40 @@ public class Plataforma{
      * @param rendimento
      * @return rendimento arredondado
      */
-    public static round(double rendimento){
-        double res;
+    public int round(double rendimento){
+        int res = 0;
         double minimo = rendimento;
-        for(double v: irs.keySet()){
-            if(v - rendimento >= 0)
-                if(v - rendimento < minimo)
+        for(int v: irs.keySet()){
+            double x = v - rendimento;
+            if(x >= 0 && x < minimo){
                     res = v;
-                else
                     break;
+            }
         }
-        if(minimo == rendimento)
+        if(res == 0)
             res = 300001;
         
         return res;
     }
 
     /**
-     * Devolve o valor de dedução fiscal associado ao utilizador atual
-     * @return valor
+     * Devolve o valor de irs e dedução fiscal associado ao utilizador atual
+     * @return par(irs,valor)
      */
-    public double getDeducaoFiscal(){
+    public Pair<Double,Double> getDeducaoFiscal(){
         //Nota: Temos de verificar se o valor acumulado das faturas não ultrapassa o valor do rendimento anual - valor pago de IRS
         //      Os descontos devem incidir apenas sobre o valor(rendimento - valorPagoIRS), como verificar esta situação?
         Individual utilizador = ((Individual) this.utilizador);
         double coeficiente = utilizador.getCoeficienteFiscal();
-        int numeroAgregado = utilizador.getNumeroAgregadoFamiliar();
+        int numeroAgregado = utilizador.getNumeroAgregadoFamiliar() - 1;
         if(numeroAgregado > 5) numeroAgregado = 5;
         double rendimento = utilizador.getRendimentoAgregado();
-        double valorPagoIRS = irs.get(round(rendimento))[numeroAgregado] * rendimento;
+        double valorPagoIRS = (irs.get(round(rendimento))[numeroAgregado] / 100) * rendimento;
 
         double valorADeduzir = 0.0;
         HashMap<String,Double> atividades = utilizador.getCodigosAtividades();
         for(String a: atividades.keySet()){
-            double desconto = atividades.get(a) * descontos.get(a).getKey();
+            double desconto = atividades.get(a) * (descontos.get(a).getKey() / 100.0);
             if(desconto > descontos.get(a).getValue())
                 desconto = descontos.get(a).getValue();
             valorADeduzir += desconto;
@@ -808,6 +924,6 @@ public class Plataforma{
 
         valorADeduzir = Math.min(valorADeduzir, valorPagoIRS);
 
-        return valorADeduzir;
+        return new Pair(valorPagoIRS,valorADeduzir);
     }
 }
