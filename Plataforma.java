@@ -32,10 +32,10 @@ public class Plataforma{
     private Entidade utilizador;
     /**Lista das atividades económicas */
     private static ArrayList<String> atividades = new ArrayList<>(Arrays.asList("despesas gerais familiares",
-                                                                   "saude", "educaçao", "habitaçao", "lares",
-                                                                   "reparaçao de automoveis", "reparacao de motociclos", 
-                                                                   "restauraçao e alojamento", "cabeleireiros",
-                                                                   "atividades veterinarias", "transportes"));
+                                                                   "saúde", "educação", "habitação", "lares",
+                                                                   "reparação de automóveis", "reparação de motociclos", 
+                                                                   "restauração e alojamento", "cabeleireiros",
+                                                                   "atividades veterinárias", "transportes", "outros"));
     /**Tabela para Cálculo do IRS baseando em rendimento anual e número do agregado*/                                                                   
     private static final HashMap<Integer,double[]> irs;
         static{
@@ -57,16 +57,17 @@ public class Plataforma{
         static{
             HashMap<String,Pair<Double,Integer>> myMap = new HashMap<String,Pair<Double,Integer>>();
             myMap.put("despesas gerais familiares", new Pair(35.0, 500));
-            myMap.put("saude", new Pair(15.0, 1000));
-            myMap.put("educaçao", new Pair(30.0, 800));
-            myMap.put("habitaçao", new Pair(15.0, 500));
+            myMap.put("saúde", new Pair(15.0, 1000));
+            myMap.put("educação", new Pair(30.0, 800));
+            myMap.put("habitação", new Pair(15.0, 500));
             myMap.put("lares", new Pair(25.0, 400));
-            myMap.put("reparaçao de automoveis", new Pair(15.0, 200));
-            myMap.put("reparaçao de motociclos", new Pair(15.0, 200));
-            myMap.put("restauraçao e alojamento", new Pair(15.0, 200));
+            myMap.put("reparação de automóveis", new Pair(15.0, 200));
+            myMap.put("reparação de motociclos", new Pair(15.0, 200));
+            myMap.put("restauração e alojamento", new Pair(15.0, 200));
             myMap.put("cabeleireiros", new Pair(10.0, 100));
-            myMap.put("atividades veterinarias", new Pair(15.0, 200));
+            myMap.put("atividades veterinárias", new Pair(15.0, 200));
             myMap.put("transportes", new Pair(20.0, 100));
+            myMap.put("outros", new Pair(0, 0));
             descontos = myMap;
         }
     /**
@@ -79,16 +80,43 @@ public class Plataforma{
     }
 
     /**
-     * Ler o NIF
+     * Ler o NIF para registar
      * @param pedido
      * @return nif
      */
-    public String lerNIF(String pedido){
+    public String lerNIFRegisto(String pedido){
         String nif;
         do{
             nif = ler(pedido);
         }while(nif.length() != 9 || (nif.charAt(0) != '1' && nif.charAt(0) != '2' && nif.charAt(0) != '5' && !nif.equals("000000000")));
-        //posteriormente remover nif.equals("000000000")
+
+        return nif;
+    }
+
+    /**
+     * Ler NIF Individual
+     * @param pedido
+     * @return nif
+     */
+    public String lerNIFIndividual(String pedido){
+        String nif;
+        do{
+            nif = ler(pedido);
+        }while(nif.length() != 9 || (nif.charAt(0) != '1' && nif.charAt(0) != '2'));
+
+        return nif;
+    }
+
+    /**
+     * Ler NIF Coletivo
+     * @param pedido
+     * @return nif
+     */
+    public String lerNIFColetivo(String pedido){
+        String nif;
+        do{
+            nif = ler(pedido);
+        }while(nif.length() != 9 || nif.charAt(0) != '5');
 
         return nif;
     }
@@ -243,7 +271,7 @@ public class Plataforma{
         System.out.print('\u000C');
         System.out.println(menu);
 
-        nif = lerNIF("NIF");
+        nif = lerNIFRegisto("NIF");
 
         Entidade e = null;
         if (this.totalEntidades.containsKey(nif)) {
@@ -307,7 +335,7 @@ public class Plataforma{
         if (numeroAgregado > 1) {
             System.out.println("Escreva o NIF dos restantes elementos do agregado familiar");
             for(int i=1; i<numeroAgregado; i++){
-                String nifFamiliar = lerNIF("NIF " + i);
+                String nifFamiliar = lerNIFIndividual("NIF " + i);
                 nifAgregado.add(nifFamiliar);
             }
         }
@@ -578,7 +606,7 @@ public class Plataforma{
         
 
         if(escolha == 1){
-            String nifCliente = lerNIF("NIF do cliente");
+            String nifCliente = lerNIFIndividual("NIF do cliente");
             String descricao = ler("descricao da fatura");
             double valor;
             s = new Scanner(System.in);
@@ -702,7 +730,9 @@ public class Plataforma{
         menu.append("               #                  Admin                     #              \n");
         menu.append("               ##############################################              \n");
         menu.append("               #                                            #              \n");
-        menu.append("               #           1 --> Logout                     #              \n");
+        menu.append("               #     1 --> Contribuintes mais gastadores    #              \n");
+        menu.append("               #     2 --> Contribuintes mais faturadores   #              \n");
+        menu.append("               #     3 --> Logout                           #              \n");
         menu.append("               #                                            #              \n");
         menu.append("               ##############################################              \n");
         System.out.print('\u000C');
@@ -712,12 +742,109 @@ public class Plataforma{
         int escolha;
         do {
             escolha = s.nextInt();
-        } while (escolha != 1);
+        } while (escolha != 1 && escolha != 2 && escolha != 3);
         s.close();
 
-        if(escolha == 1)
+        if (escolha == 1)
+            verContribuintesMaisGastadores();
+        else if(escolha == 2)
+            verContribuintesMaisFaturadores();
+        else if(escolha == 3)
             logout();
     }
+
+    /**
+     * Ver os 10 Contribuintes Individuais mais gastadores
+     */
+    public void verContribuintesMaisGastadores() {
+        TreeSet<String> contribuintes = new TreeSet<String>((nif1,nif2) -> (int) (getTotalGasto(nif1) - getTotalGasto(nif2)));
+        for (String s: this.totalEntidades.keySet()) {
+            if (s.charAt(0) == '1' || s.charAt(0) == '2')
+                contribuintes.add(s);
+        }
+
+        if (contribuintes.size() == 0) {
+            System.out.println("Não existem contribuintes registados. Por favor, volte mais tarde");
+            pausaParaLer();
+            return;
+        }
+        
+        int num = 10;
+        if (contribuintes.size() < 10)
+            num = contribuintes.size();
+
+        System.out.println("\nTop " + num + " dos contribuintes mais gastadores");
+        for (String c: contribuintes) {
+            System.out.println(c + " --> " + getTotalGasto(c) + "€");
+            num--;
+            if (num == 0)
+                break;
+        }
+
+        pausaParaLer();
+    }
+
+    /**
+     * Devolve o total gasto por um Contribuinte Individual
+     * @param nif NIF do contribuinte individual
+     * @return total gasto
+     */
+    public double getTotalGasto(String nif) {
+        double res = 0;
+        for (Integer i: this.totalEntidades.get(nif).getListaFaturas())
+            res -= this.totalFaturas.get(i).getValor();
+
+        return res;
+    }
+
+    /**
+     * Ver os X Contribuintes Coletivos faturadores
+     */
+    public void verContribuintesMaisFaturadores() {
+        TreeSet<String> contribuintes = new TreeSet<String>((nif1,nif2) -> (int) (getTotalGasto(nif1) - getTotalGasto(nif2)));
+        for (String s: this.totalEntidades.keySet()) {
+            if (s.charAt(0) == '5')
+                contribuintes.add(s);
+        }
+
+        if (contribuintes.size() == 0) {
+            System.out.println("Não existem contribuintes registados. Por favor, volte mais tarde");
+            pausaParaLer();
+            return;
+        }
+
+        Scanner s = new Scanner(System.in);
+        int num;
+        do {
+            System.out.println("Existem " + contribuintes.size() + " contribuintes registados. Quantos quer ver?");
+            num = s.nextInt(); 
+        } while (num < 1 || num > contribuintes.size());
+        s.close();
+
+        System.out.println("\nTop " + num + " dos contribuintes mais faturadores");
+        for (String c: contribuintes) {
+            System.out.println(c + " --> " + getTotalFaturado(c) + "€");
+            num--;
+            if (num == 0)
+                break;
+        }
+
+        pausaParaLer();
+    }
+
+    /**
+     * Devolve o total faturado por um Contribuinte Coletivo
+     * @param nif NIF do contribuinte coletivo
+     * @return total faturado
+     */
+    public double getTotalFaturado(String nif) {
+        double res = 0;
+        for (Integer i: this.totalEntidades.get(nif).getListaFaturas())
+            res += this.totalFaturas.get(i).getValor();
+
+        return res;
+    }
+
     /**
      * Ver as faturas por parte dos Contribuintes Individuais
      */
@@ -728,26 +855,36 @@ public class Plataforma{
             return;
         }
 
-        HashMap<String,String> empresas = new HashMap<String,String>();
-        for (Integer i: this.utilizador.getListaFaturas()) {
-            String nifEmpresa = this.totalFaturas.get(i).getNIFEmitente();
-            String nomeEmpresa = this.totalEntidades.get(nifEmpresa).getNome();
-            empresas.put(nifEmpresa, nomeEmpresa);
-        }
-        System.out.println("Tem faturas emitidas pelas seguintes empresas:");
-        for(String n: empresas.keySet())
-            System.out.println(n + " --> " + empresas.get(n));
-
         Scanner s = new Scanner(System.in);
-        String nifE;
-        do{
-            System.out.println("\nEscreva o nif da empresa que deseja ver");
-            nifE = s.nextLine();
-        }while(!empresas.containsKey(nifE));
+        int escolha;
+        do {
+            System.out.println("Deseja imprimir 1 --> todas as faturas ou 2 --> as de uma determinada empresa?");
+            escolha = s.nextInt();
+        } while (escolha != 1 && escolha != 2);
         s.close();
 
+        String nifE = "000000000";
+        if (escolha == 2) {
+            HashMap<String,String> empresas = new HashMap<String,String>();
+            for (Integer i: this.utilizador.getListaFaturas()) {
+                String nifEmpresa = this.totalFaturas.get(i).getNIFEmitente();
+                String nomeEmpresa = this.totalEntidades.get(nifEmpresa).getNome();
+                empresas.put(nifEmpresa, nomeEmpresa);
+            }
+
+            System.out.println("Tem faturas emitidas pelas seguintes empresas:");
+            for(String n: empresas.keySet())
+                System.out.println(n + " --> " + empresas.get(n));
+
+            s = new Scanner(System.in);
+            do{
+                System.out.println("\nEscreva o nif da empresa que deseja ver");
+                nifE = s.nextLine();
+            }while(!empresas.containsKey(nifE));
+            s.close();
+        }
+
         s = new Scanner(System.in);
-        int escolha;
         do{
             System.out.println("Deseja imprimir por 1 --> valor ou 2 --> data?");
             escolha = s.nextInt();
@@ -786,31 +923,40 @@ public class Plataforma{
      */
     public void verFaturasColetivo() {
         if (this.utilizador.getListaFaturas().size() == 0){
-            System.out.println("Não tem faturas emitidas em seu nome. Por favor, volte mais tarde");
+            System.out.println("Não exitem faturas emitidas por si. Por favor, volte mais tarde");
             pausaParaLer();
             return;
         }
 
-        HashMap<String,String> contribuintes = new HashMap<String,String>();
-        for (Integer i: this.utilizador.getListaFaturas()) {
-            String nifContribuinte = this.totalFaturas.get(i).getNIFCliente();
-            String nomeContribuinte = this.totalEntidades.get(nifContribuinte).getNome();
-            contribuintes.put(nifContribuinte, nomeContribuinte);
-        }
-        System.out.println("Tem faturas emitidas para os seguintes contribuintes:");
-        for(String n: contribuintes.keySet())
-            System.out.println(n + " --> " + contribuintes.get(n));
-
         Scanner s = new Scanner(System.in);
-        String nifC;
-        do{
-            System.out.println("\nEscreva o nif do contribuinte que deseja ver");
-            nifC = s.nextLine();
-        }while(!contribuintes.containsKey(nifC));
+        int escolha;
+        do {
+            System.out.println("Deseja imprimir 1 --> todas as faturas ou 2 --> as de um determinado contribuinte?");
+            escolha = s.nextInt();
+        } while (escolha != 1 && escolha != 2);
         s.close();
 
+        String nifC = "000000000";
+        if (escolha == 2) {
+            HashMap<String,String> contribuintes = new HashMap<String,String>();
+            for (Integer i: this.utilizador.getListaFaturas()) {
+                String nifContribuinte = this.totalFaturas.get(i).getNIFCliente();
+                String nomeContribuinte = this.totalEntidades.get(nifContribuinte).getNome();
+                contribuintes.put(nifContribuinte, nomeContribuinte);
+            }
+            System.out.println("Tem faturas emitidas para os seguintes contribuintes:");
+            for(String n: contribuintes.keySet())
+                System.out.println(n + " --> " + contribuintes.get(n));
+
+            s = new Scanner(System.in);
+            do{
+                System.out.println("\nEscreva o nif do contribuinte que deseja ver");
+                nifC = s.nextLine();
+            }while(!contribuintes.containsKey(nifC));
+            s.close();
+        }
+
         s = new Scanner(System.in);
-        int escolha;
         do{
             System.out.println("Deseja imprimir por 1 --> valor ou 2 --> data?");
             escolha = s.nextInt();
@@ -928,13 +1074,13 @@ public class Plataforma{
         TreeSet<Fatura> res = new TreeSet<Fatura>((f1,f2) -> (int) (f2.getValor() - f1.getValor()));
         if(this.utilizador instanceof Individual){
             for(int i: this.utilizador.getListaFaturas()){
-                if(this.totalFaturas.get(i).getNIFEmitente().equals(nif))
+                if(this.totalFaturas.get(i).getNIFEmitente().equals(nif) || nif.equals("000000000"))
                     res.add(this.totalFaturas.get(i));
             }
         }
         else if(this.utilizador instanceof Coletivo){
             for(int i: this.utilizador.getListaFaturas()){
-                if(this.totalFaturas.get(i).getNIFCliente().equals(nif))
+                if(this.totalFaturas.get(i).getNIFCliente().equals(nif) || nif.equals("000000000"))
                     res.add(this.totalFaturas.get(i));
             }
         }
@@ -951,13 +1097,13 @@ public class Plataforma{
         TreeSet<Fatura> res = new TreeSet<Fatura>((f1,f2) -> f1.getData().compareTo(f2.getData()));
         if(this.utilizador instanceof Individual){
             for(int i: this.utilizador.getListaFaturas()){
-                if(this.totalFaturas.get(i).getNIFEmitente().equals(nif))
+                if(this.totalFaturas.get(i).getNIFEmitente().equals(nif) || nif.equals("000000000"))
                     res.add(this.totalFaturas.get(i));
             }
         }
         else if(this.utilizador instanceof Coletivo){
             for(int i: this.utilizador.getListaFaturas()){
-                if(this.totalFaturas.get(i).getNIFCliente().equals(nif))
+                if(this.totalFaturas.get(i).getNIFCliente().equals(nif) || nif.equals("000000000"))
                     res.add(this.totalFaturas.get(i));
             }
         }
