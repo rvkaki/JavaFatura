@@ -10,11 +10,12 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.TreeSet;
 import javafx.util.Pair;
-import sun.reflect.generics.tree.Tree;
-
 import java.util.HashMap;
 import java.lang.System;
 import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.Year;
+import java.time.YearMonth;
 import java.util.Arrays;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -561,7 +562,8 @@ public class Plataforma{
         menu.append("               #           1 --> Emitir Fatura              #              \n");
         menu.append("               #           2 --> Ver Faturas                #              \n");
         menu.append("               #           3 --> Definições da conta        #              \n");
-        menu.append("               #           4 --> Logout                     #              \n");
+        menu.append("               #           4 --> Valor Faturado             #              \n");
+        menu.append("               #           5 --> Logout                     #              \n");
         menu.append("               #                                            #              \n");
         menu.append("               ##############################################              \n");
         System.out.print('\u000C');
@@ -571,13 +573,15 @@ public class Plataforma{
         int escolha;
         do{
             escolha = s.nextInt();
-        }while(escolha != 1 && escolha != 2 && escolha != 3 && escolha != 4);
+        }while(escolha != 1 && escolha != 2 && escolha != 3 && escolha != 4 && escolha != 5);
+        s.close();
         
 
         if(escolha == 1){
             String nifCliente = lerNIF("NIF do cliente");
             String descricao = ler("descricao da fatura");
             double valor;
+            s = new Scanner(System.in);
             do{
                 System.out.println("Escreva valor da Fatura");
                 valor = s.nextDouble();
@@ -590,7 +594,34 @@ public class Plataforma{
             boolean exit = false;
             while (!exit)
                 exit = definicoesDaConta();
-        } else if (escolha == 4)
+        }
+        else if(escolha == 4){ 
+            TreeSet<YearMonth> mesAno = new TreeSet<YearMonth>();
+            for(int i: this.utilizador.getListaFaturas()){
+                Month m = this.totalFaturas.get(i).getData().getMonth();
+                int y = this.totalFaturas.get(i).getData().getYear();
+                YearMonth my = YearMonth.of(y,m);
+                mesAno.add(my);
+            }
+            int j = 1;
+            System.out.println("Possui faturas emitidas nos seguintes meses:");
+            ArrayList<YearMonth> res = new ArrayList<YearMonth>();
+            for(YearMonth x: mesAno){
+                System.out.println(j + " --> " + x.getMonth() + "/" + x.getYear());
+                res.add(x);
+                j++;
+            }
+            s = new Scanner(System.in);
+            do{
+                System.out.println("Escolha o período pretendido:");
+                escolha = s.nextInt();
+            }while(escolha < 1 || escolha > j);
+            YearMonth mes = res.get(escolha - 1);
+            double valor = valorFaturado(mes);
+            System.out.println(valor);
+            pausaParaLer();
+        }
+        else if (escolha == 5)
             logout();
     }
     /**
@@ -646,6 +677,20 @@ public class Plataforma{
 
         novasDefinicoes.close();
         return false;
+    }
+    /**
+     * Devolve o valor faturado num determinado período (mês)
+     * @param month
+     * @return valor faturado
+     */
+    public double valorFaturado(YearMonth month){
+        double valor = 0;
+        for(int i: this.utilizador.getListaFaturas()){
+            Fatura f = this.totalFaturas.get(i);
+            if(f.getData().getMonthValue() == month.getMonthValue() && f.getData().getYear() == month.getYear())
+                valor += f.getValor();
+        }
+        return valor;
     }
     /**
      * Imprimir o menu do administrador
@@ -808,7 +853,54 @@ public class Plataforma{
         Coletivo empresa = (Coletivo) this.utilizador;
         String atividade = empresa.getAtividadeSeUnica();
 
-        Fatura f = new Fatura(empresa.getNIF(), LocalDateTime.now(), nifCliente, descricao, atividade, valor);
+        System.out.println("Está a 1 --> registar uma fatura já emitida; ou a 2 --> emitir uma nova?");
+        Scanner s = new Scanner(System.in);
+        int escolha;
+        do{
+            escolha = s.nextInt();
+        }while(escolha != 1 && escolha != 2);
+        s.close();
+
+        LocalDateTime data = LocalDateTime.now();
+        if(escolha == 1){
+            s = new Scanner(System.in);
+            System.out.println("Indique o ano");
+            int ano;
+            do{
+                ano = s.nextInt();
+            }while(ano < 2000 || ano > 2018);
+
+            System.out.println("Indique o número do mês");
+            int mes;
+            do{
+                mes = s.nextInt();
+            }while(mes < 1 || mes > 12);
+
+            YearMonth x = YearMonth.of(ano, mes);
+
+            System.out.println("Indique o dia");
+            int dia;
+            do{
+                dia = s.nextInt();
+            }while(!x.isValidDay(dia));
+
+            System.out.println("Indique a hora");
+            int hora;
+            do{
+                hora = s.nextInt();
+            }while(hora < 0 || hora > 23);
+
+            System.out.println("Indique os minutos");
+            int minutos;
+            do{
+                minutos = s.nextInt();
+            }while(minutos < 1 || minutos > 59);
+
+            data = LocalDateTime.of(ano, mes, dia, hora, minutos);
+        }
+            
+
+        Fatura f = new Fatura(empresa.getNIF(), data, nifCliente, descricao, atividade, valor);
         this.totalFaturas.add(f.clone());
         int indiceFatura = this.totalFaturas.indexOf(f);
 
