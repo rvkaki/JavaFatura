@@ -757,7 +757,7 @@ public class Plataforma{
      * Ver os 10 Contribuintes Individuais mais gastadores
      */
     public void verContribuintesMaisGastadores() {
-        TreeSet<String> contribuintes = new TreeSet<String>((nif1,nif2) -> (int) (getTotalGasto(nif1) - getTotalGasto(nif2)));
+        TreeSet<String> contribuintes = new TreeSet<String>((nif1,nif2) -> (int) (getValorTotal(nif2) - getValorTotal(nif1)));
         for (String s: this.totalEntidades.keySet()) {
             if (s.charAt(0) == '1' || s.charAt(0) == '2')
                 contribuintes.add(s);
@@ -775,7 +775,7 @@ public class Plataforma{
 
         System.out.println("\nTop " + num + " dos contribuintes mais gastadores");
         for (String c: contribuintes) {
-            System.out.println(c + " --> " + getTotalGasto(c) + "€");
+            System.out.println(c + " --> " + getValorTotal(c) + "€");
             num--;
             if (num == 0)
                 break;
@@ -785,23 +785,10 @@ public class Plataforma{
     }
 
     /**
-     * Devolve o total gasto por um Contribuinte Individual
-     * @param nif NIF do contribuinte individual
-     * @return total gasto
-     */
-    public double getTotalGasto(String nif) {
-        double res = 0;
-        for (Integer i: this.totalEntidades.get(nif).getListaFaturas())
-            res -= this.totalFaturas.get(i).getValor();
-
-        return res;
-    }
-
-    /**
      * Ver os X Contribuintes Coletivos faturadores
      */
     public void verContribuintesMaisFaturadores() {
-        TreeSet<String> contribuintes = new TreeSet<String>((nif1,nif2) -> (int) (getTotalGasto(nif1) - getTotalGasto(nif2)));
+        TreeSet<String> contribuintes = new TreeSet<String>((nif1,nif2) -> (int) (getValorTotal(nif2) - getValorTotal(nif1)));
         for (String s: this.totalEntidades.keySet()) {
             if (s.charAt(0) == '5')
                 contribuintes.add(s);
@@ -823,7 +810,7 @@ public class Plataforma{
 
         System.out.println("\nTop " + num + " dos contribuintes mais faturadores");
         for (String c: contribuintes) {
-            System.out.println(c + " --> " + getTotalFaturado(c) + "€");
+            System.out.println(c + " --> " + getValorTotal(c) + "€");
             num--;
             if (num == 0)
                 break;
@@ -833,11 +820,11 @@ public class Plataforma{
     }
 
     /**
-     * Devolve o total faturado por um Contribuinte Coletivo
-     * @param nif NIF do contribuinte coletivo
-     * @return total faturado
+     * Devolve o valor total de todas as faturas de um contribuinte
+     * @param nif NIF do contribuinte
+     * @return valor total
      */
-    public double getTotalFaturado(String nif) {
+    public double getValorTotal(String nif) {
         double res = 0;
         for (Integer i: this.totalEntidades.get(nif).getListaFaturas())
             res += this.totalFaturas.get(i).getValor();
