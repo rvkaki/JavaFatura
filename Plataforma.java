@@ -32,6 +32,8 @@ public class Plataforma{
     private ArrayList<AgregadoFamiliar> agregados;
     /**Identificação da entidade */
     private Entidade utilizador;
+    /**Limite das familias numerosas*/
+    private int limiteFamiliaNumerosa;
     /**Lista das atividades económicas */
     private static ArrayList<String> atividades = new ArrayList<>(Arrays.asList("despesas gerais familiares",
                                                                    "saúde", "educação", "habitação", "lares",
@@ -80,6 +82,7 @@ public class Plataforma{
         this.totalEntidades = new HashMap<String,Entidade>();
         this.agregados = new ArrayList<AgregadoFamiliar>();
         this.utilizador = null;
+        this.limiteFamiliaNumerosa = 4;
     }
 
     /**
@@ -134,6 +137,7 @@ public class Plataforma{
             save.writeObject(this.totalFaturas);
             save.writeObject(this.totalEntidades);
             save.writeObject(this.agregados);
+            save.writeObject(this.limiteFamiliaNumerosa);
             save.close();
             novoEstado.close();
         }
@@ -152,12 +156,10 @@ public class Plataforma{
             FileInputStream estado = new FileInputStream("estado.sav");
             if(estado.available() > 0){
                 ObjectInputStream restore = new ObjectInputStream(estado);
-                ArrayList<Fatura> totalFaturas = (ArrayList<Fatura>) restore.readObject();
-                HashMap<String,Entidade> totalEntidades = (HashMap<String,Entidade>) restore.readObject();
-                ArrayList<AgregadoFamiliar> agregados = (ArrayList<AgregadoFamiliar>) restore.readObject();
-                this.totalFaturas = totalFaturas;
-                this.totalEntidades = totalEntidades;
-                this.agregados = agregados;
+                this.totalFaturas = (ArrayList<Fatura>) restore.readObject();
+                this.totalEntidades = (HashMap<String,Entidade>) restore.readObject();
+                this.agregados = (ArrayList<AgregadoFamiliar>) restore.readObject();
+                this.limiteFamiliaNumerosa = (int) restore.readObject();
                 restore.close();
             }
             estado.close();
@@ -336,25 +338,27 @@ public class Plataforma{
         System.out.print('\u000C');
         System.out.println(menu);
         
-        int numeroAgregado = Integer.parseInt(ler("numero de elementos do Agregado Familiar"));
+        int numeroAgregado = Integer.parseInt(ler("número de elementos do agregado familiar (incluindo você)"));
         HashMap<String,Boolean> nifAgregado = new HashMap<String,Boolean>();
         int numeroFilhos;
         do{
-            numeroFilhos = Integer.parseInt(ler("numero de filhos"));
+            numeroFilhos = Integer.parseInt(ler("número de filhos"));
         }while(numeroFilhos >= numeroAgregado);
+
         if (numeroAgregado > 1) {
             System.out.println("Escreva o NIF dos filhos");
             for(int i=1; i<=numeroFilhos; i++){
                 String nifFilho = lerNIFIndividual("NIF filho " + i);
                 nifAgregado.put(nifFilho, true);
-
             }
-            System.out.println("Escreva o NIF dos restantes elementos do agregado familiar");
+
+            System.out.println("Escreva o NIF dos restantes elementos do agregado familiar (excluindo você)");
             for(int i=1; i<numeroAgregado-numeroFilhos; i++){
                 String nifFamiliar = lerNIFIndividual("NIF " + i);
                 nifAgregado.put(nifFamiliar, false);
             }
         }
+    
         double coeficiente = Double.parseDouble(ler("coeficiente Fiscal"));
         double rendimentoAtual;
         double rendimentoAgregado;
@@ -369,6 +373,8 @@ public class Plataforma{
             }
         
         if(nif != null){
+            this.agregados.get(indice).atualizaAgregado(nifAgregado);
+
             rendimentoAtual = this.agregados.get(indice).getRendimento();
             Scanner s = new Scanner(System.in);
             String resposta;
@@ -380,16 +386,15 @@ public class Plataforma{
 
             if(resposta.equals("n")){
                 rendimentoAgregado = Double.parseDouble(ler("rendimento anual do agregado familiar"));
-                for(String n: nifAgregado.keySet())
-                    this.agregados.get(indice).setRendimento(rendimentoAgregado);
+                this.agregados.get(indice).setRendimento(rendimentoAgregado);
             }
         }
         else {
             rendimentoAgregado = Double.parseDouble(ler("rendimento anual do agregado familiar"));
             this.agregados.add(new AgregadoFamiliar(nifAgregado, rendimentoAgregado));
-            e.setIndice(indice);
         }
-        
+
+        e.setIndice(indice);
         e.setCoeficienteFiscal(coeficiente);
     }
     /**
@@ -403,9 +408,10 @@ public class Plataforma{
         menu.append("               #            RegistarColetivo                #              \n");
         menu.append("               ##############################################              \n");
         menu.append("               #                                            #              \n");
-        menu.append("               #       Designação:                          #              \n");
-        menu.append("               #       Coeficiente Fiscal:                  #              \n");
-        menu.append("               #       Atividades Económicas:               #              \n");
+        menu.append("               #         Designação:                        #              \n");
+        menu.append("               #         Coeficiente Fiscal:                #              \n");
+        menu.append("               #         Atividades Económicas:             #              \n");
+        menu.append("               #         Interior do país:                  #              \n");
         menu.append("               #                                            #              \n");
         menu.append("               ##############################################              \n");
         System.out.print('\u000C');
@@ -414,10 +420,19 @@ public class Plataforma{
         String designacao = ler("designacao");
         double coeficiente = Double.parseDouble(ler("coeficiente Fiscal"));
         ArrayList<String> informacaoAtividades = lerAtividadesColetivo();
+        
+        Scanner ler = new Scanner(System.in);
+        System.out.println("É uma empresa do interior? (s/n)");
+        String res = ler.nextLine();
+        boolean interior = false;
+        if (res.equals("s"))
+            interior = true;
+        ler.close();
 
         e.setDesignacao(designacao);
         e.setInformacaoAtividades(informacaoAtividades);
         e.setCoeficienteFiscal(coeficiente);
+        e.setInterior(interior);
     }
     /**
      * Fazer o log out
@@ -507,8 +522,8 @@ public class Plataforma{
         else if (escolha == 3){
             Pair<Double,Double> valor = this.getDeducaoFiscal();
             double irs = valor.getKey();
-            double dedução = valor.getValue();
-            System.out.println("O valor pago de IRS foi " + irs + " e o valor de dedução é " + dedução);
+            double deducao = valor.getValue();
+            System.out.println("O valor pago de IRS foi " + irs + " e o valor de dedução é " + deducao);
             pausaParaLer();
         }
         else if (escolha == 4) {
@@ -744,9 +759,10 @@ public class Plataforma{
         menu.append("               #                  Admin                     #              \n");
         menu.append("               ##############################################              \n");
         menu.append("               #                                            #              \n");
-        menu.append("               #     1 --> Contribuintes mais gastadores    #              \n");
-        menu.append("               #     2 --> Contribuintes mais faturadores   #              \n");
-        menu.append("               #     3 --> Logout                           #              \n");
+        menu.append("               #    1 --> Contribuintes mais gastadores     #              \n");
+        menu.append("               #    2 --> Contribuintes mais faturadores    #              \n");
+        menu.append("               #    3 --> Alterar limite família numerosa   #              \n");
+        menu.append("               #    4 --> Logout                            #              \n");
         menu.append("               #                                            #              \n");
         menu.append("               ##############################################              \n");
         System.out.print('\u000C');
@@ -756,7 +772,7 @@ public class Plataforma{
         int escolha;
         do {
             escolha = s.nextInt();
-        } while (escolha != 1 && escolha != 2 && escolha != 3);
+        } while (escolha != 1 && escolha != 2 && escolha != 3 && escolha != 4);
         s.close();
 
         if (escolha == 1)
@@ -764,6 +780,8 @@ public class Plataforma{
         else if(escolha == 2)
             verContribuintesMaisFaturadores();
         else if(escolha == 3)
+            alterarLimiteFamiliaNumerosa();
+        else if(escolha == 4)
             logout();
     }
 
@@ -844,6 +862,16 @@ public class Plataforma{
             res += this.totalFaturas.get(i).getValor();
 
         return res;
+    }
+
+    /**
+     * Altera a definição de famílias numerosas
+     */
+    public void alterarLimiteFamiliaNumerosa() {
+        System.out.println("O valor atual é " + this.limiteFamiliaNumerosa + ". Introduza o novo limite para as famílias numerosas");
+        Scanner s = new Scanner(System.in);
+        this.limiteFamiliaNumerosa = s.nextInt();
+        s.close();
     }
 
     /**
@@ -1165,5 +1193,25 @@ public class Plataforma{
         valorADeduzir = Math.min(valorADeduzir, valorPagoIRS);
 
         return new Pair(valorPagoIRS,valorADeduzir);
+    }
+
+    // Falta acrecentar os valores reais da redução de imposto!!!!!
+    public double reducaoImposto() {
+        if (this.utilizador instanceof Individual && isFamiliaNumerosa(this.utilizador.getNIF())) {
+            ;
+        } else if (this.utilizador instanceof Coletivo && ((Coletivo) this.utilizador).getInterior()) {
+            ;
+        }
+
+        return 0.0;
+    }
+
+    /**
+     * Função que diz se a família de um dado Individual é numerosa
+     * @param nif NIF do Individual
+     */
+    public boolean isFamiliaNumerosa(String nif){
+        Individual i = (Individual) this.totalEntidades.get(nif);
+        return this.agregados.get(i.getIndice()).getNumeroFilhos() >= limiteFamiliaNumerosa;
     }
 }

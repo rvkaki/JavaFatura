@@ -15,6 +15,9 @@ public class Coletivo extends Entidade{
     private ArrayList<String> informacaoAtividades;
     /** Número do coeficiente fiscal */
     private double coeficienteFiscal;
+    /** Indica se a empresa é do interior */
+    private boolean interior;
+
     /**
      * Construtor por omissão
      */
@@ -23,6 +26,7 @@ public class Coletivo extends Entidade{
         this.designacao = "";
         this.informacaoAtividades = new ArrayList<String>();
         this.coeficienteFiscal = 0.0;
+        this.interior = false;
     }
     /**
      * Construtor por parametro
@@ -36,13 +40,14 @@ public class Coletivo extends Entidade{
      * @param informacaoAtividade
      * @param coeficienteFiscal
      */
-    public Coletivo(String nif, String email, String nome, String morada, String password, ArrayList<Integer> listaFaturas, String designacao, ArrayList<String> informacaoAtividades, double coeficienteFiscal){
+    public Coletivo(String nif, String email, String nome, String morada, String password, ArrayList<Integer> listaFaturas, String designacao, ArrayList<String> informacaoAtividades, double coeficienteFiscal, boolean interior){
         super(nif, email, nome, morada, password, listaFaturas);
         this.designacao = designacao;
         this.informacaoAtividades = new ArrayList<String>(informacaoAtividades.size());
         for(String s: informacaoAtividades)
             this.informacaoAtividades.add(s);
         this.coeficienteFiscal = coeficienteFiscal;
+        this.interior = interior;
     }
     /**
      * Construtor por cópia
@@ -53,6 +58,7 @@ public class Coletivo extends Entidade{
         this.designacao = e.getDesignacao();
         this.informacaoAtividades = e.getInformacaoAtividades();
         this.coeficienteFiscal = e.getCoeficienteFiscal();
+        this.interior = e.getInterior();
     }
     /** 
      * Devolve a designacao do coletivo
@@ -78,6 +84,15 @@ public class Coletivo extends Entidade{
     public double getCoeficienteFiscal(){
         return this.coeficienteFiscal;
     }
+
+    /**
+     * Devolve true se a empresa for do interior
+     * @return o coeficiente fiscal
+     */
+    public boolean getInterior(){
+        return this.interior;
+    }
+
     /** 
      * Define a designação do coletivo
      * @param designacao
@@ -102,6 +117,15 @@ public class Coletivo extends Entidade{
     public void setCoeficienteFiscal(double coeficiente){
         this.coeficienteFiscal = coeficiente;
     }
+
+    /**
+     * Define se a empresa é do interior
+     * @param interior
+     */
+    public void setInterior(boolean interior){
+        this.interior = interior;
+    }
+
     /**
      * Devolve a ????????
      * @return 

@@ -43,6 +43,20 @@ public class AgregadoFamiliar implements Serializable{
         return this.rendimento;
     }
 
+    /**
+     * Devolve o número de filhos no agregado
+     * @return número de filhos
+     */
+    public int getNumeroFilhos(){
+        int res = 0;
+        for (boolean filho: this.agregado.values()) {
+            if (filho)
+                res += 1;
+        }
+
+        return res;
+    }
+
     public void setAgregado(HashMap<String,Boolean> agregado){
         for(String s: agregado.keySet())
             this.agregado.put(s, agregado.get(s));
@@ -56,5 +70,10 @@ public class AgregadoFamiliar implements Serializable{
         return this.agregado.getOrDefault(nif, false);
     }
 
-
+    public void atualizaAgregado(HashMap<String,Boolean> newAgregado){
+        for (String nif: newAgregado.keySet()) {
+            if (!this.agregado.containsKey(nif))
+                this.agregado.put(nif, newAgregado.get(nif));
+        }
+    }
 }
