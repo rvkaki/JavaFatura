@@ -10,27 +10,21 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Individual extends Entidade{
-    /** Número do agregado familiar*/
-    private int numeroAgregadoFamiliar;
-    /** Lista com os nif do agregado */
-    private ArrayList<String> nifAgregado;
     /** Numero do coeficiente fiscal */
     private double coeficienteFiscal;
     /** Map com atividades e valor deduzido para cada */
     private HashMap<String, Double> codigosAtividades;
-    /** Rendimento do Agregado Familiar */
-    private double rendimentoAgregado;
+    /** Posição do respetivo Agregado na lista de Agregados da Plataforma */
+    private int indice;
 
     /**
      * Construtor por omissão
      */
     public Individual(){
         super();
-        this.numeroAgregadoFamiliar = 0;
-        this.nifAgregado = new ArrayList<String>();
         this.coeficienteFiscal = 0.0;
         this.codigosAtividades = new HashMap<String,Double>();
-        this.rendimentoAgregado = 0.0;
+        this.indice = 0;
     }
     /**
      * Construtor por parametro
@@ -40,23 +34,17 @@ public class Individual extends Entidade{
      * @param morada
      * @param password
      * @param listaFaturas
-     * @param numeroAgregadoFamiliar
-     * @param nifAgregado
      * @param coeficienteFiscal
      * @param codigosAtividades
-     * @param rendimentoAgregado
+     * @param indice
      */
-    public Individual(String nif, String email, String nome, String morada, String password, ArrayList<Integer> listaFaturas, int numeroAgregadoFamiliar, ArrayList<String> nifAgregado, double coeficienteFiscal, HashMap<String,Double> codigosAtividades, double rendimentoAgregado){
+    public Individual(String nif, String email, String nome, String morada, String password, ArrayList<Integer> listaFaturas, double coeficienteFiscal, HashMap<String,Double> codigosAtividades, int indice){
         super(nif, email, nome, morada, password, listaFaturas);
-        this.numeroAgregadoFamiliar = numeroAgregadoFamiliar;
-        this.nifAgregado = new ArrayList<String>(nifAgregado.size());
-        for(String s: nifAgregado)
-            this.nifAgregado.add(s);
         this.coeficienteFiscal = coeficienteFiscal;
         this.codigosAtividades = new HashMap<String,Double>(codigosAtividades.size());
         for(String s: codigosAtividades.keySet())
             this.codigosAtividades.put(s, codigosAtividades.get(s));
-        this.rendimentoAgregado = rendimentoAgregado;
+        this.indice = indice;
     }
     /**
      * Contrutor por cópia 
@@ -64,28 +52,9 @@ public class Individual extends Entidade{
      */
     public Individual(Individual c){
         super(c);
-        this.numeroAgregadoFamiliar = c.getNumeroAgregadoFamiliar();
-        this.nifAgregado = c.getNIFAgregadoFamiliar();
         this.coeficienteFiscal = c.getCoeficienteFiscal();
         this.codigosAtividades = c.getCodigosAtividades();
-        this.rendimentoAgregado = c.getRendimentoAgregado();
-    }
-    /**
-     * Devolve o numero do agregado familiar
-     * @return numero do agregado familiar
-     */
-    public int getNumeroAgregadoFamiliar(){
-        return this.numeroAgregadoFamiliar;
-    }
-    /**
-     * Devolve o nif do agregado familiar
-     * @return nif
-     */
-    public ArrayList<String> getNIFAgregadoFamiliar(){
-        ArrayList<String> res = new ArrayList<String>(this.nifAgregado.size());
-        for(String s: this.nifAgregado)
-            res.add(s);
-        return res;
+        this.indice = c.getIndice();
     }
     /**
      * Devolve o coeficiente fiscal
@@ -105,28 +74,11 @@ public class Individual extends Entidade{
         return res;
     }
     /**
-     * Devolve o rendimento do agregado
-     * @return rendimento do agregado
+     * Devolve o indice
+     * @return indice
      */
-    public double getRendimentoAgregado(){
-        return this.rendimentoAgregado;
-    }
-    /**
-     * Define o numero do agregado familiar
-     * @param numero
-     */
-    public void setNumeroAgregadoFamiliar(int numero){
-        this.numeroAgregadoFamiliar = numero;
-    }
-    /** 
-     * Define o nif dos agragados
-     * @param nifs
-     */
-    public void setNIFAgregado(ArrayList<String> nifs){
-        ArrayList<String> res = new ArrayList<String>(nifs.size());
-        for(String s: nifs)
-            res.add(s);
-        this.nifAgregado = res;
+    public int getIndice(){
+        return this.indice;
     }
     /**
      * Define o coeficiente fiscal 
@@ -145,14 +97,12 @@ public class Individual extends Entidade{
             res.put(s, codigos.get(s));
         this.codigosAtividades = res;
     }
-    /**
-     * Define o rendimento do Agregado
-     * @param rendimentoAgregado
+    /** Define o indice
+     * @param indice
      */
-    public void setRendimentoAgregado(double rendimentoAgregado){
-        this.rendimentoAgregado = rendimentoAgregado;
+    public void setIndice(int indice){
+        this.indice = indice;
     }
-
     /**
      * Atualiza a entrada de uma determinada atividade no codigosAtividades
      * @param key chave 

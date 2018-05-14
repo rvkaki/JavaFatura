@@ -28,6 +28,8 @@ public class Plataforma{
     private ArrayList<Fatura> totalFaturas;
     /** Lista de todas as entidades*/ 
     private HashMap<String,Entidade> totalEntidades;
+    /** Lista de todos os Agregados */
+    private ArrayList<AgregadoFamiliar> agregados;
     /**Identificação da entidade */
     private Entidade utilizador;
     /**Lista das atividades económicas */
@@ -76,6 +78,7 @@ public class Plataforma{
    public Plataforma(){
         this.totalFaturas = new ArrayList<Fatura>();
         this.totalEntidades = new HashMap<String,Entidade>();
+        this.agregados = new ArrayList<AgregadoFamiliar>();
         this.utilizador = null;
     }
 
@@ -130,6 +133,7 @@ public class Plataforma{
             ObjectOutputStream save = new ObjectOutputStream(novoEstado);
             save.writeObject(this.totalFaturas);
             save.writeObject(this.totalEntidades);
+            save.writeObject(this.agregados);
             save.close();
             novoEstado.close();
         }
@@ -150,8 +154,10 @@ public class Plataforma{
                 ObjectInputStream restore = new ObjectInputStream(estado);
                 ArrayList<Fatura> totalFaturas = (ArrayList<Fatura>) restore.readObject();
                 HashMap<String,Entidade> totalEntidades = (HashMap<String,Entidade>) restore.readObject();
+                ArrayList<AgregadoFamiliar> agregados = (ArrayList<AgregadoFamiliar>) restore.readObject();
                 this.totalFaturas = totalFaturas;
                 this.totalEntidades = totalEntidades;
+                this.agregados = agregados;
                 restore.close();
             }
             estado.close();
@@ -331,27 +337,39 @@ public class Plataforma{
         System.out.println(menu);
         
         int numeroAgregado = Integer.parseInt(ler("numero de elementos do Agregado Familiar"));
-        ArrayList<String> nifAgregado = new ArrayList<String>(numeroAgregado);
+        HashMap<String,Boolean> nifAgregado = new HashMap<String,Boolean>();
+        int numeroFilhos;
+        do{
+            numeroFilhos = Integer.parseInt(ler("numero de filhos"));
+        }while(numeroFilhos >= numeroAgregado);
         if (numeroAgregado > 1) {
+            System.out.println("Escreva o NIF dos filhos");
+            for(int i=1; i<=numeroFilhos; i++){
+                String nifFilho = lerNIFIndividual("NIF filho " + i);
+                nifAgregado.put(nifFilho, true);
+
+            }
             System.out.println("Escreva o NIF dos restantes elementos do agregado familiar");
-            for(int i=1; i<numeroAgregado; i++){
+            for(int i=1; i<numeroAgregado-numeroFilhos; i++){
                 String nifFamiliar = lerNIFIndividual("NIF " + i);
-                nifAgregado.add(nifFamiliar);
+                nifAgregado.put(nifFamiliar, false);
             }
         }
         double coeficiente = Double.parseDouble(ler("coeficiente Fiscal"));
         double rendimentoAtual;
         double rendimentoAgregado;
+        int indice = this.agregados.size();
         String nif = null;
 
-        for(String nif1: nifAgregado)
+        for(String nif1: nifAgregado.keySet())
             if(this.totalEntidades.containsKey(nif1)){
                 nif = nif1;
+                indice = ((Individual) this.totalEntidades.get(nif)).getIndice();
                 break;
             }
         
         if(nif != null){
-            rendimentoAtual = ((Individual) this.totalEntidades.get(nif)).getRendimentoAgregado();
+            rendimentoAtual = this.agregados.get(indice).getRendimento();
             Scanner s = new Scanner(System.in);
             String resposta;
             do{
@@ -362,20 +380,16 @@ public class Plataforma{
 
             if(resposta.equals("n")){
                 rendimentoAgregado = Double.parseDouble(ler("rendimento anual do agregado familiar"));
-                for(String n: nifAgregado)
-                    ((Individual) this.totalEntidades.get(n)).setRendimentoAgregado(rendimentoAgregado);
-            }
-            else {
-                e.setRendimentoAgregado(rendimentoAtual);
+                for(String n: nifAgregado.keySet())
+                    this.agregados.get(indice).setRendimento(rendimentoAgregado);
             }
         }
         else {
             rendimentoAgregado = Double.parseDouble(ler("rendimento anual do agregado familiar"));
-            e.setRendimentoAgregado(rendimentoAgregado);
+            this.agregados.add(new AgregadoFamiliar(nifAgregado, rendimentoAgregado));
+            e.setIndice(indice);
         }
         
-        e.setNumeroAgregadoFamiliar(numeroAgregado);
-        e.setNIFAgregado(nifAgregado);
         e.setCoeficienteFiscal(coeficiente);
     }
     /**
@@ -1131,9 +1145,10 @@ public class Plataforma{
         //      Os descontos devem incidir apenas sobre o valor(rendimento - valorPagoIRS), como verificar esta situação?
         Individual utilizador = ((Individual) this.utilizador);
         double coeficiente = utilizador.getCoeficienteFiscal();
-        int numeroAgregado = utilizador.getNumeroAgregadoFamiliar() - 1;
+        AgregadoFamiliar agregado = this.agregados.get(utilizador.getIndice());
+        int numeroAgregado = agregado.getAgregado().size();
         if(numeroAgregado > 5) numeroAgregado = 5;
-        double rendimento = utilizador.getRendimentoAgregado();
+        double rendimento = agregado.getRendimento();
         double valorPagoIRS = (irs.get(round(rendimento))[numeroAgregado] / 100) * rendimento;
 
         double valorADeduzir = 0.0;
