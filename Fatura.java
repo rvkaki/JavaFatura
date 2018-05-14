@@ -8,6 +8,7 @@
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 public class Fatura implements Serializable{
     /** Nif do emitente */
@@ -20,6 +21,8 @@ public class Fatura implements Serializable{
     private String descricao;
     /** Atividade económica da fatura */
     private String atividade;
+    /** Atividades económicas anteriores */
+    private ArrayList<String> atividadesAnteriores;
     /** Valor da fatura */
     private double valor;
     /**
@@ -30,8 +33,9 @@ public class Fatura implements Serializable{
     	this.data = LocalDateTime.now();
     	this.nifCliente = "";
     	this.descricao = "";
-    	this.atividade = "";
-    	this.valor = 0.0;
+        this.atividade = "";
+        this.atividadesAnteriores = new ArrayList<String>();
+        this.valor = 0.0;
     }
     /**
      * Construtor por parametro
@@ -42,13 +46,16 @@ public class Fatura implements Serializable{
      * @param atividade
      * @param valor
      */
-    public Fatura(String nifEmitente, LocalDateTime data, String nifCliente, String descricao, String atividade, double valor){
+    public Fatura(String nifEmitente, LocalDateTime data, String nifCliente, String descricao, String atividade, ArrayList<String> atividadesAnteriores, double valor){
     	this.nifEmitente = nifEmitente;
     	this.data = data;
     	this.nifCliente = nifCliente;
     	this.descricao = descricao;
-    	this.atividade = atividade;
-    	this.valor = valor;
+        this.atividade = atividade;
+        this.atividadesAnteriores = new ArrayList<String>(atividadesAnteriores.size());
+        for (String s: atividadesAnteriores)
+            this.atividadesAnteriores.add(s);
+        this.valor = valor;
     }
     /**
      * Contrutor por cópia
@@ -59,7 +66,10 @@ public class Fatura implements Serializable{
     	this.data = f.getData();
     	this.nifCliente = f.getNIFCliente();
     	this.descricao = f.getDescricao();
-    	this.atividade = f.getAtividade();
+        this.atividade = f.getAtividade();
+        this.atividadesAnteriores = new ArrayList<String>(atividadesAnteriores.size());
+        for (String s: f.getAtividadesAnteriores())
+            this.atividadesAnteriores.add(s);
     	this.valor = f.getValor();
     }
     /**
@@ -97,6 +107,19 @@ public class Fatura implements Serializable{
     public String getAtividade(){
     	return this.atividade;
     }
+
+    /**
+     * Devolve as atividades económicas anteriores
+     * @return atividades económicas anteriores
+     */
+    public ArrayList<String> getAtividadesAnteriores() {
+        ArrayList<String> res = new ArrayList<String>(this.atividadesAnteriores.size());
+        for (String s: this.atividadesAnteriores)
+            res.add(s);
+
+        return res;
+    }
+
     /**
      * Devolve o valor
      * @return valor
@@ -110,6 +133,7 @@ public class Fatura implements Serializable{
      * @param atividade
      */
     public void setAtividade(String atividade){
+        this.atividadesAnteriores.add(this.atividade);
         this.atividade = atividade;
     }
 

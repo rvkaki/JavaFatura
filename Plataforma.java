@@ -499,11 +499,12 @@ public class Plataforma{
         menu.append("               #           Contribuinte Individual          #              \n");
         menu.append("               ##############################################              \n");
         menu.append("               #                                            #              \n");
-        menu.append("               #           1 --> Ver Faturas                #              \n");
-        menu.append("               #           2 --> Validar Faturas            #              \n");
-        menu.append("               #           3 --> Valor Dedução Fiscal       #              \n");
-        menu.append("               #           4 --> Definições da conta        #              \n");
-        menu.append("               #           5 --> Logout                     #              \n");
+        menu.append("               #        1 --> Ver Faturas                   #              \n");
+        menu.append("               #        2 --> Alterar Atividade Faturas     #              \n");
+        menu.append("               #        3 --> Validar Faturas               #              \n");
+        menu.append("               #        4 --> Valor Dedução Fiscal          #              \n");
+        menu.append("               #        5 --> Definições da conta           #              \n");
+        menu.append("               #        6 --> Logout                        #              \n");
         menu.append("               #                                            #              \n");
         menu.append("               ##############################################              \n");
         System.out.print('\u000C');
@@ -518,20 +519,89 @@ public class Plataforma{
         if(escolha == 1)
             verFaturasIndividual();
         else if (escolha == 2)
+            alterarAtividadeFaturas();
+        else if (escolha == 3)
             validarFaturas();
-        else if (escolha == 3){
+        else if (escolha == 4){
             Pair<Double,Double> valor = this.getDeducaoFiscal();
             double irs = valor.getKey();
             double deducao = valor.getValue();
             System.out.println("O valor pago de IRS foi " + irs + " e o valor de dedução é " + deducao);
             pausaParaLer();
         }
-        else if (escolha == 4) {
+        else if (escolha == 5) {
             boolean exit = false;
             while (!exit)
                 exit = definicoesDaConta();
-        } else if (escolha == 5)
+        } else if (escolha == 6)
             logout();
+    }
+
+    /**
+     * Alterar a atividade das faturas
+     */
+    public void alterarAtividadeFaturas() {
+        ArrayList<Fatura> faturasAlteraveis = new ArrayList<Fatura>();
+        for (int i: this.utilizador.getListaFaturas()) {
+            Fatura f = this.totalFaturas.get(i);
+            Coletivo c = (Coletivo) this.totalEntidades.get(f.getNIFEmitente());
+            if (c.getAtividadeSeUnica() == "")
+                faturasAlteraveis.add(f);
+        }
+
+        if (faturasAlteraveis.size() == 0) {
+            System.out.println("Não tem faturas para alterar. Por favor, volte mais tarde");
+            pausaParaLer();
+
+            return;
+        }
+
+        System.out.println("Pode alterar as seguintes faturas:");
+        int i = 0;
+        for (Fatura f: faturasAlteraveis) {
+            System.out.println("Fatura " + i);
+            System.out.println(f);
+            i++;
+        }
+
+        System.out.println("Qual quer alterar?");
+        int escolha;
+        Scanner s = new Scanner(System.in);
+        do {
+            escolha = s.nextInt();
+        } while (escolha < 0 || escolha >= faturasAlteraveis.size());
+        s.close();
+
+        Fatura f = faturasAlteraveis.get(escolha);
+        System.out.print('\u000C');
+        ArrayList<String> atividades = ((Coletivo) this.totalEntidades.get(f.getNIFEmitente())).getInformacaoAtividades();
+        System.out.println(f);
+        System.out.println("Pode alterar esta fatura para:");
+        i = 0;
+        for (String a: atividades) {
+            System.out.println(i + " --> " + a);
+            i++;
+        }
+
+        s = new Scanner(System.in);
+        do {
+            escolha = s.nextInt();
+        } while (escolha >= atividades.size());
+        s.close();
+
+        HashMap<String,Double> codigos = ((Individual) this.utilizador).getCodigosAtividades();
+
+        String chave = f.getAtividade();
+        double valor = codigos.get(chave) - f.getValor();
+        ((Individual) this.utilizador).atualizaCodigosAtividades(chave, valor);
+
+        f.setAtividade(atividades.get(escolha));
+
+        chave = f.getAtividade();
+        valor = codigos.getOrDefault(chave, 0.0) + f.getValor();
+        ((Individual) this.utilizador).atualizaCodigosAtividades(chave, valor);
+
+        pausaParaLer();
     }
 
     /**
@@ -1075,7 +1145,7 @@ public class Plataforma{
         }
             
 
-        Fatura f = new Fatura(empresa.getNIF(), data, nifCliente, descricao, atividade, valor);
+        Fatura f = new Fatura(empresa.getNIF(), data, nifCliente, descricao, atividade, new ArrayList(), valor);
         this.totalFaturas.add(f.clone());
         int indiceFatura = this.totalFaturas.indexOf(f);
 
