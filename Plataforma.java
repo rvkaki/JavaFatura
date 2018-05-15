@@ -363,6 +363,8 @@ public class Plataforma{
         double rendimentoAtual;
         double rendimentoAgregado;
         int indice = this.agregados.size();
+        if(this.agregados.isEmpty())
+            indice = 0;
         String nif = null;
 
         for(String nif1: nifAgregado.keySet())
@@ -832,7 +834,8 @@ public class Plataforma{
         menu.append("               #    1 --> Contribuintes mais gastadores     #              \n");
         menu.append("               #    2 --> Contribuintes mais faturadores    #              \n");
         menu.append("               #    3 --> Alterar limite família numerosa   #              \n");
-        menu.append("               #    4 --> Logout                            #              \n");
+        menu.append("               #    4 --> Ver utilizadores registados       #              \n");
+        menu.append("               #    5 --> Logout                            #              \n");
         menu.append("               #                                            #              \n");
         menu.append("               ##############################################              \n");
         System.out.print('\u000C');
@@ -842,7 +845,7 @@ public class Plataforma{
         int escolha;
         do {
             escolha = s.nextInt();
-        } while (escolha != 1 && escolha != 2 && escolha != 3 && escolha != 4);
+        } while (escolha != 1 && escolha != 2 && escolha != 3 && escolha != 4 && escolha != 5);
         s.close();
 
         if (escolha == 1)
@@ -852,7 +855,20 @@ public class Plataforma{
         else if(escolha == 3)
             alterarLimiteFamiliaNumerosa();
         else if(escolha == 4)
+            printUtilizadoresRegistados();
+        else if(escolha == 5)
             logout();
+    }
+
+    /**
+     * Ver os utilizadores registados no sistema
+     */
+    public void printUtilizadoresRegistados(){
+        for(Entidade e: this.totalEntidades.values()){
+            if(!e.getPassword().equals(""))
+                System.out.println(e.getNIF() + " --> " + e.getNome());
+        }
+        pausaParaLer();
     }
 
     /**
