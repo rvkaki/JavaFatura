@@ -529,10 +529,14 @@ public class Plataforma{
         else if (escolha == 3)
             validarFaturas();
         else if (escolha == 4){
-            Pair<Double,Double> valor = this.getDeducaoFiscal();
-            double irs = valor.getKey();
-            double deducao = valor.getValue();
-            System.out.println("O valor pago de IRS foi " + irs + " e o valor de dedução é " + deducao);
+            double deducaoAgregado = this.getDeducaoFiscalAgregado();
+            double deducaoIndividual = this.getDeducaoFiscal();
+            double irs = this.getIRS();
+            double valorFinal = Math.min(deducaoAgregado, irs);
+            System.out.println("O valor pago de IRS foi " + irs);
+            System.out.println("O valor de dedução acumulado por si é " + deducaoIndividual);
+            System.out.println("O valor de dedução acumulado pelo seu agregado é " + deducaoAgregado);
+            System.out.println("Isto resulta num valor de dedução de " + valorFinal);
             pausaParaLer();
         }
         else if (escolha == 5) {
@@ -1257,34 +1261,75 @@ public class Plataforma{
     }
 
     /**
-     * Devolve o valor de irs e dedução fiscal associado ao utilizador atual
-     * @return par(irs,valor)
+     * Devolve o valor de irs associado ao agregado familiar do utilizador atual
+     * @return irs
      */
-    public Pair<Double,Double> getDeducaoFiscal(){
-        //Nota: Temos de verificar se o valor acumulado das faturas não ultrapassa o valor do rendimento anual - valor pago de IRS
-        //      Os descontos devem incidir apenas sobre o valor(rendimento - valorPagoIRS), como verificar esta situação?
+    public double getIRS(){
         Individual utilizador = ((Individual) this.utilizador);
-        double coeficiente = utilizador.getCoeficienteFiscal();
         AgregadoFamiliar agregado = this.agregados.get(utilizador.getIndice());
         int numeroAgregado = agregado.getAgregado().size();
         if(numeroAgregado > 5) numeroAgregado = 5;
         double rendimento = agregado.getRendimento();
         double valorPagoIRS = (irs.get(round(rendimento))[numeroAgregado] / 100) * rendimento;
+        return valorPagoIRS;
+    }
+
+    /**
+     * Devolve o valor de dedução fiscal associado ao agregado do utilizador atual
+     * @return deducao
+     */
+    public double getDeducaoFiscalAgregado(){
+        //Nota: Temos de verificar se o valor acumulado das faturas não ultrapassa o valor do rendimento anual - valor pago de IRS
+        //      Os descontos devem incidir apenas sobre o valor(rendimento - valorPagoIRS), como verificar esta situação?
+        Individual utilizador = ((Individual) this.utilizador);
+        AgregadoFamiliar agregado = this.agregados.get(utilizador.getIndice());
+        double coeficiente = utilizador.getCoeficienteFiscal();
+        int numeroAgregado = agregado.getAgregado().size();
+        if(numeroAgregado > 5) numeroAgregado = 5;
+
+        HashMap<String,Double> atividadesAgregado = new HashMap<String,Double>();
+        for(String nif: agregado.getAgregado().keySet()){
+            Individual i = (Individual) this.totalEntidades.get(nif);
+            HashMap<String,Double> atividades = i.getCodigosAtividades();
+            for(String s: atividades.keySet()){
+                if(atividadesAgregado.containsKey(s))
+                    atividadesAgregado.put(s, atividades.get(s) + atividadesAgregado.get(s));
+                else
+                    atividadesAgregado.put(s, atividades.get(s));
+            }
+        }
 
         double valorADeduzir = 0.0;
-        HashMap<String,Double> atividades = utilizador.getCodigosAtividades();
-        for(String a: atividades.keySet()){
-            double desconto = atividades.get(a) * (descontos.get(a).getKey() / 100.0);
-            if(desconto > descontos.get(a).getValue())
-                desconto = descontos.get(a).getValue();
+        for(String a: atividadesAgregado.keySet()){
+            double desconto = atividadesAgregado.get(a) * (descontos.get(a).getKey() / 100.0);
+            desconto = Math.min(desconto, descontos.get(a).getValue());
             valorADeduzir += desconto;
         }
         
         valorADeduzir /= coeficiente;
 
-        valorADeduzir = Math.min(valorADeduzir, valorPagoIRS);
+        return valorADeduzir;
+    }
 
-        return new Pair(valorPagoIRS,valorADeduzir);
+    /**
+     * Devolve o valor de dedução fiscal associado utilizador atual
+     * @return deducao
+     */
+    public double getDeducaoFiscal(){
+        Individual utilizador = ((Individual) this.utilizador);
+        double coeficiente = utilizador.getCoeficienteFiscal();
+
+        double valorADeduzir = 0.0;
+        HashMap<String,Double> atividades = utilizador.getCodigosAtividades();
+        for(String a: atividades.keySet()){
+            double desconto = atividades.get(a) * (descontos.get(a).getKey() / 100.0);
+            desconto = Math.min(desconto, descontos.get(a).getValue() / 2);
+            valorADeduzir += desconto;
+        }
+        
+        valorADeduzir /= coeficiente;
+
+        return valorADeduzir;
     }
 
     // Falta acrecentar os valores reais da redução de imposto!!!!!

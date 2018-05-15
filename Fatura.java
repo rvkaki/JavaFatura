@@ -67,7 +67,7 @@ public class Fatura implements Serializable{
     	this.nifCliente = f.getNIFCliente();
     	this.descricao = f.getDescricao();
         this.atividade = f.getAtividade();
-        this.atividadesAnteriores = new ArrayList<String>(atividadesAnteriores.size());
+        this.atividadesAnteriores = new ArrayList<String>(f.getAtividadesAnteriores().size());
         for (String s: f.getAtividadesAnteriores())
             this.atividadesAnteriores.add(s);
     	this.valor = f.getValor();
