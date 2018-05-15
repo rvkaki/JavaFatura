@@ -340,6 +340,7 @@ public class Plataforma{
         
         int numeroAgregado = Integer.parseInt(ler("número de elementos do agregado familiar (incluindo você)"));
         HashMap<String,Boolean> nifAgregado = new HashMap<String,Boolean>();
+        nifAgregado.put(e.getNIF(), false);
         if (numeroAgregado > 1) {
             int numeroFilhos;
             do{
@@ -371,7 +372,7 @@ public class Plataforma{
         String nif = null;
 
         for(String nif1: nifAgregado.keySet())
-            if(this.totalEntidades.containsKey(nif1)){
+            if(this.totalEntidades.containsKey(nif1) && ! nif1.equals(e.getNIF())){
                 nif = nif1;
                 indice = ((Individual) this.totalEntidades.get(nif)).getIndice();
                 break;
