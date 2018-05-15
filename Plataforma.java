@@ -340,22 +340,27 @@ public class Plataforma{
         
         int numeroAgregado = Integer.parseInt(ler("número de elementos do agregado familiar (incluindo você)"));
         HashMap<String,Boolean> nifAgregado = new HashMap<String,Boolean>();
-        int numeroFilhos;
-        do{
-            numeroFilhos = Integer.parseInt(ler("número de filhos"));
-        }while(numeroFilhos >= numeroAgregado);
-
         if (numeroAgregado > 1) {
-            System.out.println("Escreva o NIF dos filhos");
-            for(int i=1; i<=numeroFilhos; i++){
-                String nifFilho = lerNIFIndividual("NIF filho " + i);
-                nifAgregado.put(nifFilho, true);
+            int numeroFilhos;
+            do{
+                numeroFilhos = Integer.parseInt(ler("número de filhos"));
+            }while(numeroFilhos >= numeroAgregado);
+
+        
+            if (numeroFilhos > 0){
+                System.out.println("Escreva o NIF dos filhos");
+                for(int i=1; i<=numeroFilhos; i++){
+                    String nifFilho = lerNIFIndividual("NIF filho " + i);
+                    nifAgregado.put(nifFilho, true);
+                }
             }
 
-            System.out.println("Escreva o NIF dos restantes elementos do agregado familiar (excluindo você)");
-            for(int i=1; i<numeroAgregado-numeroFilhos; i++){
-                String nifFamiliar = lerNIFIndividual("NIF " + i);
-                nifAgregado.put(nifFamiliar, false);
+            if(numeroAgregado - numeroFilhos > 0){
+                System.out.println("Escreva o NIF dos restantes elementos do agregado familiar (excluindo você)");
+                for(int i=1; i<numeroAgregado-numeroFilhos; i++){
+                    String nifFamiliar = lerNIFIndividual("NIF " + i);
+                    nifAgregado.put(nifFamiliar, false);
+                }
             }
         }
     
@@ -363,8 +368,6 @@ public class Plataforma{
         double rendimentoAtual;
         double rendimentoAgregado;
         int indice = this.agregados.size();
-        if(this.agregados.isEmpty())
-            indice = 0;
         String nif = null;
 
         for(String nif1: nifAgregado.keySet())
@@ -515,7 +518,7 @@ public class Plataforma{
         Scanner s = new Scanner(System.in);
         do{
             escolha = s.nextInt();
-        }while(escolha != 1 && escolha != 2 && escolha != 3 && escolha != 4 && escolha != 5);
+        }while(escolha != 1 && escolha != 2 && escolha != 3 && escolha != 4 && escolha != 5 && escolha != 6);
         s.close();
 
         if(escolha == 1)
@@ -868,6 +871,8 @@ public class Plataforma{
             if(!e.getPassword().equals(""))
                 System.out.println(e.getNIF() + " --> " + e.getNome());
         }
+        if(this.agregados.isEmpty())
+            System.out.println("Não existem agregados");
         pausaParaLer();
     }
 
