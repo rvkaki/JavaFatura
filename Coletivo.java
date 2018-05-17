@@ -77,6 +77,15 @@ public class Coletivo extends Entidade{
             res.add(s);
         return res;
     }
+
+    /**
+     * Devolve o número de atividades do coletivo
+     * @return número de atividades
+     */
+    public int getNumeroAtividades(){
+        return this.informacaoAtividades.size();
+    }
+
     /**
      * Devolve o coeficiente fiscal
      * @return o coeficiente fiscal

@@ -180,11 +180,19 @@ public class Fatura implements Serializable{
         StringBuilder s = new StringBuilder();
         s.append("Fatura emitida por " + this.nifEmitente + " em " + this.data.toLocalDate() + " às " + this.data.toLocalTime() + "\n");
         s.append("Ao contribuinte " + this.nifCliente + " no valor de " + this.valor + "€\n");
-        if (this.estaPendente())
-            s.append("Atividade Económica: (PENDENTE)\n");
-        else
-            s.append("Atividade Económica: " + this.atividade + "\n");
         s.append("Descrição: " + this.descricao + "\n");
+        if (this.estaPendente())
+            s.append("Atividade económica atual: (PENDENTE)\n");
+        else
+            s.append("Atividade económica atual: " + this.atividade + "\n");
+        s.append("Histórico de atividades económicas:\n");
+        for (String atv: this.atividadesAnteriores) {
+            if (atv.equals(""))
+                s.append("\t-> (PENDENTE)\n");
+            else
+                s.append("\t-> " + atv + "\n");
+
+        }
         return s.toString();
     }
 }

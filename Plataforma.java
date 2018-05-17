@@ -71,7 +71,7 @@ public class Plataforma{
             myMap.put("cabeleireiros", new Pair(10.0, 100));
             myMap.put("atividades veterinárias", new Pair(15.0, 200));
             myMap.put("transportes", new Pair(20.0, 100));
-            myMap.put("outros", new Pair(0, 0));
+            myMap.put("outros", new Pair(0.0, 0));
             descontos = myMap;
         }
     /**
@@ -142,6 +142,7 @@ public class Plataforma{
             novoEstado.close();
         }
         catch(Exception exc){
+            System.out.print('\u000C');
             System.out.println("Não foi possível guardar o estado no ficheiro");
             pausaParaLer();
         }
@@ -165,6 +166,7 @@ public class Plataforma{
             estado.close();
         }
         catch(Exception exc){
+            System.out.print('\u000C');
             System.out.println("Não foi possível ler o estado do ficheiro");
             pausaParaLer();
         }
@@ -251,9 +253,10 @@ public class Plataforma{
 
         if (escolha == 1)
             this.login();
-        else if(escolha == 2)
+        else if(escolha == 2) {
             this.registar();
-        else if (escolha == 3)
+            this.save();
+        } else if (escolha == 3)
             return true;
 
         return false;
@@ -356,7 +359,7 @@ public class Plataforma{
                 }
             }
 
-            if(numeroAgregado - numeroFilhos > 0){
+            if(numeroAgregado - numeroFilhos > 1){
                 System.out.println("Escreva o NIF dos restantes elementos do agregado familiar (excluindo você)");
                 for(int i=1; i<numeroAgregado-numeroFilhos; i++){
                     String nifFamiliar = lerNIFIndividual("NIF " + i);
@@ -444,14 +447,13 @@ public class Plataforma{
      * Fazer o log out
      */
     public void logout(){
-        this.save();
         this.utilizador = null;
+        this.save();
     }
     /**
      * Fazer o log in
      */
     public void login(){
-        String nif;
         StringBuilder menu = new StringBuilder();
 
         menu.append("               ##############################################              \n");
@@ -465,6 +467,7 @@ public class Plataforma{
         System.out.print('\u000C');
         System.out.println(menu);
 
+        String nif;
         do{
             nif = ler("NIF");
         }while(nif.length() != 9 || (nif.charAt(0) != '1' && nif.charAt(0) != '2' && nif.charAt(0) != '5' && !nif.equals("000000000")));
@@ -473,8 +476,15 @@ public class Plataforma{
             Entidade e = this.totalEntidades.get(nif);
             String password = e.getPassword();
             String tentativa;
+            int numTentativas = 3;
             do{
+                if (numTentativas == 0) {
+                    System.out.println("Excedeu o número de tentativas. Por favor, tente novamente mais tarde");
+                    pausaParaLer();
+                    return;
+                }
                 tentativa = ler("Password");
+                numTentativas--;
             }while(! password.equals(tentativa));
 
             this.utilizador = e;
@@ -555,7 +565,7 @@ public class Plataforma{
         for (int i: this.utilizador.getListaFaturas()) {
             Fatura f = this.totalFaturas.get(i);
             Coletivo c = (Coletivo) this.totalEntidades.get(f.getNIFEmitente());
-            if (c.getAtividadeSeUnica() == "")
+            if (!f.getAtividade().equals("") && c.getNumeroAtividades() > 1)
                 faturasAlteraveis.add(f);
         }
 
@@ -585,6 +595,7 @@ public class Plataforma{
         Fatura f = faturasAlteraveis.get(escolha);
         System.out.print('\u000C');
         ArrayList<String> atividades = ((Coletivo) this.totalEntidades.get(f.getNIFEmitente())).getInformacaoAtividades();
+        atividades.remove(f.getAtividade());
         System.out.println(f);
         System.out.println("Pode alterar esta fatura para:");
         i = 0;
@@ -740,6 +751,13 @@ public class Plataforma{
                 YearMonth my = YearMonth.of(y,m);
                 mesAno.add(my);
             }
+
+            if (mesAno.size() == 0) {
+                System.out.println("Não exitem faturas emitidas por si. Por favor, volte mais tarde");
+                pausaParaLer();
+                return;
+            }
+
             int j = 1;
             System.out.println("Possui faturas emitidas nos seguintes meses:");
             ArrayList<YearMonth> res = new ArrayList<YearMonth>();
@@ -750,12 +768,12 @@ public class Plataforma{
             }
             s = new Scanner(System.in);
             do{
-                System.out.println("Escolha o período pretendido:");
+                System.out.println("Escolha o mês pretendido:");
                 escolha = s.nextInt();
             }while(escolha < 1 || escolha > j);
             YearMonth mes = res.get(escolha - 1);
             double valor = valorFaturado(mes);
-            System.out.println(valor);
+            System.out.println("No mês selecionado faturou " + valor + "€");
             pausaParaLer();
         }
         else if (escolha == 5)
@@ -1037,8 +1055,9 @@ public class Plataforma{
                 res = sortData(nifE, true);
         }
 
+        System.out.print('\u000C');
         for(Fatura f: res)
-            System.out.println(f.toString());
+            System.out.println(f);
 
         pausaParaLer();
     }
@@ -1109,8 +1128,9 @@ public class Plataforma{
                 res = sortData(nifC, true);
         }
 
+        System.out.print('\u000C');
         for(Fatura f: res)
-            System.out.println(f.toString());
+            System.out.println(f);
 
         pausaParaLer();
     }
@@ -1289,13 +1309,15 @@ public class Plataforma{
 
         HashMap<String,Double> atividadesAgregado = new HashMap<String,Double>();
         for(String nif: agregado.getAgregado().keySet()){
-            Individual i = (Individual) this.totalEntidades.get(nif);
-            HashMap<String,Double> atividades = i.getCodigosAtividades();
-            for(String s: atividades.keySet()){
-                if(atividadesAgregado.containsKey(s))
-                    atividadesAgregado.put(s, atividades.get(s) + atividadesAgregado.get(s));
-                else
-                    atividadesAgregado.put(s, atividades.get(s));
+            if (this.totalEntidades.containsKey(nif)) {
+                Individual i = (Individual) this.totalEntidades.get(nif);
+                HashMap<String,Double> atividades = i.getCodigosAtividades();
+                for(String s: atividades.keySet()){
+                    if(atividadesAgregado.containsKey(s))
+                        atividadesAgregado.put(s, atividades.get(s) + atividadesAgregado.get(s));
+                    else
+                        atividadesAgregado.put(s, atividades.get(s));
+                }
             }
         }
 
