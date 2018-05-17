@@ -340,7 +340,10 @@ public class Plataforma{
         System.out.print('\u000C');
         System.out.println(menu);
         
-        int numeroAgregado = Integer.parseInt(ler("número de elementos do agregado familiar (incluindo você)"));
+        int numeroAgregado;
+        do {
+            numeroAgregado = Integer.parseInt(ler("número de elementos do agregado familiar (incluindo você)"));
+        } while (numeroAgregado <= 0);
         HashMap<String,Boolean> nifAgregado = new HashMap<String,Boolean>();
         nifAgregado.put(e.getNIF(), false);
         if (numeroAgregado > 1) {
@@ -861,7 +864,9 @@ public class Plataforma{
         menu.append("               #    2 --> Contribuintes mais faturadores    #              \n");
         menu.append("               #    3 --> Alterar limite família numerosa   #              \n");
         menu.append("               #    4 --> Ver utilizadores registados       #              \n");
-        menu.append("               #    5 --> Logout                            #              \n");
+        menu.append("               #    5 --> Ver agregados familiares          #              \n");
+        menu.append("               #    6 --> Ver faturas submetidas            #              \n");
+        menu.append("               #    7 --> Logout                            #              \n");
         menu.append("               #                                            #              \n");
         menu.append("               ##############################################              \n");
         System.out.print('\u000C');
@@ -871,7 +876,7 @@ public class Plataforma{
         int escolha;
         do {
             escolha = s.nextInt();
-        } while (escolha != 1 && escolha != 2 && escolha != 3 && escolha != 4 && escolha != 5);
+        } while (escolha != 1 && escolha != 2 && escolha != 3 && escolha != 4 && escolha != 5 && escolha != 6 && escolha != 7);
         s.close();
 
         if (escolha == 1)
@@ -883,7 +888,31 @@ public class Plataforma{
         else if(escolha == 4)
             printUtilizadoresRegistados();
         else if(escolha == 5)
+            printAgregadosFamiliares();
+        else if(escolha == 6)
+            printFaturasSubmetidas();
+        else if(escolha == 7)
             logout();
+    }
+
+    /**
+     * Ver todas as faturas submetidas
+     */
+    public void printFaturasSubmetidas() {
+        for (Fatura f: this.totalFaturas)
+            System.out.println(f);
+
+        pausaParaLer();
+    }
+
+    /**
+     * Ver todos os agregados familiares
+     */
+    public void printAgregadosFamiliares() {
+        for (AgregadoFamiliar af: this.agregados)
+            System.out.println(af);
+
+        pausaParaLer();
     }
 
     /**
@@ -894,8 +923,7 @@ public class Plataforma{
             if(!e.getPassword().equals(""))
                 System.out.println(e.getNIF() + " --> " + e.getNome());
         }
-        if(this.agregados.isEmpty())
-            System.out.println("Não existem agregados");
+
         pausaParaLer();
     }
 
@@ -982,7 +1010,7 @@ public class Plataforma{
      * Altera a definição de famílias numerosas
      */
     public void alterarLimiteFamiliaNumerosa() {
-        System.out.println("O valor atual é " + this.limiteFamiliaNumerosa + ". Introduza o novo limite para as famílias numerosas");
+        System.out.println("O valor atual é " + this.limiteFamiliaNumerosa + ". Introduza o novo limite para as famílias numerosas:");
         Scanner s = new Scanner(System.in);
         this.limiteFamiliaNumerosa = s.nextInt();
         s.close();

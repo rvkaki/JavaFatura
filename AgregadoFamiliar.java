@@ -112,4 +112,31 @@ public class AgregadoFamiliar implements Serializable{
                 this.agregado.put(nif, newAgregado.get(nif));
         }
     }
+
+    /**
+     * Contrói a String do agregado
+     * @return String do agregado
+     */
+    public String toString(){
+        StringBuilder s = new StringBuilder();
+        int i = 1;
+        for (String str : this.agregado.keySet()) {
+            if (!isFilho(str)) {
+                s.append("Elemento " + i + ": " + str + "\n");
+                i++;
+            }
+        }
+
+        i = 1;
+        for (String str : this.agregado.keySet()) {
+            if (isFilho(str)) {
+                s.append("Filho " + i + ": " + str + "\n");
+                i++;
+            }
+        }
+
+        s.append("O rendimento anual deste agregado é " + this.rendimento + "€\n");
+
+        return s.toString();
+    }
 }
