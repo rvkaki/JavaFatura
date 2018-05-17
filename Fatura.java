@@ -44,6 +44,7 @@ public class Fatura implements Serializable{
      * @param nifCliente
      * @param descricao
      * @param atividade
+     * @param atividadesAnteriores
      * @param valor
      */
     public Fatura(String nifEmitente, LocalDateTime data, String nifCliente, String descricao, String atividade, ArrayList<String> atividadesAnteriores, double valor){

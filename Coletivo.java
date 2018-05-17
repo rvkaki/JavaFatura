@@ -39,6 +39,7 @@ public class Coletivo extends Entidade{
      * @param designacao
      * @param informacaoAtividade
      * @param coeficienteFiscal
+     * @param interior
      */
     public Coletivo(String nif, String email, String nome, String morada, String password, ArrayList<Integer> listaFaturas, String designacao, ArrayList<String> informacaoAtividades, double coeficienteFiscal, boolean interior){
         super(nif, email, nome, morada, password, listaFaturas);
@@ -136,7 +137,7 @@ public class Coletivo extends Entidade{
     }
 
     /**
-     * Devolve a ????????
+     * Devolve a atividade da empresa se só tiver uma associada ou uma String vazia, caso contrário
      * @return 
      */
     public String getAtividadeSeUnica() {

@@ -14,11 +14,19 @@ public class AgregadoFamiliar implements Serializable{
     /**Rendimento do agregado familiar */
     private double rendimento;
 
+    /**
+     * Construtor por omissão
+     */
     public AgregadoFamiliar(){
         this.agregado = new HashMap<String,Boolean>();
         this.rendimento = 0.0;
     }
 
+    /**
+     * Construtor por parâmetro
+     * @param agregado
+     * @param rendimento
+     */
     public AgregadoFamiliar(HashMap<String,Boolean> agregado, double rendimento){
         this.agregado = new HashMap<String,Boolean>();
         for(String s: agregado.keySet())
@@ -26,11 +34,19 @@ public class AgregadoFamiliar implements Serializable{
         this.rendimento = rendimento;
     }
 
+    /**
+     * Construtor de cópia
+     * @param af o AgregadoFamiliar original
+     */
     public AgregadoFamiliar(AgregadoFamiliar af){
         this.agregado = af.getAgregado();
         this.rendimento = af.getRendimento();
     }
 
+    /**
+     * Devolve o agregado
+     * @return agregado
+     */
     public HashMap<String,Boolean> getAgregado(){
         HashMap<String,Boolean> res = new HashMap<String,Boolean>();
         for(String s: this.agregado.keySet())
@@ -39,12 +55,16 @@ public class AgregadoFamiliar implements Serializable{
         return res;
     }
 
+    /**
+     * Devolve o rendimento
+     * @return rendimento
+     */
     public double getRendimento(){
         return this.rendimento;
     }
 
     /**
-     * Devolve o número de filhos no agregado
+     * Devolve o número de filhos do agregado
      * @return número de filhos
      */
     public int getNumeroFilhos(){
@@ -57,19 +77,35 @@ public class AgregadoFamiliar implements Serializable{
         return res;
     }
 
+    /**
+     * Define o agregado
+     * @param agregado
+     */
     public void setAgregado(HashMap<String,Boolean> agregado){
         for(String s: agregado.keySet())
             this.agregado.put(s, agregado.get(s));
     }
 
+    /**
+     * Define o rendimento
+     * @param rendimento
+     */
     public void setRendimento(double rendimento){
         this.rendimento = rendimento;
     }
 
+    /**
+     * Função que diz se um dado nif é um dos filhos do agregado
+     * @param agregado
+     */
     public Boolean isFilho(String nif){
         return this.agregado.getOrDefault(nif, false);
     }
 
+    /**
+     * Função que atualiza o agregado, adicionando os elementos de newAgregado que ainda não estão no agregado
+     * @param newAgregado
+     */
     public void atualizaAgregado(HashMap<String,Boolean> newAgregado){
         for (String nif: newAgregado.keySet()) {
             if (!this.agregado.containsKey(nif))

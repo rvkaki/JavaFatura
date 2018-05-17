@@ -150,7 +150,6 @@ public class Plataforma{
 
     /**
      * Carrega os dados de um ficheiro
-     * @return plataforma com os dados carregados
      */
     public void load(){
         try{
@@ -174,7 +173,7 @@ public class Plataforma{
 
     /**
      * Dá início ao menu
-     * @param????
+     * @param args os argumentos passados ao programa
      */
     public static void main(String[] args){
         Plataforma plataforma = new Plataforma();
@@ -199,7 +198,7 @@ public class Plataforma{
         return res;
     }
     /**
-     * ???
+     * Função para dar tempo para ler o texto impresso, que espera que o utilizador pressione Enter para continuar
      */
     public void pausaParaLer(){
         System.out.println();
@@ -262,7 +261,7 @@ public class Plataforma{
         return false;
     }
     /**
-     * Registar no site
+     * Menu para registar um utilizador na plataforma
      */
     public void registar(){ 
         String nif;
@@ -322,7 +321,7 @@ public class Plataforma{
 
     }
     /**
-     * Registar uma entidade individual
+     *  Menu para registar uma entidade individual na plataforma
      * @param e
      */
     public void registarIndividual(Individual e){
@@ -407,7 +406,7 @@ public class Plataforma{
         e.setCoeficienteFiscal(coeficiente);
     }
     /**
-     * Registar uma entidade coletivo
+     *  Menu para registar um utilizador entidade coletivo na plataforma
      * @param e
      */
     public void registarColetivo(Coletivo e){
@@ -495,7 +494,8 @@ public class Plataforma{
             return;
         }
 
-        while (this.utilizador != null) { // Enquanto não fizer logout
+        // Enquanto o utilizador não fizer logout
+        while (this.utilizador != null) {
             if (nif.equals("000000000"))
                 printMenuAdmin();
             else if (this.utilizador instanceof Individual)
@@ -565,7 +565,7 @@ public class Plataforma{
         for (int i: this.utilizador.getListaFaturas()) {
             Fatura f = this.totalFaturas.get(i);
             Coletivo c = (Coletivo) this.totalEntidades.get(f.getNIFEmitente());
-            if (!f.getAtividade().equals("") && c.getNumeroAtividades() > 1)
+            if (!f.estaPendente() && c.getNumeroAtividades() > 1)
                 faturasAlteraveis.add(f);
         }
 
@@ -781,7 +781,7 @@ public class Plataforma{
     }
     /**
      * Ver ou mudar as definições de conta
-     * @return ???
+     * @return true se o utilizador quiser voltar ao menu, false caso contrário
      */
     public boolean definicoesDaConta() {
         StringBuilder menu = new StringBuilder();
@@ -931,7 +931,7 @@ public class Plataforma{
     }
 
     /**
-     * Ver os X Contribuintes Coletivos faturadores
+     * Ver os X Contribuintes Coletivos mais faturadores
      */
     public void verContribuintesMaisFaturadores() {
         TreeSet<String> contribuintes = new TreeSet<String>((nif1,nif2) -> (int) (getValorTotal(nif2) - getValorTotal(nif1)));
@@ -1354,7 +1354,11 @@ public class Plataforma{
         return valorADeduzir;
     }
 
-    // Falta acrecentar os valores reais da redução de imposto!!!!!
+    /**
+     * Devolve a redução de imposto associada ao utilizador atual
+     * @return deducao
+     */
+    ///////////////////////////////// Falta acrecentar os valores reais da redução de imposto!!!!!
     public double reducaoImposto() {
         if (this.utilizador instanceof Individual && isFamiliaNumerosa(this.utilizador.getNIF())) {
             ;
@@ -1368,6 +1372,7 @@ public class Plataforma{
     /**
      * Função que diz se a família de um dado Individual é numerosa
      * @param nif NIF do Individual
+     * @return true se a família for numerosa, false caso contrário
      */
     public boolean isFamiliaNumerosa(String nif){
         Individual i = (Individual) this.totalEntidades.get(nif);
