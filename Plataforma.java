@@ -86,11 +86,26 @@ public class Plataforma{
     }
 
     /**
-     * Ler o NIF para registar
+     * Ler pedido
+     * @param pedido
+     * @return leitura do input
+     */
+    public String ler(String pedido){
+        if (pedido != null)
+            System.out.println(pedido);
+
+        Scanner ler = new Scanner(System.in);
+        String res = ler.nextLine();
+        ler.close();
+        return res;
+    }
+
+    /**
+     * Ler qualquer NIF válido
      * @param pedido
      * @return nif
      */
-    public String lerNIFRegisto(String pedido){
+    public String lerNIF(String pedido){
         String nif;
         do{
             nif = ler(pedido);
@@ -125,6 +140,59 @@ public class Plataforma{
         }while(nif.length() != 9 || nif.charAt(0) != '5');
 
         return nif;
+    }
+
+    /**
+     * Ler int
+     * @param pedido
+     * @return int
+     */
+    public int lerInt(String pedido) {
+        int res;
+        while (true) {
+            try {
+                res = Integer.parseInt(ler(pedido));
+            } catch (NumberFormatException exc) {
+                System.out.println("Por favor, introduza um número");
+                continue;
+            }
+
+            break;
+        }
+
+        return res;
+    }
+
+    /**
+     * Ler double
+     * @param pedido
+     * @return double
+     */
+    public double lerDouble(String pedido) {
+        double res;
+        while (true) {
+            try {
+                res = Double.parseDouble(ler(pedido));
+            } catch (NumberFormatException exc) {
+                System.out.println("Por favor, introduza um número");
+                continue;
+            }
+
+            break;
+        }
+
+        return res;
+    }
+
+    /**
+     * Função para dar tempo para ler o texto impresso. Espera que o utilizador pressione Enter antes de continuar
+     */
+    public void pausaParaLer(){
+        System.out.println();
+        System.out.println("Pressione Enter para continuar...");
+        Scanner s = new Scanner(System.in);
+        s.nextLine();
+        s.close();
     }
 
     /**
@@ -185,42 +253,18 @@ public class Plataforma{
 
         plataforma.save();
     }
-    /**
-     * Ler pedido
-     * @param pedido
-     * @return leitura do input
-     */
-    public String ler(String pedido){
-        System.out.println("Escreva " + pedido);
-        Scanner ler = new Scanner(System.in);
-        String res = ler.nextLine();
-        ler.close();
-        return res;
-    }
-    /**
-     * Função para dar tempo para ler o texto impresso, que espera que o utilizador pressione Enter para continuar
-     */
-    public void pausaParaLer(){
-        System.out.println();
-        System.out.println("Pressione Enter para continuar...");
-        Scanner s = new Scanner(System.in);
-        s.nextLine();
-        s.close();
-    }
+
     /**
      * Ler atividades económicas do coletivo
      * @return lista com as atividades do coletivo
      */
     public ArrayList<String> lerAtividadesColetivo() {
         ArrayList<String> codigosAtividades = new ArrayList<String>();
-        Scanner ler = new Scanner(System.in);
         for (String atividade: this.atividades) {
-            System.out.println("Atua na área de " + atividade + "? (s/n)");
-            String res = ler.nextLine();
+            String res = ler("Atua na área de " + atividade + "? (s/n)");
             if (res.equals("s"))
                 codigosAtividades.add(atividade);
         }
-        ler.close();
 
         return codigosAtividades;
     }
@@ -244,11 +288,9 @@ public class Plataforma{
         System.out.print('\u000C');
         System.out.println(menu);
 
-        Scanner s = new Scanner(System.in);
         do{
-            escolha = s.nextInt();
+            escolha = lerInt(null);
         }while(escolha != 1 && escolha != 2 && escolha != 3);
-        s.close();
 
         if (escolha == 1)
             this.login();
@@ -281,7 +323,7 @@ public class Plataforma{
         System.out.print('\u000C');
         System.out.println(menu);
 
-        nif = lerNIFRegisto("NIF");
+        nif = lerNIF("Escreva o seu NIF");
 
         Entidade e = null;
         if (this.totalEntidades.containsKey(nif)) {
@@ -302,13 +344,13 @@ public class Plataforma{
             e.setNIF(nif);
         }
         
-        String nome = ler("nome");
+        String nome = ler("Escreva o seu nome");
         e.setNome(nome);
-        String email = ler("email");
+        String email = ler("Escreva o seu email");
         e.setEmail(email);
-        String morada = ler("morada");
+        String morada = ler("Escreva a sua morada");
         e.setMorada(morada);
-        String password = ler("password");
+        String password = ler("Escreva a sua password");
         e.setPassword(password);
 
         if(nif.charAt(0) == '1' || nif.charAt(0) == '2')
@@ -342,21 +384,21 @@ public class Plataforma{
         
         int numeroAgregado;
         do {
-            numeroAgregado = Integer.parseInt(ler("número de elementos do agregado familiar (incluindo você)"));
+            numeroAgregado = lerInt("Escreva o número de elementos do seu agregado familiar (incluindo você)");
         } while (numeroAgregado <= 0);
         HashMap<String,Boolean> nifAgregado = new HashMap<String,Boolean>();
         nifAgregado.put(e.getNIF(), false);
         if (numeroAgregado > 1) {
             int numeroFilhos;
             do{
-                numeroFilhos = Integer.parseInt(ler("número de filhos"));
+                numeroFilhos = lerInt("Escreva o número de filhos");
             }while(numeroFilhos >= numeroAgregado);
 
         
             if (numeroFilhos > 0){
                 System.out.println("Escreva o NIF dos filhos");
                 for(int i=1; i<=numeroFilhos; i++){
-                    String nifFilho = lerNIFIndividual("NIF filho " + i);
+                    String nifFilho = lerNIFIndividual("NIF do filho " + i + ":");
                     nifAgregado.put(nifFilho, true);
                 }
             }
@@ -364,13 +406,13 @@ public class Plataforma{
             if(numeroAgregado - numeroFilhos > 1){
                 System.out.println("Escreva o NIF dos restantes elementos do agregado familiar (excluindo você)");
                 for(int i=1; i<numeroAgregado-numeroFilhos; i++){
-                    String nifFamiliar = lerNIFIndividual("NIF " + i);
+                    String nifFamiliar = lerNIFIndividual("NIF do elemento " + i + ":");
                     nifAgregado.put(nifFamiliar, false);
                 }
             }
         }
     
-        double coeficiente = Double.parseDouble(ler("coeficiente Fiscal"));
+        double coeficiente = lerDouble("Escreva o seu coeficiente fiscal");
         double rendimentoAtual;
         double rendimentoAgregado;
         int indice = this.agregados.size();
@@ -387,21 +429,18 @@ public class Plataforma{
             this.agregados.get(indice).atualizaAgregado(nifAgregado);
 
             rendimentoAtual = this.agregados.get(indice).getRendimento();
-            Scanner s = new Scanner(System.in);
             String resposta;
             do{
-                System.out.println("Confirma que o rendimento anual do seu agregado é " + rendimentoAtual + "? (s/n)");
-                resposta = s.nextLine();
+                resposta = ler("Confirma que o rendimento anual do seu agregado é " + rendimentoAtual + "? (s/n)");
             }while(!resposta.equals("s") && !resposta.equals("n"));
-            s.close();
 
             if(resposta.equals("n")){
-                rendimentoAgregado = Double.parseDouble(ler("rendimento anual do agregado familiar"));
+                rendimentoAgregado = lerDouble("Escreva o rendimento anual do seu agregado familiar");
                 this.agregados.get(indice).setRendimento(rendimentoAgregado);
             }
         }
         else {
-            rendimentoAgregado = Double.parseDouble(ler("rendimento anual do agregado familiar"));
+            rendimentoAgregado = lerDouble("Escreva o rendimento anual do seu agregado familiar");
             this.agregados.add(new AgregadoFamiliar(nifAgregado, rendimentoAgregado));
         }
 
@@ -428,17 +467,14 @@ public class Plataforma{
         System.out.print('\u000C');
         System.out.println(menu);
         
-        String designacao = ler("designacao");
-        double coeficiente = Double.parseDouble(ler("coeficiente Fiscal"));
+        String designacao = ler("Escreva a designação da empresa");
+        double coeficiente = lerDouble("Escreva o coeficiente fiscal da empresa");
         ArrayList<String> informacaoAtividades = lerAtividadesColetivo();
         
-        Scanner ler = new Scanner(System.in);
-        System.out.println("É uma empresa do interior? (s/n)");
-        String res = ler.nextLine();
+        String res = ler("É uma empresa do interior? (s/n)");
         boolean interior = false;
         if (res.equals("s"))
             interior = true;
-        ler.close();
 
         e.setDesignacao(designacao);
         e.setInformacaoAtividades(informacaoAtividades);
@@ -469,10 +505,7 @@ public class Plataforma{
         System.out.print('\u000C');
         System.out.println(menu);
 
-        String nif;
-        do{
-            nif = ler("NIF");
-        }while(nif.length() != 9 || (nif.charAt(0) != '1' && nif.charAt(0) != '2' && nif.charAt(0) != '5' && !nif.equals("000000000")));
+        String nif = lerNIF("Escreva o seu NIF");
 
         if (this.totalEntidades.containsKey(nif) && !this.totalEntidades.get(nif).getPassword().equals("")) {
             Entidade e = this.totalEntidades.get(nif);
@@ -485,7 +518,7 @@ public class Plataforma{
                     pausaParaLer();
                     return;
                 }
-                tentativa = ler("Password");
+                tentativa = ler("Escreva a sua password");
                 numTentativas--;
             }while(! password.equals(tentativa));
 
@@ -529,11 +562,9 @@ public class Plataforma{
         System.out.print('\u000C');
         System.out.println(menu);
 
-        Scanner s = new Scanner(System.in);
         do{
-            escolha = s.nextInt();
+            escolha = lerInt(null);
         }while(escolha != 1 && escolha != 2 && escolha != 3 && escolha != 4 && escolha != 5 && escolha != 6);
-        s.close();
 
         if(escolha == 1)
             verFaturasIndividual();
@@ -587,13 +618,10 @@ public class Plataforma{
             i++;
         }
 
-        System.out.println("Qual quer alterar?");
         int escolha;
-        Scanner s = new Scanner(System.in);
         do {
-            escolha = s.nextInt();
+            escolha = lerInt("Qual quer alterar?");
         } while (escolha < 0 || escolha >= faturasAlteraveis.size());
-        s.close();
 
         Fatura f = faturasAlteraveis.get(escolha);
         System.out.print('\u000C');
@@ -607,11 +635,9 @@ public class Plataforma{
             i++;
         }
 
-        s = new Scanner(System.in);
         do {
-            escolha = s.nextInt();
+            escolha = lerInt(null);
         } while (escolha >= atividades.size());
-        s.close();
 
         HashMap<String,Double> codigos = ((Individual) this.utilizador).getCodigosAtividades();
 
@@ -662,11 +688,9 @@ public class Plataforma{
         System.out.println(menu);
 
         int escolha;
-        Scanner s = new Scanner(System.in);
         do{
-            escolha = s.nextInt();
+            escolha = lerInt(null);
         }while(escolha != 1 && escolha != 2);
-        s.close();
 
         if(escolha == 1){
             for(Fatura f: faturasPendentes){
@@ -681,11 +705,9 @@ public class Plataforma{
                     i++;
                 }
 
-                s = new Scanner(System.in);
                 do{
-                    escolha = s.nextInt();
+                    escolha = lerInt(null);
                 }while(escolha >= atividades.size());
-                s.close();
 
                 f.setAtividade(atividades.get(escolha));
                 HashMap<String,Double> codigos = ((Individual) this.utilizador).getCodigosAtividades();
@@ -720,24 +742,18 @@ public class Plataforma{
         System.out.print('\u000C');
         System.out.println(menu);
 
-        Scanner s = new Scanner(System.in);
         int escolha;
         do{
-            escolha = s.nextInt();
+            escolha = lerInt(null);
         }while(escolha != 1 && escolha != 2 && escolha != 3 && escolha != 4 && escolha != 5);
-        s.close();
-        
 
         if(escolha == 1){
-            String nifCliente = lerNIFIndividual("NIF do cliente");
-            String descricao = ler("descricao da fatura");
+            String nifCliente = lerNIFIndividual("Escreva o NIF do cliente");
+            String descricao = ler("Escreva a descrição da fatura");
             double valor;
-            s = new Scanner(System.in);
             do{
-                System.out.println("Escreva valor da Fatura");
-                valor = s.nextDouble();
+                valor = lerDouble("Escreva o valor da fatura");
             }while(valor < 0);
-            s.close();
             emitirFatura(nifCliente, descricao, valor);
         }else if(escolha == 2)
             verFaturasColetivo();
@@ -769,10 +785,8 @@ public class Plataforma{
                 res.add(x);
                 j++;
             }
-            s = new Scanner(System.in);
             do{
-                System.out.println("Escolha o mês pretendido:");
-                escolha = s.nextInt();
+                escolha = lerInt("Escreva o mês pretendido");
             }while(escolha < 1 || escolha > j);
             YearMonth mes = res.get(escolha - 1);
             double valor = valorFaturado(mes);
@@ -803,37 +817,27 @@ public class Plataforma{
         System.out.print('\u000C');
         System.out.println(menu);
 
-        Scanner s = new Scanner(System.in);
         int escolha;
         do {
-            escolha = s.nextInt();
+            escolha = lerInt(null);
         } while (escolha != 1 && escolha != 2 && escolha != 3 && escolha != 4 && escolha != 5);
-        s.close();
 
-        Scanner novasDefinicoes = new Scanner(System.in);
         if (escolha == 1) {
-            System.out.println("Introduza o novo nome");
-            this.utilizador.setNome(novasDefinicoes.nextLine());
+            this.utilizador.setNome(ler("Escreva o novo nome"));
         } else if (escolha == 2) {
-            System.out.println("Introduza o novo email");
-            this.utilizador.setEmail(novasDefinicoes.nextLine());
+            this.utilizador.setEmail(ler("Escreva o novo email"));
         } else if (escolha == 3) {
-            System.out.println("Introduza a nova morada");
-            this.utilizador.setMorada(novasDefinicoes.nextLine());
+            this.utilizador.setMorada(ler("Escreva a nova morada"));
         } else if (escolha == 4) {
             String tentativa;
             do {
-                System.out.println("Introduza a password atual");
-                tentativa = novasDefinicoes.nextLine();
+                tentativa = ler("Escreva a password atual");
             } while (!this.utilizador.getPassword().equals(tentativa));
-            System.out.println("Introduza a nova password");
-            this.utilizador.setPassword(novasDefinicoes.nextLine());
-        } else if (escolha == 5) {
-            novasDefinicoes.close();
-            return true;
-        }
 
-        novasDefinicoes.close();
+            this.utilizador.setPassword(ler("Escreva a nova password"));
+        } else if (escolha == 5)
+            return true;
+
         return false;
     }
     /**
@@ -872,12 +876,10 @@ public class Plataforma{
         System.out.print('\u000C');
         System.out.println(menu);
 
-        Scanner s = new Scanner(System.in);
         int escolha;
         do {
-            escolha = s.nextInt();
+            escolha = lerInt(null);
         } while (escolha != 1 && escolha != 2 && escolha != 3 && escolha != 4 && escolha != 5 && escolha != 6 && escolha != 7);
-        s.close();
 
         if (escolha == 1)
             verContribuintesMaisGastadores();
@@ -974,13 +976,10 @@ public class Plataforma{
             return;
         }
 
-        Scanner s = new Scanner(System.in);
         int num;
         do {
-            System.out.println("Existem " + contribuintes.size() + " contribuintes registados. Quantos quer ver?");
-            num = s.nextInt(); 
+            num = lerInt("Existem " + contribuintes.size() + " contribuintes registados. Quantos quer ver?");
         } while (num < 1 || num > contribuintes.size());
-        s.close();
 
         System.out.println("\nTop " + num + " dos contribuintes mais faturadores");
         for (String c: contribuintes) {
@@ -1010,10 +1009,7 @@ public class Plataforma{
      * Altera a definição de famílias numerosas
      */
     public void alterarLimiteFamiliaNumerosa() {
-        System.out.println("O valor atual é " + this.limiteFamiliaNumerosa + ". Introduza o novo limite para as famílias numerosas:");
-        Scanner s = new Scanner(System.in);
-        this.limiteFamiliaNumerosa = s.nextInt();
-        s.close();
+        this.limiteFamiliaNumerosa = lerInt("O valor atual é " + this.limiteFamiliaNumerosa + ". Introduza o novo limite para as famílias numerosas:");
     }
 
     /**
@@ -1026,13 +1022,10 @@ public class Plataforma{
             return;
         }
 
-        Scanner s = new Scanner(System.in);
         int escolha;
         do {
-            System.out.println("Deseja imprimir 1 --> todas as faturas ou 2 --> as de uma determinada empresa?");
-            escolha = s.nextInt();
+            escolha = lerInt("Deseja imprimir 1 --> todas as faturas ou 2 --> as de uma determinada empresa?");
         } while (escolha != 1 && escolha != 2);
-        s.close();
 
         String nifE = "000000000";
         if (escolha == 2) {
@@ -1047,20 +1040,14 @@ public class Plataforma{
             for(String n: empresas.keySet())
                 System.out.println(n + " --> " + empresas.get(n));
 
-            s = new Scanner(System.in);
             do{
-                System.out.println("\nEscreva o nif da empresa que deseja ver");
-                nifE = s.nextLine();
+                nifE = lerNIFColetivo("\nEscreva o nif da empresa que deseja ver");
             }while(!empresas.containsKey(nifE));
-            s.close();
         }
 
-        s = new Scanner(System.in);
         do{
-            System.out.println("Deseja imprimir por 1 --> valor ou 2 --> data?");
-            escolha = s.nextInt();
+            escolha = lerInt("Deseja imprimir por 1 --> valor ou 2 --> data?");
         }while(escolha != 1 && escolha != 2);
-        s.close();
         System.out.println();
 
         TreeSet<Fatura> res = null;
@@ -1068,13 +1055,10 @@ public class Plataforma{
             res = sortValor(nifE);
         
         else if(escolha == 2){
-            s = new Scanner(System.in);
             do{
-                System.out.println("Deseja imprimir por data 1 --> ascendente ou 2 --> descendente");
-                escolha = s.nextInt();
+                escolha = lerInt("Deseja imprimir por data 1 --> ascendente ou 2 --> descendente");
             }while(escolha != 1 && escolha != 2);
             System.out.println();
-            s.close();
 
             if(escolha == 1)
                 res = sortData(nifE, false);
@@ -1100,13 +1084,10 @@ public class Plataforma{
             return;
         }
 
-        Scanner s = new Scanner(System.in);
         int escolha;
         do {
-            System.out.println("Deseja imprimir 1 --> todas as faturas ou 2 --> as de um determinado contribuinte?");
-            escolha = s.nextInt();
+            escolha = lerInt("Deseja imprimir 1 --> todas as faturas ou 2 --> as de um determinado contribuinte?");
         } while (escolha != 1 && escolha != 2);
-        s.close();
 
         String nifC = "000000000";
         if (escolha == 2) {
@@ -1120,20 +1101,14 @@ public class Plataforma{
             for(String n: contribuintes.keySet())
                 System.out.println(n + " --> " + contribuintes.get(n));
 
-            s = new Scanner(System.in);
             do{
-                System.out.println("\nEscreva o nif do contribuinte que deseja ver");
-                nifC = s.nextLine();
+                nifC = lerNIFIndividual("\nEscreva o nif do contribuinte que deseja ver");
             }while(!contribuintes.containsKey(nifC));
-            s.close();
         }
 
-        s = new Scanner(System.in);
         do{
-            System.out.println("Deseja imprimir por 1 --> valor ou 2 --> data?");
-            escolha = s.nextInt();
+            escolha = lerInt("Deseja imprimir por 1 --> valor ou 2 --> data?");
         }while(escolha != 1 && escolha != 2);
-        s.close();
         System.out.println();
 
         TreeSet<Fatura> res = null;
@@ -1141,13 +1116,10 @@ public class Plataforma{
             res = sortValor(nifC);
         
         else if(escolha == 2){
-            s = new Scanner(System.in);
             do{
-                System.out.println("Deseja imprimir por data 1 --> ascendente ou 2 --> descendente");
-                escolha = s.nextInt();
+                escolha = lerInt("Deseja imprimir por data 1 --> ascendente ou 2 --> descendente");
             }while(escolha != 1 && escolha != 2);
             System.out.println();
-            s.close();
 
             if(escolha == 1)
                 res = sortData(nifC, false);
@@ -1172,47 +1144,38 @@ public class Plataforma{
         Coletivo empresa = (Coletivo) this.utilizador;
         String atividade = empresa.getAtividadeSeUnica();
 
-        System.out.println("Está a 1 --> registar uma fatura já emitida; ou a 2 --> emitir uma nova?");
-        Scanner s = new Scanner(System.in);
         int escolha;
         do{
-            escolha = s.nextInt();
+            escolha = lerInt("Está a 1 --> registar uma fatura já emitida; ou a 2 --> emitir uma nova?");
         }while(escolha != 1 && escolha != 2);
-        s.close();
 
         LocalDateTime data = LocalDateTime.now();
         if(escolha == 1){
-            s = new Scanner(System.in);
-            System.out.println("Indique o ano");
             int ano;
             do{
-                ano = s.nextInt();
+                ano = lerInt("Indique o ano");
             }while(ano < 2000 || ano > 2018);
 
-            System.out.println("Indique o número do mês");
             int mes;
             do{
-                mes = s.nextInt();
+                mes = lerInt("Indique o número do mês");
             }while(mes < 1 || mes > 12);
 
             YearMonth x = YearMonth.of(ano, mes);
 
-            System.out.println("Indique o dia");
             int dia;
             do{
-                dia = s.nextInt();
+                dia = lerInt("Indique o dia");
             }while(!x.isValidDay(dia));
 
-            System.out.println("Indique a hora");
             int hora;
             do{
-                hora = s.nextInt();
+                hora = lerInt("Indique a hora");
             }while(hora < 0 || hora > 23);
 
-            System.out.println("Indique os minutos");
             int minutos;
             do{
-                minutos = s.nextInt();
+                minutos = lerInt("Indique os minutos");
             }while(minutos < 1 || minutos > 59);
 
             data = LocalDateTime.of(ano, mes, dia, hora, minutos);
