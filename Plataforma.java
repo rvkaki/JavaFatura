@@ -544,7 +544,7 @@ public class Plataforma{
         else if (escolha == 4){
             double deducaoAgregado = this.getDeducaoFiscalAgregado();
             double deducaoIndividual = this.getDeducaoFiscal();
-            double irs = this.getIRS();
+            double irs = this.getIRS() * (1 - reducaoImposto());
             double valorFinal = Math.min(deducaoAgregado, irs);
             System.out.println("O valor pago de IRS foi " + irs);
             System.out.println("O valor de dedução acumulado por si é " + deducaoIndividual);
@@ -714,7 +714,8 @@ public class Plataforma{
         menu.append("               #           2 --> Ver Faturas                #              \n");
         menu.append("               #           3 --> Definições da conta        #              \n");
         menu.append("               #           4 --> Valor Faturado             #              \n");
-        menu.append("               #           5 --> Logout                     #              \n");
+        menu.append("               #           5 --> Imposto                    #              \n");
+        menu.append("               #           6 --> Logout                     #              \n");
         menu.append("               #                                            #              \n");
         menu.append("               ##############################################              \n");
         System.out.print('\u000C');
@@ -724,7 +725,7 @@ public class Plataforma{
         int escolha;
         do{
             escolha = s.nextInt();
-        }while(escolha != 1 && escolha != 2 && escolha != 3 && escolha != 4 && escolha != 5);
+        }while(escolha != 1 && escolha != 2 && escolha != 3 && escolha != 4 && escolha != 5 && escolha != 6);
         s.close();
         
 
@@ -779,7 +780,12 @@ public class Plataforma{
             System.out.println("No mês selecionado faturou " + valor + "€");
             pausaParaLer();
         }
-        else if (escolha == 5)
+        else if (escolha == 5){
+            double imposto = getImpostoColetivo() * (1.0 - reducaoImposto());
+            System.out.println("O valor a pagar de imposto é: " + imposto);
+            pausaParaLer();
+        }
+        else if (escolha == 6)
             logout();
     }
     /**
@@ -849,6 +855,17 @@ public class Plataforma{
                 valor += f.getValor();
         }
         return valor;
+    }
+    /**
+     * Devolve o imposto a pagar pela Empresa
+     * @return imposto
+     */
+    public double getImpostoColetivo(){
+        Coletivo empresa = (Coletivo) this.utilizador;
+        double imposto = 0.0;
+        for(int i: empresa.getListaFaturas())
+            imposto += this.totalFaturas.get(i).getValor() * 0.23;
+        return imposto;
     }
     /**
      * Imprimir o menu do administrador
@@ -1386,15 +1403,15 @@ public class Plataforma{
      * Devolve a redução de imposto associada ao utilizador atual
      * @return deducao
      */
-    ///////////////////////////////// Falta acrecentar os valores reais da redução de imposto!!!!!
     public double reducaoImposto() {
+        double reducao = 0.0;
         if (this.utilizador instanceof Individual && isFamiliaNumerosa(this.utilizador.getNIF())) {
-            ;
+            reducao = this.agregados.get(((Individual) this.utilizador).getIndice()).getNumeroFilhos() * 0.05;
         } else if (this.utilizador instanceof Coletivo && ((Coletivo) this.utilizador).getInterior()) {
-            ;
+            reducao = 0.10;
         }
 
-        return 0.0;
+        return reducao;
     }
 
     /**
