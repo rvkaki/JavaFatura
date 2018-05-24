@@ -14,8 +14,6 @@ public class Coletivo extends Entidade{
     private String designacao;
     /** Lista com informações das atividades económicas */
     private ArrayList<String> informacaoAtividades;
-    /** Número do coeficiente fiscal */
-    private double coeficienteFiscal;
     /** Distritos de interior */
     private static ArrayList<String> distritosInterior = new ArrayList<>(Arrays.asList("vila real","bragança","viseu","guarda","castelo branco", "portalegre", "évora","evora", "santarém","santarem", "beja"));
     /** Distrito da Empresa */
@@ -28,7 +26,6 @@ public class Coletivo extends Entidade{
         super();
         this.designacao = "";
         this.informacaoAtividades = new ArrayList<String>();
-        this.coeficienteFiscal = 0.0;
         this.distrito = "";
     }
     /**
@@ -41,16 +38,14 @@ public class Coletivo extends Entidade{
      * @param listafaturas
      * @param designacao
      * @param informacaoAtividade
-     * @param coeficienteFiscal
      * @param distrito
      */
-    public Coletivo(String nif, String email, String nome, String morada, String password, ArrayList<Integer> listaFaturas, String designacao, ArrayList<String> informacaoAtividades, double coeficienteFiscal, String distrito){
+    public Coletivo(String nif, String email, String nome, String morada, String password, ArrayList<Integer> listaFaturas, String designacao, ArrayList<String> informacaoAtividades, String distrito){
         super(nif, email, nome, morada, password, listaFaturas);
         this.designacao = designacao;
         this.informacaoAtividades = new ArrayList<String>(informacaoAtividades.size());
         for(String s: informacaoAtividades)
             this.informacaoAtividades.add(s);
-        this.coeficienteFiscal = coeficienteFiscal;
         this.distrito = distrito;
     }
     /**
@@ -61,7 +56,6 @@ public class Coletivo extends Entidade{
         super(e);
         this.designacao = e.getDesignacao();
         this.informacaoAtividades = e.getInformacaoAtividades();
-        this.coeficienteFiscal = e.getCoeficienteFiscal();
         this.distrito = e.getDistrito();
     }
     /** 
@@ -91,14 +85,6 @@ public class Coletivo extends Entidade{
     }
 
     /**
-     * Devolve o coeficiente fiscal
-     * @return o coeficiente fiscal
-     */
-    public double getCoeficienteFiscal(){
-        return this.coeficienteFiscal;
-    }
-
-    /**
      * Devolve o distrito da empresa
      * @return o distrito
      */
@@ -122,13 +108,6 @@ public class Coletivo extends Entidade{
         for(String s: informacaoAtividades)
             res.add(s);
         this.informacaoAtividades = res;
-    }
-    /**
-     * Define o coeficiente fiscal
-     * @param coeficiente
-     */
-    public void setCoeficienteFiscal(double coeficiente){
-        this.coeficienteFiscal = coeficiente;
     }
 
     /**
