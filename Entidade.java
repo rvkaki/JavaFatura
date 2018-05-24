@@ -22,6 +22,7 @@ public class Entidade implements Serializable{
     private String password;
     /** Lista com as faturas da entidade */
     private ArrayList<Integer> listaFaturas;
+
     /**
      * Construtor por omissão
      */
@@ -33,8 +34,9 @@ public class Entidade implements Serializable{
         this.password = "";
         this.listaFaturas = new ArrayList<Integer>();
     }
+
     /**
-     * Construtor por parametro 
+     * Construtor por parametro
      * @param nif
      * @param email
      * @param nome
@@ -52,6 +54,7 @@ public class Entidade implements Serializable{
         for (Integer i: listaFaturas)
             this.listaFaturas.add(i);
     }
+
     /**
      * Construtor por cópia
      * @param e entidade original
@@ -64,6 +67,7 @@ public class Entidade implements Serializable{
         this.password = e.getPassword();
         this.listaFaturas = e.getListaFaturas();
     }
+
     /**
      * Devolve o nif da entidade
      * @return o nif
@@ -71,13 +75,15 @@ public class Entidade implements Serializable{
     public String getNIF(){
         return this.nif;
     }
-    /** 
+
+    /**
      * Devolve o email da entidade
      * @return email
      */
     public String getEmail(){
         return this.email;
     }
+
     /**
      * Devolve o nome da entidade
      * @return nome
@@ -85,6 +91,7 @@ public class Entidade implements Serializable{
     public String getNome(){
         return this.nome;
     }
+
     /**
      * Devolve a morada da entidade
      * @return morada
@@ -92,6 +99,7 @@ public class Entidade implements Serializable{
     public String getMorada(){
         return this.morada;
     }
+
     /**
      * Devolve a password da entidade
      * @return password
@@ -99,6 +107,7 @@ public class Entidade implements Serializable{
     public String getPassword(){
         return this.password;
     }
+
     /**
      * Devolve a lista de faturas da entidade
      * @return a lista de faturas
@@ -109,6 +118,7 @@ public class Entidade implements Serializable{
             res.add(x);
         return res;
     }
+
     /**
      * Define o nif da entidade
      * @param nif
@@ -116,6 +126,7 @@ public class Entidade implements Serializable{
     public void setNIF(String nif){
         this.nif = nif;
     }
+
     /**
      * Define o email da entidade
      * @param email
@@ -123,6 +134,7 @@ public class Entidade implements Serializable{
     public void setEmail(String email){
         this.email = email;
     }
+
     /**
      * Define o nome da entidade
      * @param nome
@@ -130,6 +142,7 @@ public class Entidade implements Serializable{
     public void setNome(String nome){
         this.nome = nome;
     }
+
     /**
      * Define a morada da entidade
      * @param morada
@@ -137,6 +150,7 @@ public class Entidade implements Serializable{
     public void setMorada(String morada){
         this.morada = morada;
     }
+
     /**
      * Define a password da entidade
      * @param password
@@ -144,6 +158,19 @@ public class Entidade implements Serializable{
     public void setPassword(String password){
         this.password = password;
     }
+
+    /**
+     * Define a lista de faturas
+     * @param faturas
+     */
+    public void setListaFaturas(ArrayList<Integer> faturas){
+        ArrayList<Integer> res = new ArrayList<Integer>(faturas.size());
+        for (Integer i: faturas)
+            res.add(i);
+        
+        this.listaFaturas = res;
+    }
+
     /**
      * Define a lista de faturas
      * @param fatura
@@ -151,6 +178,7 @@ public class Entidade implements Serializable{
     public void adicionarFatura(int fatura){
         this.listaFaturas.add(fatura);
     }
+
     /**
      * Cria uma cópia do objeto
      * @return cópia do objeto
@@ -158,6 +186,7 @@ public class Entidade implements Serializable{
     public Entidade clone(){
     	return new Entidade(this);
     }
+
     /**
      * Verifica a igualdade dos objetos
      * @param o
@@ -166,7 +195,7 @@ public class Entidade implements Serializable{
     public boolean equals(Object o){
         if(this == o)
             return true;
-        
+
         if( (o == null) || (this.getClass() != o.getClass()))
             return false;
 

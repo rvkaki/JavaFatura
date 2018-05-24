@@ -27,7 +27,7 @@ import java.lang.Exception;
 public class Plataforma{
     /**Lista de todas as faturas */
     private ArrayList<Fatura> totalFaturas;
-    /** Lista de todas as entidades*/ 
+    /** Lista de todas as entidades*/
     private HashMap<String,Entidade> totalEntidades;
     /** Lista de todos os Agregados */
     private ArrayList<AgregadoFamiliar> agregados;
@@ -38,10 +38,10 @@ public class Plataforma{
     /**Lista das atividades económicas */
     private static ArrayList<String> atividades = new ArrayList<>(Arrays.asList("despesas gerais familiares",
                                                                    "saúde", "educação", "habitação", "lares",
-                                                                   "reparação de automóveis", "reparação de motociclos", 
+                                                                   "reparação de automóveis", "reparação de motociclos",
                                                                    "restauração e alojamento", "cabeleireiros",
                                                                    "atividades veterinárias", "transportes", "outros"));
-    /**Tabela para Cálculo do IRS baseando em rendimento anual e número do agregado*/                                                                   
+    /**Tabela para Cálculo do IRS baseando em rendimento anual e número do agregado*/
     private static final HashMap<Integer,double[]> irs;
         static{
             HashMap<Integer,double[]> myMap = new HashMap<Integer,double[]>();
@@ -75,9 +75,10 @@ public class Plataforma{
             myMap.put("outros", new Pair(0.0, 0));
             descontos = myMap;
         }
+
     /**
      * Construtor por omissão
-     */                                                              
+     */
    public Plataforma(){
         this.totalFaturas = new ArrayList<Fatura>();
         this.totalEntidades = new HashMap<String,Entidade>();
@@ -189,9 +190,23 @@ public class Plataforma{
      * Função para dar tempo para ler o texto impresso. Espera que o utilizador pressione Enter antes de continuar
      */
     public void pausaParaLer(){
-        System.out.println();
-        System.out.println("Pressione Enter para continuar...");
+        System.out.println("\nPressione Enter para continuar...");
         ler(null);
+    }
+
+    /**
+     * Dá início ao menu
+     * @param args os argumentos passados ao programa
+     */
+    public static void main(String[] args){
+        Plataforma plataforma = new Plataforma();
+        plataforma.load();
+
+        boolean exit = false;
+        while (!exit)
+            exit = plataforma.printMenu();
+
+        plataforma.save();
     }
 
     /**
@@ -246,21 +261,6 @@ public class Plataforma{
     }
 
     /**
-     * Dá início ao menu
-     * @param args os argumentos passados ao programa
-     */
-    public static void main(String[] args){
-        Plataforma plataforma = new Plataforma();
-        plataforma.load();
-
-        boolean exit = false;
-        while (!exit)
-            exit = plataforma.printMenu();
-
-        plataforma.save();
-    }
-
-    /**
      * Imprime o menu inicial
      * @return true se o utilizador quiser sair da plataforma, false caso queira continuar a utilizá-la
      */
@@ -294,211 +294,7 @@ public class Plataforma{
 
         return false;
     }
-    /**
-     * Menu para registar um utilizador na plataforma
-     */
-    public void registar(){ 
-        StringBuilder menu = new StringBuilder();
 
-        menu.append("               ##############################################              \n");
-        menu.append("               #                 Registar                   #              \n");
-        menu.append("               ##############################################              \n");
-        menu.append("               #                                            #              \n");
-        menu.append("               #             NIF:                           #              \n");
-        menu.append("               #             Nome:                          #              \n");
-        menu.append("               #             Email:                         #              \n");
-        menu.append("               #             Morada:                        #              \n");
-        menu.append("               #             Password:                      #              \n");
-        menu.append("               #                                            #              \n");
-        menu.append("               ##############################################              \n");
-        System.out.print('\u000C');
-        System.out.println(menu);
-
-        String nif = lerNIF("Escreva o seu NIF");
-
-        Entidade e = null;
-        if (this.totalEntidades.containsKey(nif)) {
-            e = this.totalEntidades.get(nif);
-            if (!e.getPassword().equals("")) {
-                System.out.println("NIF já registado!");
-                pausaParaLer();
-                return;
-            }
-        } else {
-            if (nif.charAt(0) == '1' || nif.charAt(0) == '2')
-                e = new Individual();
-            else if (nif.charAt(0) == '5')
-                e = new Coletivo();
-            else if (nif.equals("000000000"))
-                e = new Entidade();
-            
-            e.setNIF(nif);
-        }
-        
-        String nome = ler("Escreva o seu nome");
-        e.setNome(nome);
-        String email = ler("Escreva o seu email");
-        e.setEmail(email);
-        String morada = ler("Escreva a sua morada");
-        e.setMorada(morada);
-        String password = ler("Escreva a sua password");
-        e.setPassword(password);
-
-        if(nif.charAt(0) == '1' || nif.charAt(0) == '2')
-            registarIndividual((Individual) e);
-        
-        else if(nif.charAt(0) == '5')
-            registarColetivo((Coletivo) e);
-
-        this.totalEntidades.put(nif, e.clone());
-    }
-    /**
-     *  Menu para registar uma entidade individual na plataforma
-     * @param e
-     */
-    public void registarIndividual(Individual e){
-        StringBuilder menu = new StringBuilder();
-
-        menu.append("               ##############################################              \n");
-        menu.append("               #            RegistarIndividual              #              \n");
-        menu.append("               ##############################################              \n");
-        menu.append("               #                                            #              \n");
-        menu.append("               #       Número de elementos agregado:        #              \n");
-        menu.append("               #       NIF dos elementos agregado:          #              \n");
-        menu.append("               #       Coeficiente Fiscal:                  #              \n");
-        menu.append("               #       Rendimento anual agregado:           #              \n");
-        menu.append("               #                                            #              \n");
-        menu.append("               ##############################################              \n");
-        System.out.print('\u000C');
-        System.out.println(menu);
-        
-        int numeroAgregado;
-        do {
-            numeroAgregado = lerInt("Escreva o número de elementos do seu agregado familiar (incluindo você)");
-        } while (numeroAgregado <= 0);
-        HashMap<String,Boolean> nifAgregado = new HashMap<String,Boolean>();
-
-        String x;
-        boolean isFilho = false;
-        do{
-            x = ler("É um dos filhos do agregado? (s/n)");
-        }while(!x.equals("s") && !x.equals("n"));
-        if(x.equals("s"))
-            isFilho = true;
-        nifAgregado.put(e.getNIF(), isFilho);
-        if (numeroAgregado > 1) {
-            int numeroFilhos;
-            do{
-                numeroFilhos = lerInt("Escreva o número de filhos (excluindo você se for esse o caso)");
-            }while(numeroFilhos >= numeroAgregado);
-
-        
-            if (numeroFilhos > 0){
-                System.out.println("Escreva o NIF dos filhos");
-                for(int i=1; i<=numeroFilhos; i++){
-                    String nifFilho = lerNIFIndividual("NIF do filho " + i + ":");
-                    nifAgregado.put(nifFilho, true);
-                }
-            }
-
-            if(numeroAgregado - numeroFilhos > 1){
-                System.out.println("Escreva o NIF dos restantes elementos do agregado familiar (excluindo você)");
-                for(int i=1; i<numeroAgregado-numeroFilhos; i++){
-                    String nifFamiliar = lerNIFIndividual("NIF do elemento " + i + ":");
-                    nifAgregado.put(nifFamiliar, false);
-                }
-            }
-        }
-    
-        double coeficiente = lerDouble("Escreva o seu coeficiente fiscal");
-        double rendimentoAtual;
-        double rendimentoAgregado;
-        int indice = this.agregados.size();
-        String nif = null;
-
-        for(String nif1: nifAgregado.keySet())
-            if(this.totalEntidades.containsKey(nif1) && ! nif1.equals(e.getNIF())){
-                nif = nif1;
-                indice = ((Individual) this.totalEntidades.get(nif)).getIndice();
-                break;
-            }
-        
-        if(nif != null){
-            this.agregados.get(indice).atualizaAgregado(nifAgregado);
-
-            rendimentoAtual = this.agregados.get(indice).getRendimento();
-            String resposta;
-            do{
-                resposta = ler("Confirma que o rendimento anual do seu agregado é " + rendimentoAtual + "? (s/n)");
-            }while(!resposta.equals("s") && !resposta.equals("n"));
-
-            if(resposta.equals("n")){
-                rendimentoAgregado = lerDouble("Escreva o rendimento anual do seu agregado familiar");
-                this.agregados.get(indice).setRendimento(rendimentoAgregado);
-            }
-        }
-        else {
-            rendimentoAgregado = lerDouble("Escreva o rendimento anual do seu agregado familiar");
-            this.agregados.add(new AgregadoFamiliar(nifAgregado, rendimentoAgregado));
-        }
-
-        e.setIndice(indice);
-        e.setCoeficienteFiscal(coeficiente);
-    }
-    /**
-     *  Menu para registar um utilizador entidade coletivo na plataforma
-     * @param e
-     */
-    public void registarColetivo(Coletivo e){
-        StringBuilder menu = new StringBuilder();
-
-        menu.append("               ##############################################              \n");
-        menu.append("               #            RegistarColetivo                #              \n");
-        menu.append("               ##############################################              \n");
-        menu.append("               #                                            #              \n");
-        menu.append("               #         Designação:                        #              \n");
-        menu.append("               #         Atividades Económicas:             #              \n");
-        menu.append("               #         Distrito:                          #              \n");
-        menu.append("               #                                            #              \n");
-        menu.append("               ##############################################              \n");
-        System.out.print('\u000C');
-        System.out.println(menu);
-        
-        String designacao = ler("Escreva a designação da empresa");
-        ArrayList<String> informacaoAtividades = lerAtividadesColetivo();
-        String distrito = ler("Escreva o seu distrito:");
-
-        e.setDesignacao(designacao);
-        e.setInformacaoAtividades(informacaoAtividades);
-        e.setDistrito(distrito);
-    }
-
-    /**
-     * Ler atividades económicas do coletivo
-     * @return lista com as atividades do coletivo
-     */
-    public ArrayList<String> lerAtividadesColetivo() {
-        ArrayList<String> codigosAtividades = new ArrayList<String>();
-        for (String atividade: this.atividades) {
-            String res;
-            do {
-                res = ler("Atua na área de " + atividade + "? (s/n)");
-            } while (!res.equals("s") && !res.equals("n"));
-
-            if (res.equals("s"))
-                codigosAtividades.add(atividade);
-        }
-
-        return codigosAtividades;
-    }
-
-    /**
-     * Fazer o log out
-     */
-    public void logout(){
-        this.utilizador = null;
-        this.save();
-    }
     /**
      * Fazer o log in
      */
@@ -551,6 +347,165 @@ public class Plataforma{
                 printMenuColetivo();
         }
     }
+
+    /**
+     * Imprimir o menu do administrador
+     */
+    public void printMenuAdmin(){
+        StringBuilder menu = new StringBuilder();
+
+        menu.append("               ##############################################              \n");
+        menu.append("               #                  Admin                     #              \n");
+        menu.append("               ##############################################              \n");
+        menu.append("               #                                            #              \n");
+        menu.append("               #    1 --> Contribuintes mais gastadores     #              \n");
+        menu.append("               #    2 --> Contribuintes mais faturadores    #              \n");
+        menu.append("               #    3 --> Alterar limite família numerosa   #              \n");
+        menu.append("               #    4 --> Ver utilizadores registados       #              \n");
+        menu.append("               #    5 --> Ver agregados familiares          #              \n");
+        menu.append("               #    6 --> Ver faturas submetidas            #              \n");
+        menu.append("               #    7 --> Logout                            #              \n");
+        menu.append("               #                                            #              \n");
+        menu.append("               ##############################################              \n");
+        System.out.print('\u000C');
+        System.out.println(menu);
+
+        int escolha;
+        do {
+            escolha = lerInt(null);
+        } while (escolha != 1 && escolha != 2 && escolha != 3 && escolha != 4 && escolha != 5 && escolha != 6 && escolha != 7);
+
+        if (escolha == 1)
+            verContribuintesMaisGastadores();
+        else if(escolha == 2)
+            verContribuintesMaisFaturadores();
+        else if(escolha == 3)
+            alterarLimiteFamiliaNumerosa();
+        else if(escolha == 4)
+            printUtilizadoresRegistados();
+        else if(escolha == 5)
+            printAgregadosFamiliares();
+        else if(escolha == 6)
+            printFaturasSubmetidas();
+        else if(escolha == 7)
+            logout();
+    }
+
+    /**
+     * Ver os 10 Contribuintes Individuais mais gastadores
+     */
+    public void verContribuintesMaisGastadores() {
+        TreeSet<String> contribuintes = new TreeSet<String>((nif1,nif2) -> (int) (getValorTotal(nif2) - getValorTotal(nif1)));
+        for (String s: this.totalEntidades.keySet()) {
+            if (s.charAt(0) == '1' || s.charAt(0) == '2')
+                contribuintes.add(s);
+        }
+
+        if (contribuintes.size() == 0) {
+            System.out.println("Não existem contribuintes registados. Por favor, volte mais tarde");
+            pausaParaLer();
+            return;
+        }
+
+        int num = 10;
+        if (contribuintes.size() < 10)
+            num = contribuintes.size();
+
+        System.out.println("\nTop " + num + " dos contribuintes mais gastadores");
+        for (String c: contribuintes) {
+            System.out.println(c + " --> " + getValorTotal(c) + "€");
+            num--;
+            if (num == 0)
+                break;
+        }
+
+        pausaParaLer();
+    }
+
+    /**
+     * Ver os X Contribuintes Coletivos mais faturadores
+     */
+    public void verContribuintesMaisFaturadores() {
+        TreeSet<String> contribuintes = new TreeSet<String>((nif1,nif2) -> (int) (getValorTotal(nif2) - getValorTotal(nif1)));
+        for (String s: this.totalEntidades.keySet()) {
+            if (s.charAt(0) == '5')
+                contribuintes.add(s);
+        }
+
+        if (contribuintes.size() == 0) {
+            System.out.println("Não existem contribuintes registados. Por favor, volte mais tarde");
+            pausaParaLer();
+            return;
+        }
+
+        int num;
+        do {
+            num = lerInt("Existem " + contribuintes.size() + " contribuintes registados. Quantos quer ver?");
+        } while (num < 1 || num > contribuintes.size());
+
+        System.out.println("\nTop " + num + " dos contribuintes mais faturadores");
+        for (String c: contribuintes) {
+            System.out.println(c + " --> " + getValorTotal(c) + "€");
+            num--;
+            if (num == 0)
+                break;
+        }
+
+        pausaParaLer();
+    }
+
+    /**
+     * Devolve o valor total de todas as faturas de um contribuinte
+     * @param nif NIF do contribuinte
+     * @return valor total
+     */
+    public double getValorTotal(String nif) {
+        double res = 0;
+        for (Integer i: this.totalEntidades.get(nif).getListaFaturas())
+            res += this.totalFaturas.get(i).getValor();
+
+        return res;
+    }
+
+    /**
+     * Altera a definição de famílias numerosas
+     */
+    public void alterarLimiteFamiliaNumerosa() {
+        this.limiteFamiliaNumerosa = lerInt("O valor atual é " + this.limiteFamiliaNumerosa + ". Introduza o novo limite para as famílias numerosas:");
+    }
+
+    /**
+     * Ver os utilizadores registados no sistema
+     */
+    public void printUtilizadoresRegistados(){
+        for(Entidade e: this.totalEntidades.values()){
+            if(!e.getPassword().equals(""))
+                System.out.println(e.getNIF() + " --> " + e.getNome());
+        }
+
+        pausaParaLer();
+    }
+
+    /**
+     * Ver todos os agregados familiares
+     */
+    public void printAgregadosFamiliares() {
+        for (AgregadoFamiliar af: this.agregados)
+            System.out.println(af);
+
+        pausaParaLer();
+    }
+
+    /**
+     * Ver todas as faturas submetidas
+     */
+    public void printFaturasSubmetidas() {
+        for (Fatura f: this.totalFaturas)
+            System.out.println(f);
+
+        pausaParaLer();
+    }
+
     /**
      * Imprimir o menu de uma entidade individual
      */
@@ -594,17 +549,64 @@ public class Plataforma{
     }
 
     /**
-     * Ver o valor de dedução fiscal
+     * Ver as faturas por parte dos Contribuintes Individuais
      */
-    public void verValorDeducaoFiscal() {
-        double deducaoAgregado = this.getDeducaoFiscalAgregado();
-        double deducaoIndividual = this.getDeducaoFiscal();
-        double irs = this.getIRS() * (1 - reducaoImposto());
-        double valorFinal = Math.min(deducaoAgregado, irs);
-        System.out.println("O valor pago de IRS foi " + irs + "€");
-        System.out.println("O valor de dedução acumulado por si é " + deducaoIndividual + "€");
-        System.out.println("O valor de dedução acumulado pelo seu agregado é " + deducaoAgregado + "€");
-        System.out.println("Isto resulta num valor de dedução de " + valorFinal + "€");
+    public void verFaturasIndividual() {
+        if (this.utilizador.getListaFaturas().size() == 0){
+            System.out.println("Não tem faturas emitidas em seu nome. Por favor, volte mais tarde");
+            pausaParaLer();
+            return;
+        }
+
+        int escolha;
+        do {
+            escolha = lerInt("Deseja imprimir 1 --> todas as faturas ou 2 --> as de uma determinada empresa?");
+        } while (escolha != 1 && escolha != 2);
+
+        String nifE = "000000000";
+        if (escolha == 2) {
+            HashMap<String,String> empresas = new HashMap<String,String>();
+            for (Integer i: this.utilizador.getListaFaturas()) {
+                String nifEmpresa = this.totalFaturas.get(i).getNIFEmitente();
+                String nomeEmpresa = this.totalEntidades.get(nifEmpresa).getNome();
+                empresas.put(nifEmpresa, nomeEmpresa);
+            }
+
+            System.out.println("Tem faturas emitidas pelas seguintes empresas:");
+            for(String n: empresas.keySet())
+                System.out.println(n + " --> " + empresas.get(n));
+
+            do{
+                nifE = lerNIFColetivo("\nEscreva o nif da empresa que deseja ver");
+            }while(!empresas.containsKey(nifE));
+        }
+
+        do{
+            escolha = lerInt("Deseja imprimir por 1 --> valor ou 2 --> data?");
+        }while(escolha != 1 && escolha != 2);
+        System.out.println();
+
+        ArrayList<Fatura> res = null;
+        if(escolha == 1)
+            res = sortValor(nifE);
+
+        else if(escolha == 2){
+            do{
+                escolha = lerInt("Deseja imprimir por data 1 --> ascendente ou 2 --> descendente");
+            }while(escolha != 1 && escolha != 2);
+            System.out.println();
+
+            if(escolha == 1)
+                res = sortData(nifE, false);
+
+            else if(escolha == 2)
+                res = sortData(nifE, true);
+        }
+
+        System.out.print('\u000C');
+        for(Fatura f: res)
+            System.out.println(f);
+
         pausaParaLer();
     }
 
@@ -733,10 +735,118 @@ public class Plataforma{
                 ((Individual) this.utilizador).atualizaCodigosAtividades(chave, valor);
 
             }
-                
+
         }
         else if(escolha == 2)
             return;
+    }
+
+    /**
+     * Ver o valor de dedução fiscal
+     */
+    public void verValorDeducaoFiscal() {
+        double deducaoAgregado = this.getDeducaoFiscalAgregado();
+        double deducaoIndividual = this.getDeducaoFiscal();
+        double irs = this.getIRS() * (1 - reducaoImposto());
+        double valorFinal = Math.min(deducaoAgregado, irs);
+        System.out.println("O valor pago de IRS foi " + irs + "€");
+        System.out.println("O valor de dedução acumulado por si é " + deducaoIndividual + "€");
+        System.out.println("O valor de dedução acumulado pelo seu agregado é " + deducaoAgregado + "€");
+        System.out.println("Isto resulta num valor de dedução de " + valorFinal + "€");
+        pausaParaLer();
+    }
+
+    /**
+     * Devolve o valor de dedução fiscal associado ao agregado do utilizador atual
+     * @return deducao
+     */
+    public double getDeducaoFiscalAgregado(){
+        Individual utilizador = (Individual) this.utilizador;
+        AgregadoFamiliar agregado = this.agregados.get(utilizador.getIndice());
+        double coeficiente = utilizador.getCoeficienteFiscal();
+        int numeroAgregado = agregado.getAgregado().size();
+        if(numeroAgregado > 5) numeroAgregado = 5;
+
+        HashMap<String,Double> atividadesAgregado = new HashMap<String,Double>();
+        for(String nif: agregado.getAgregado().keySet()){
+            if (this.totalEntidades.containsKey(nif)) {
+                Individual i = (Individual) this.totalEntidades.get(nif);
+                HashMap<String,Double> atividades = i.getCodigosAtividades();
+                for(String s: atividades.keySet()){
+                    if(atividadesAgregado.containsKey(s))
+                        atividadesAgregado.put(s, atividades.get(s) + atividadesAgregado.get(s));
+                    else
+                        atividadesAgregado.put(s, atividades.get(s));
+                }
+            }
+        }
+
+        double valorADeduzir = 0.0;
+        for(String a: atividadesAgregado.keySet()){
+            double desconto = atividadesAgregado.get(a) * (descontos.get(a).getKey() / 100.0);
+            desconto = Math.min(desconto, descontos.get(a).getValue());
+            valorADeduzir += desconto;
+        }
+
+        valorADeduzir /= coeficiente;
+
+        return valorADeduzir;
+    }
+
+    /**
+     * Devolve o valor de dedução fiscal associado utilizador atual
+     * @return deducao
+     */
+    public double getDeducaoFiscal(){
+        Individual utilizador = ((Individual) this.utilizador);
+        double coeficiente = utilizador.getCoeficienteFiscal();
+
+        double valorADeduzir = 0.0;
+        HashMap<String,Double> atividades = utilizador.getCodigosAtividades();
+        for(String a: atividades.keySet()){
+            double desconto = atividades.get(a) * (descontos.get(a).getKey() / 100.0);
+            desconto = Math.min(desconto, descontos.get(a).getValue() / 2);
+            valorADeduzir += desconto;
+        }
+
+        valorADeduzir /= coeficiente;
+
+        return valorADeduzir;
+    }
+
+    /**
+     * Devolve o valor de irs associado ao agregado familiar do utilizador atual
+     * @return irs
+     */
+    public double getIRS(){
+        Individual utilizador = ((Individual) this.utilizador);
+        AgregadoFamiliar agregado = this.agregados.get(utilizador.getIndice());
+        int numeroAgregado = agregado.getAgregado().size();
+        if(numeroAgregado > 5) numeroAgregado = 5;
+        double rendimento = agregado.getRendimento();
+        double valorPagoIRS = (irs.get(round(rendimento))[numeroAgregado] / 100) * rendimento;
+        return valorPagoIRS;
+    }
+
+    /**
+     * Arredonda o rendimento para aceder ao Map irs
+     * @param rendimento
+     * @return rendimento arredondado
+     */
+    public int round(double rendimento){
+        int res = 0;
+        double minimo = rendimento;
+        for(int v: irs.keySet()){
+            double x = v - rendimento;
+            if(x >= 0 && x < minimo){
+                    res = v;
+                    break;
+            }
+        }
+        if(res == 0)
+            res = 300001;
+
+        return res;
     }
 
     /**
@@ -776,11 +886,8 @@ public class Plataforma{
         }
         else if(escolha == 4)
             verValorFaturado();
-        else if (escolha == 5){
-            double imposto = getImpostoColetivo() * (1.0 - reducaoImposto());
-            System.out.println("O valor a pagar de imposto é " + imposto + "€");
-            pausaParaLer();
-        }
+        else if (escolha == 5)
+            verImposto();
         else if (escolha == 6)
             logout();
     }
@@ -847,12 +954,128 @@ public class Plataforma{
             this.totalEntidades.put(nifCliente, i.clone());
         }
         this.totalEntidades.get(nifCliente).adicionarFatura(indiceFatura);
-        
+
         if(!atividade.equals("")){
             HashMap<String,Double> codigos = ((Individual) this.totalEntidades.get(nifCliente)).getCodigosAtividades();
             valor += codigos.getOrDefault(atividade, 0.0);
             ((Individual) this.totalEntidades.get(nifCliente)).atualizaCodigosAtividades(atividade, valor);
         }
+    }
+
+    /**
+     * Ver as faturas por parte das Empresas
+     */
+    public void verFaturasColetivo() {
+        if (this.utilizador.getListaFaturas().size() == 0){
+            System.out.println("Não exitem faturas emitidas por si. Por favor, volte mais tarde");
+            pausaParaLer();
+            return;
+        }
+
+        int escolha;
+        do {
+            escolha = lerInt("Deseja imprimir 1 --> todas as faturas ou 2 --> as de um determinado contribuinte?");
+        } while (escolha != 1 && escolha != 2);
+
+        String nifC = "000000000";
+        if (escolha == 2) {
+            HashMap<String,String> contribuintes = new HashMap<String,String>();
+            for (Integer i: this.utilizador.getListaFaturas()) {
+                String nifContribuinte = this.totalFaturas.get(i).getNIFCliente();
+                String nomeContribuinte = this.totalEntidades.get(nifContribuinte).getNome();
+                if(nomeContribuinte.equals(""))
+                    nomeContribuinte = "(Contribuinte não registado)";
+                contribuintes.put(nifContribuinte, nomeContribuinte);
+            }
+            System.out.println("Tem faturas emitidas para os seguintes contribuintes:");
+            for(String n: contribuintes.keySet())
+                System.out.println(n + " --> " + contribuintes.get(n));
+
+            do{
+                nifC = lerNIFIndividual("\nEscreva o nif do contribuinte que deseja ver");
+            }while(!contribuintes.containsKey(nifC));
+        }
+
+        do{
+            escolha = lerInt("Deseja imprimir por 1 --> valor ou 2 --> data?");
+        }while(escolha != 1 && escolha != 2);
+        System.out.println();
+
+        ArrayList<Fatura> res = null;
+        if(escolha == 1)
+            res = sortValor(nifC);
+
+        else if(escolha == 2){
+            do{
+                escolha = lerInt("Deseja imprimir por data 1 --> ascendente ou 2 --> descendente");
+            }while(escolha != 1 && escolha != 2);
+            System.out.println();
+
+            if(escolha == 1)
+                res = sortData(nifC, false);
+
+            else if(escolha == 2)
+                res = sortData(nifC, true);
+        }
+
+        System.out.print('\u000C');
+        for(Fatura f: res)
+            System.out.println(f);
+
+        pausaParaLer();
+    }
+
+    /**
+     * Método que ordena as faturas de uma entidade por valor (decrescente)
+     * @param nif do cliente ou emissor
+     * @return res TreeMap de faturas ordenado decrescentemente
+     */
+    public ArrayList<Fatura> sortValor(String nif){
+        ArrayList<Fatura> res = new ArrayList<Fatura>();
+        if(this.utilizador instanceof Individual){
+            for(int i: this.utilizador.getListaFaturas()){
+                if(this.totalFaturas.get(i).getNIFEmitente().equals(nif) || nif.equals("000000000"))
+                    res.add(this.totalFaturas.get(i));
+            }
+        }
+        else if(this.utilizador instanceof Coletivo){
+            for(int i: this.utilizador.getListaFaturas()){
+                if(this.totalFaturas.get(i).getNIFCliente().equals(nif) || nif.equals("000000000"))
+                    res.add(this.totalFaturas.get(i));
+            }
+        }
+
+        Collections.sort(res, (f1,f2) -> (int)(f2.getValor() - f1.getValor()));
+
+        return res;
+    }
+
+    /**
+     * Método que ordena as faturas de uma entidade por data (crescente se bool decrescente == false)
+     * @param nif do cliente ou emissor
+     * @return res TreeMap de faturas ordenado decrescentemente
+     */
+    public ArrayList<Fatura> sortData(String nif, boolean decrescente){
+        ArrayList<Fatura> res = new ArrayList<Fatura>();
+        if(this.utilizador instanceof Individual){
+            for(int i: this.utilizador.getListaFaturas()){
+                if(this.totalFaturas.get(i).getNIFEmitente().equals(nif) || nif.equals("000000000"))
+                    res.add(this.totalFaturas.get(i));
+            }
+        }
+        else if(this.utilizador instanceof Coletivo){
+            for(int i: this.utilizador.getListaFaturas()){
+                if(this.totalFaturas.get(i).getNIFCliente().equals(nif) || nif.equals("000000000"))
+                    res.add(this.totalFaturas.get(i));
+            }
+        }
+
+        if(decrescente)
+            Collections.sort(res, (f2,f1) -> (int)(f1.getData().compareTo(f2.getData())));
+        else
+            Collections.sort(res, (f1,f2) -> (int)(f1.getData().compareTo(f2.getData())));
+
+        return res;
     }
 
     /**
@@ -908,6 +1131,46 @@ public class Plataforma{
     }
 
     /**
+     * Imprime o imposto a pagar pela Empresa
+     */
+    public void verImposto(){
+        Coletivo empresa = (Coletivo) this.utilizador;
+        double imposto = 0.0;
+        for(int i: empresa.getListaFaturas())
+            imposto += this.totalFaturas.get(i).getValor() * 0.23;
+
+        imposto = imposto * (1.0 - reducaoImposto());
+
+        System.out.println("O valor de imposto a pagar é " + imposto + "€");
+        pausaParaLer();
+    }
+
+    /**
+     * Devolve a redução de imposto associada ao utilizador atual
+     * @return deducao
+     */
+    public double reducaoImposto() {
+        double reducao = 0.0;
+        if (this.utilizador instanceof Individual && isFamiliaNumerosa(this.utilizador.getNIF())) {
+            reducao = this.agregados.get(((Individual) this.utilizador).getIndice()).getNumeroFilhos() * 0.05;
+        } else if (this.utilizador instanceof Coletivo && ((Coletivo) this.utilizador).isInterior()) {
+            reducao = 0.10;
+        }
+
+        return reducao;
+    }
+
+    /**
+     * Função que diz se a família de um dado Individual é numerosa
+     * @param nif NIF do Individual
+     * @return true se a família for numerosa, false caso contrário
+     */
+    public boolean isFamiliaNumerosa(String nif){
+        Individual i = (Individual) this.totalEntidades.get(nif);
+        return this.agregados.get(i.getIndice()).getNumeroFilhos() >= limiteFamiliaNumerosa;
+    }
+
+    /**
      * Ver ou mudar as definições de conta
      * @return true se o utilizador quiser voltar ao menu, false caso contrário
      */
@@ -953,468 +1216,210 @@ public class Plataforma{
     }
 
     /**
-     * Devolve o imposto a pagar pela Empresa
-     * @return imposto
+     * Menu para registar um utilizador na plataforma
      */
-    public double getImpostoColetivo(){
-        Coletivo empresa = (Coletivo) this.utilizador;
-        double imposto = 0.0;
-        for(int i: empresa.getListaFaturas())
-            imposto += this.totalFaturas.get(i).getValor() * 0.23;
-        return imposto;
-    }
-    /**
-     * Imprimir o menu do administrador
-     */
-    public void printMenuAdmin(){
+    public void registar(){
         StringBuilder menu = new StringBuilder();
 
         menu.append("               ##############################################              \n");
-        menu.append("               #                  Admin                     #              \n");
+        menu.append("               #                 Registar                   #              \n");
         menu.append("               ##############################################              \n");
         menu.append("               #                                            #              \n");
-        menu.append("               #    1 --> Contribuintes mais gastadores     #              \n");
-        menu.append("               #    2 --> Contribuintes mais faturadores    #              \n");
-        menu.append("               #    3 --> Alterar limite família numerosa   #              \n");
-        menu.append("               #    4 --> Ver utilizadores registados       #              \n");
-        menu.append("               #    5 --> Ver agregados familiares          #              \n");
-        menu.append("               #    6 --> Ver faturas submetidas            #              \n");
-        menu.append("               #    7 --> Logout                            #              \n");
+        menu.append("               #             NIF:                           #              \n");
+        menu.append("               #             Nome:                          #              \n");
+        menu.append("               #             Email:                         #              \n");
+        menu.append("               #             Morada:                        #              \n");
+        menu.append("               #             Password:                      #              \n");
         menu.append("               #                                            #              \n");
         menu.append("               ##############################################              \n");
         System.out.print('\u000C');
         System.out.println(menu);
 
-        int escolha;
-        do {
-            escolha = lerInt(null);
-        } while (escolha != 1 && escolha != 2 && escolha != 3 && escolha != 4 && escolha != 5 && escolha != 6 && escolha != 7);
+        String nif = lerNIF("Escreva o seu NIF");
 
-        if (escolha == 1)
-            verContribuintesMaisGastadores();
-        else if(escolha == 2)
-            verContribuintesMaisFaturadores();
-        else if(escolha == 3)
-            alterarLimiteFamiliaNumerosa();
-        else if(escolha == 4)
-            printUtilizadoresRegistados();
-        else if(escolha == 5)
-            printAgregadosFamiliares();
-        else if(escolha == 6)
-            printFaturasSubmetidas();
-        else if(escolha == 7)
-            logout();
-    }
-
-    /**
-     * Ver todas as faturas submetidas
-     */
-    public void printFaturasSubmetidas() {
-        for (Fatura f: this.totalFaturas)
-            System.out.println(f);
-
-        pausaParaLer();
-    }
-
-    /**
-     * Ver todos os agregados familiares
-     */
-    public void printAgregadosFamiliares() {
-        for (AgregadoFamiliar af: this.agregados)
-            System.out.println(af);
-
-        pausaParaLer();
-    }
-
-    /**
-     * Ver os utilizadores registados no sistema
-     */
-    public void printUtilizadoresRegistados(){
-        for(Entidade e: this.totalEntidades.values()){
-            if(!e.getPassword().equals(""))
-                System.out.println(e.getNIF() + " --> " + e.getNome());
-        }
-
-        pausaParaLer();
-    }
-
-    /**
-     * Ver os 10 Contribuintes Individuais mais gastadores
-     */
-    public void verContribuintesMaisGastadores() {
-        TreeSet<String> contribuintes = new TreeSet<String>((nif1,nif2) -> (int) (getValorTotal(nif2) - getValorTotal(nif1)));
-        for (String s: this.totalEntidades.keySet()) {
-            if (s.charAt(0) == '1' || s.charAt(0) == '2')
-                contribuintes.add(s);
-        }
-
-        if (contribuintes.size() == 0) {
-            System.out.println("Não existem contribuintes registados. Por favor, volte mais tarde");
-            pausaParaLer();
-            return;
-        }
-        
-        int num = 10;
-        if (contribuintes.size() < 10)
-            num = contribuintes.size();
-
-        System.out.println("\nTop " + num + " dos contribuintes mais gastadores");
-        for (String c: contribuintes) {
-            System.out.println(c + " --> " + getValorTotal(c) + "€");
-            num--;
-            if (num == 0)
-                break;
-        }
-
-        pausaParaLer();
-    }
-
-    /**
-     * Ver os X Contribuintes Coletivos mais faturadores
-     */
-    public void verContribuintesMaisFaturadores() {
-        TreeSet<String> contribuintes = new TreeSet<String>((nif1,nif2) -> (int) (getValorTotal(nif2) - getValorTotal(nif1)));
-        for (String s: this.totalEntidades.keySet()) {
-            if (s.charAt(0) == '5')
-                contribuintes.add(s);
-        }
-
-        if (contribuintes.size() == 0) {
-            System.out.println("Não existem contribuintes registados. Por favor, volte mais tarde");
-            pausaParaLer();
-            return;
-        }
-
-        int num;
-        do {
-            num = lerInt("Existem " + contribuintes.size() + " contribuintes registados. Quantos quer ver?");
-        } while (num < 1 || num > contribuintes.size());
-
-        System.out.println("\nTop " + num + " dos contribuintes mais faturadores");
-        for (String c: contribuintes) {
-            System.out.println(c + " --> " + getValorTotal(c) + "€");
-            num--;
-            if (num == 0)
-                break;
-        }
-
-        pausaParaLer();
-    }
-
-    /**
-     * Devolve o valor total de todas as faturas de um contribuinte
-     * @param nif NIF do contribuinte
-     * @return valor total
-     */
-    public double getValorTotal(String nif) {
-        double res = 0;
-        for (Integer i: this.totalEntidades.get(nif).getListaFaturas())
-            res += this.totalFaturas.get(i).getValor();
-
-        return res;
-    }
-
-    /**
-     * Altera a definição de famílias numerosas
-     */
-    public void alterarLimiteFamiliaNumerosa() {
-        this.limiteFamiliaNumerosa = lerInt("O valor atual é " + this.limiteFamiliaNumerosa + ". Introduza o novo limite para as famílias numerosas:");
-    }
-
-    /**
-     * Ver as faturas por parte dos Contribuintes Individuais
-     */
-    public void verFaturasIndividual() {
-        if (this.utilizador.getListaFaturas().size() == 0){
-            System.out.println("Não tem faturas emitidas em seu nome. Por favor, volte mais tarde");
-            pausaParaLer();
-            return;
-        }
-
-        int escolha;
-        do {
-            escolha = lerInt("Deseja imprimir 1 --> todas as faturas ou 2 --> as de uma determinada empresa?");
-        } while (escolha != 1 && escolha != 2);
-
-        String nifE = "000000000";
-        if (escolha == 2) {
-            HashMap<String,String> empresas = new HashMap<String,String>();
-            for (Integer i: this.utilizador.getListaFaturas()) {
-                String nifEmpresa = this.totalFaturas.get(i).getNIFEmitente();
-                String nomeEmpresa = this.totalEntidades.get(nifEmpresa).getNome();
-                empresas.put(nifEmpresa, nomeEmpresa);
+        Entidade e = null;
+        if (this.totalEntidades.containsKey(nif)) {
+            e = this.totalEntidades.get(nif);
+            if (!e.getPassword().equals("")) {
+                System.out.println("NIF já registado!");
+                pausaParaLer();
+                return;
             }
+        } else {
+            if (nif.charAt(0) == '1' || nif.charAt(0) == '2')
+                e = new Individual();
+            else if (nif.charAt(0) == '5')
+                e = new Coletivo();
+            else if (nif.equals("000000000"))
+                e = new Entidade();
 
-            System.out.println("Tem faturas emitidas pelas seguintes empresas:");
-            for(String n: empresas.keySet())
-                System.out.println(n + " --> " + empresas.get(n));
-
-            do{
-                nifE = lerNIFColetivo("\nEscreva o nif da empresa que deseja ver");
-            }while(!empresas.containsKey(nifE));
+            e.setNIF(nif);
         }
 
-        do{
-            escolha = lerInt("Deseja imprimir por 1 --> valor ou 2 --> data?");
-        }while(escolha != 1 && escolha != 2);
-        System.out.println();
+        String nome = ler("Escreva o seu nome");
+        e.setNome(nome);
+        String email = ler("Escreva o seu email");
+        e.setEmail(email);
+        String morada = ler("Escreva a sua morada");
+        e.setMorada(morada);
+        String password = ler("Escreva a sua password");
+        e.setPassword(password);
 
-        ArrayList<Fatura> res = null;
-        if(escolha == 1)
-            res = sortValor(nifE);
+        if(nif.charAt(0) == '1' || nif.charAt(0) == '2')
+            registarIndividual((Individual) e);
 
-        else if(escolha == 2){
-            do{
-                escolha = lerInt("Deseja imprimir por data 1 --> ascendente ou 2 --> descendente");
-            }while(escolha != 1 && escolha != 2);
-            System.out.println();
+        else if(nif.charAt(0) == '5')
+            registarColetivo((Coletivo) e);
 
-            if(escolha == 1)
-                res = sortData(nifE, false);
-            
-            else if(escolha == 2)
-                res = sortData(nifE, true);
-        }
-        
+        this.totalEntidades.put(nif, e.clone());
+    }
+
+    /**
+     *  Menu para registar uma entidade individual na plataforma
+     * @param e
+     */
+    public void registarIndividual(Individual e){
+        StringBuilder menu = new StringBuilder();
+
+        menu.append("               ##############################################              \n");
+        menu.append("               #            RegistarIndividual              #              \n");
+        menu.append("               ##############################################              \n");
+        menu.append("               #                                            #              \n");
+        menu.append("               #       Número de elementos agregado:        #              \n");
+        menu.append("               #       NIF dos elementos agregado:          #              \n");
+        menu.append("               #       Coeficiente Fiscal:                  #              \n");
+        menu.append("               #       Rendimento anual agregado:           #              \n");
+        menu.append("               #                                            #              \n");
+        menu.append("               ##############################################              \n");
         System.out.print('\u000C');
-        for(Fatura f: res)
-            System.out.println(f);
+        System.out.println(menu);
 
-        pausaParaLer();
-    }
-
-    /**
-     * Ver as faturas por parte das Empresas
-     */
-    public void verFaturasColetivo() {
-        if (this.utilizador.getListaFaturas().size() == 0){
-            System.out.println("Não exitem faturas emitidas por si. Por favor, volte mais tarde");
-            pausaParaLer();
-            return;
-        }
-
-        int escolha;
+        int numeroAgregado;
         do {
-            escolha = lerInt("Deseja imprimir 1 --> todas as faturas ou 2 --> as de um determinado contribuinte?");
-        } while (escolha != 1 && escolha != 2);
+            numeroAgregado = lerInt("Escreva o número de elementos do seu agregado familiar (incluindo você)");
+        } while (numeroAgregado <= 0);
+        HashMap<String,Boolean> nifAgregado = new HashMap<String,Boolean>();
 
-        String nifC = "000000000";
-        if (escolha == 2) {
-            HashMap<String,String> contribuintes = new HashMap<String,String>();
-            for (Integer i: this.utilizador.getListaFaturas()) {
-                String nifContribuinte = this.totalFaturas.get(i).getNIFCliente();
-                String nomeContribuinte = this.totalEntidades.get(nifContribuinte).getNome();
-                if(nomeContribuinte.equals(""))
-                    nomeContribuinte = "(Contribuinte não registado)";
-                contribuintes.put(nifContribuinte, nomeContribuinte);
-            }
-            System.out.println("Tem faturas emitidas para os seguintes contribuintes:");
-            for(String n: contribuintes.keySet())
-                System.out.println(n + " --> " + contribuintes.get(n));
-
-            do{
-                nifC = lerNIFIndividual("\nEscreva o nif do contribuinte que deseja ver");
-            }while(!contribuintes.containsKey(nifC));
-        }
-
+        String x;
+        boolean isFilho = false;
         do{
-            escolha = lerInt("Deseja imprimir por 1 --> valor ou 2 --> data?");
-        }while(escolha != 1 && escolha != 2);
-        System.out.println();
-
-        ArrayList<Fatura> res = null;
-        if(escolha == 1)
-            res = sortValor(nifC);
-        
-        else if(escolha == 2){
+            x = ler("É um dos filhos do agregado? (s/n)");
+        }while(!x.equals("s") && !x.equals("n"));
+        if(x.equals("s"))
+            isFilho = true;
+        nifAgregado.put(e.getNIF(), isFilho);
+        if (numeroAgregado > 1) {
+            int numeroFilhos;
             do{
-                escolha = lerInt("Deseja imprimir por data 1 --> ascendente ou 2 --> descendente");
-            }while(escolha != 1 && escolha != 2);
-            System.out.println();
+                numeroFilhos = lerInt("Escreva o número de filhos (excluindo você se for esse o caso)");
+            }while(numeroFilhos >= numeroAgregado);
 
-            if(escolha == 1)
-                res = sortData(nifC, false);
-            
-            else if(escolha == 2)
-                res = sortData(nifC, true);
-        }
 
-        System.out.print('\u000C');
-        for(Fatura f: res)
-            System.out.println(f);
-
-        pausaParaLer();
-    }
-    /**
-     * Método que ordena as faturas de uma entidade por valor (decrescente)
-     * @param nif do cliente ou emissor
-     * @return res TreeMap de faturas ordenado decrescentemente
-     */
-    public ArrayList<Fatura> sortValor(String nif){
-        ArrayList<Fatura> res = new ArrayList<Fatura>();
-        if(this.utilizador instanceof Individual){
-            for(int i: this.utilizador.getListaFaturas()){
-                if(this.totalFaturas.get(i).getNIFEmitente().equals(nif) || nif.equals("000000000"))
-                    res.add(this.totalFaturas.get(i));
+            if (numeroFilhos > 0){
+                System.out.println("Escreva o NIF dos filhos");
+                for(int i=1; i<=numeroFilhos; i++){
+                    String nifFilho = lerNIFIndividual("NIF do filho " + i + ":");
+                    nifAgregado.put(nifFilho, true);
+                }
             }
-        }
-        else if(this.utilizador instanceof Coletivo){
-            for(int i: this.utilizador.getListaFaturas()){
-                if(this.totalFaturas.get(i).getNIFCliente().equals(nif) || nif.equals("000000000"))
-                    res.add(this.totalFaturas.get(i));
-            }
-        }
 
-        Collections.sort(res, (f1,f2) -> (int)(f2.getValor() - f1.getValor()));
-
-        return res;
-    }
-
-    /**
-     * Método que ordena as faturas de uma entidade por data (crescente se bool decrescente == false)
-     * @param nif do cliente ou emissor
-     * @return res TreeMap de faturas ordenado decrescentemente
-     */
-    public ArrayList<Fatura> sortData(String nif, boolean decrescente){
-        ArrayList<Fatura> res = new ArrayList<Fatura>();
-        if(this.utilizador instanceof Individual){
-            for(int i: this.utilizador.getListaFaturas()){
-                if(this.totalFaturas.get(i).getNIFEmitente().equals(nif) || nif.equals("000000000"))
-                    res.add(this.totalFaturas.get(i));
-            }
-        }
-        else if(this.utilizador instanceof Coletivo){
-            for(int i: this.utilizador.getListaFaturas()){
-                if(this.totalFaturas.get(i).getNIFCliente().equals(nif) || nif.equals("000000000"))
-                    res.add(this.totalFaturas.get(i));
-            }
-        }
-        
-        if(decrescente)
-            Collections.sort(res, (f2,f1) -> (int)(f1.getData().compareTo(f2.getData())));
-        else
-            Collections.sort(res, (f1,f2) -> (int)(f1.getData().compareTo(f2.getData())));
-        
-        return res;
-    }
-
-    /**
-     * Arredonda o rendimento para aceder ao Map irs
-     * @param rendimento
-     * @return rendimento arredondado
-     */
-    public int round(double rendimento){
-        int res = 0;
-        double minimo = rendimento;
-        for(int v: irs.keySet()){
-            double x = v - rendimento;
-            if(x >= 0 && x < minimo){
-                    res = v;
-                    break;
-            }
-        }
-        if(res == 0)
-            res = 300001;
-        
-        return res;
-    }
-
-    /**
-     * Devolve o valor de irs associado ao agregado familiar do utilizador atual
-     * @return irs
-     */
-    public double getIRS(){
-        Individual utilizador = ((Individual) this.utilizador);
-        AgregadoFamiliar agregado = this.agregados.get(utilizador.getIndice());
-        int numeroAgregado = agregado.getAgregado().size();
-        if(numeroAgregado > 5) numeroAgregado = 5;
-        double rendimento = agregado.getRendimento();
-        double valorPagoIRS = (irs.get(round(rendimento))[numeroAgregado] / 100) * rendimento;
-        return valorPagoIRS;
-    }
-
-    /**
-     * Devolve o valor de dedução fiscal associado ao agregado do utilizador atual
-     * @return deducao
-     */
-    public double getDeducaoFiscalAgregado(){
-        //Nota: Temos de verificar se o valor acumulado das faturas não ultrapassa o valor do rendimento anual - valor pago de IRS
-        //      Os descontos devem incidir apenas sobre o valor(rendimento - valorPagoIRS), como verificar esta situação?
-        Individual utilizador = ((Individual) this.utilizador);
-        AgregadoFamiliar agregado = this.agregados.get(utilizador.getIndice());
-        double coeficiente = utilizador.getCoeficienteFiscal();
-        int numeroAgregado = agregado.getAgregado().size();
-        if(numeroAgregado > 5) numeroAgregado = 5;
-
-        HashMap<String,Double> atividadesAgregado = new HashMap<String,Double>();
-        for(String nif: agregado.getAgregado().keySet()){
-            if (this.totalEntidades.containsKey(nif)) {
-                Individual i = (Individual) this.totalEntidades.get(nif);
-                HashMap<String,Double> atividades = i.getCodigosAtividades();
-                for(String s: atividades.keySet()){
-                    if(atividadesAgregado.containsKey(s))
-                        atividadesAgregado.put(s, atividades.get(s) + atividadesAgregado.get(s));
-                    else
-                        atividadesAgregado.put(s, atividades.get(s));
+            if(numeroAgregado - numeroFilhos > 1){
+                System.out.println("Escreva o NIF dos restantes elementos do agregado familiar (excluindo você)");
+                for(int i=1; i<numeroAgregado-numeroFilhos; i++){
+                    String nifFamiliar = lerNIFIndividual("NIF do elemento " + i + ":");
+                    nifAgregado.put(nifFamiliar, false);
                 }
             }
         }
 
-        double valorADeduzir = 0.0;
-        for(String a: atividadesAgregado.keySet()){
-            double desconto = atividadesAgregado.get(a) * (descontos.get(a).getKey() / 100.0);
-            desconto = Math.min(desconto, descontos.get(a).getValue());
-            valorADeduzir += desconto;
-        }
-        
-        valorADeduzir /= coeficiente;
+        double coeficiente = lerDouble("Escreva o seu coeficiente fiscal");
+        double rendimentoAtual;
+        double rendimentoAgregado;
+        int indice = this.agregados.size();
+        String nif = null;
 
-        return valorADeduzir;
+        for(String nif1: nifAgregado.keySet())
+            if(this.totalEntidades.containsKey(nif1) && ! nif1.equals(e.getNIF())){
+                nif = nif1;
+                indice = ((Individual) this.totalEntidades.get(nif)).getIndice();
+                break;
+            }
+
+        if(nif != null){
+            this.agregados.get(indice).atualizaAgregado(nifAgregado);
+
+            rendimentoAtual = this.agregados.get(indice).getRendimento();
+            String resposta;
+            do{
+                resposta = ler("Confirma que o rendimento anual do seu agregado é " + rendimentoAtual + "? (s/n)");
+            }while(!resposta.equals("s") && !resposta.equals("n"));
+
+            if(resposta.equals("n")){
+                rendimentoAgregado = lerDouble("Escreva o rendimento anual do seu agregado familiar");
+                this.agregados.get(indice).setRendimento(rendimentoAgregado);
+            }
+        }
+        else {
+            rendimentoAgregado = lerDouble("Escreva o rendimento anual do seu agregado familiar");
+            this.agregados.add(new AgregadoFamiliar(nifAgregado, rendimentoAgregado));
+        }
+
+        e.setIndice(indice);
+        e.setCoeficienteFiscal(coeficiente);
     }
 
     /**
-     * Devolve o valor de dedução fiscal associado utilizador atual
-     * @return deducao
+     *  Menu para registar um utilizador entidade coletivo na plataforma
+     * @param e
      */
-    public double getDeducaoFiscal(){
-        Individual utilizador = ((Individual) this.utilizador);
-        double coeficiente = utilizador.getCoeficienteFiscal();
+    public void registarColetivo(Coletivo e){
+        StringBuilder menu = new StringBuilder();
 
-        double valorADeduzir = 0.0;
-        HashMap<String,Double> atividades = utilizador.getCodigosAtividades();
-        for(String a: atividades.keySet()){
-            double desconto = atividades.get(a) * (descontos.get(a).getKey() / 100.0);
-            desconto = Math.min(desconto, descontos.get(a).getValue() / 2);
-            valorADeduzir += desconto;
-        }
-        
-        valorADeduzir /= coeficiente;
+        menu.append("               ##############################################              \n");
+        menu.append("               #            RegistarColetivo                #              \n");
+        menu.append("               ##############################################              \n");
+        menu.append("               #                                            #              \n");
+        menu.append("               #         Designação:                        #              \n");
+        menu.append("               #         Atividades Económicas:             #              \n");
+        menu.append("               #         Distrito:                          #              \n");
+        menu.append("               #                                            #              \n");
+        menu.append("               ##############################################              \n");
+        System.out.print('\u000C');
+        System.out.println(menu);
 
-        return valorADeduzir;
+        String designacao = ler("Escreva a designação da empresa");
+        ArrayList<String> informacaoAtividades = lerAtividadesColetivo();
+        String distrito = ler("Escreva o seu distrito:");
+
+        e.setDesignacao(designacao);
+        e.setInformacaoAtividades(informacaoAtividades);
+        e.setDistrito(distrito);
     }
 
     /**
-     * Devolve a redução de imposto associada ao utilizador atual
-     * @return deducao
+     * Ler atividades económicas do coletivo
+     * @return lista com as atividades do coletivo
      */
-    public double reducaoImposto() {
-        double reducao = 0.0;
-        if (this.utilizador instanceof Individual && isFamiliaNumerosa(this.utilizador.getNIF())) {
-            reducao = this.agregados.get(((Individual) this.utilizador).getIndice()).getNumeroFilhos() * 0.05;
-        } else if (this.utilizador instanceof Coletivo && ((Coletivo) this.utilizador).isInterior()) {
-            reducao = 0.10;
+    public ArrayList<String> lerAtividadesColetivo() {
+        ArrayList<String> codigosAtividades = new ArrayList<String>();
+        for (String atividade: this.atividades) {
+            String res;
+            do {
+                res = ler("Atua na área de " + atividade + "? (s/n)");
+            } while (!res.equals("s") && !res.equals("n"));
+
+            if (res.equals("s"))
+                codigosAtividades.add(atividade);
         }
 
-        return reducao;
+        return codigosAtividades;
     }
 
     /**
-     * Função que diz se a família de um dado Individual é numerosa
-     * @param nif NIF do Individual
-     * @return true se a família for numerosa, false caso contrário
+     * Fazer o log out
      */
-    public boolean isFamiliaNumerosa(String nif){
-        Individual i = (Individual) this.totalEntidades.get(nif);
-        return this.agregados.get(i.getIndice()).getNumeroFilhos() >= limiteFamiliaNumerosa;
+    public void logout(){
+        this.utilizador = null;
+        this.save();
     }
 }

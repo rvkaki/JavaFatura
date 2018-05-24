@@ -51,7 +51,7 @@ public class AgregadoFamiliar implements Serializable{
         HashMap<String,Boolean> res = new HashMap<String,Boolean>();
         for(String s: this.agregado.keySet())
             res.put(s, this.agregado.get(s));
-        
+
         return res;
     }
 
@@ -138,5 +138,30 @@ public class AgregadoFamiliar implements Serializable{
         s.append("O rendimento anual deste agregado é " + this.rendimento + "€\n");
 
         return s.toString();
+    }
+
+    /**
+     * Cria uma cópia do objeto
+     * @return cópia do objeto
+     */
+    public AgregadoFamiliar clone(){
+    	return new AgregadoFamiliar(this);
+    }
+
+    /**
+     * Verifica a igualdade dos objetos
+     * @param o
+     * @return true se houver igualdade, false se não houver igualdade
+     */
+    public boolean equals(Object o){
+        if (this == o)
+            return true;
+
+        if ((o == null) || (this.getClass() != o.getClass()))
+            return false;
+
+        AgregadoFamiliar af = (AgregadoFamiliar) o;
+        return(this.rendimento == af.getRendimento() &&
+               this.agregado.equals(af.getAgregado()));
     }
 }

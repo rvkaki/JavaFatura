@@ -3,7 +3,7 @@
  * Classe que representa a fatura de uma entidade
  *
  * @author GC-JRI-RV
- * @version 15/04/2018  
+ * @version 15/04/2018
  */
 
 import java.io.Serializable;
@@ -25,6 +25,7 @@ public class Fatura implements Serializable{
     private ArrayList<String> atividadesAnteriores;
     /** Valor da fatura */
     private double valor;
+
     /**
      * Construtor por omissão
      */
@@ -37,6 +38,7 @@ public class Fatura implements Serializable{
         this.atividadesAnteriores = new ArrayList<String>();
         this.valor = 0.0;
     }
+
     /**
      * Construtor por parametro
      * @param nifEmitente
@@ -58,6 +60,7 @@ public class Fatura implements Serializable{
             this.atividadesAnteriores.add(s);
         this.valor = valor;
     }
+
     /**
      * Contrutor por cópia
      * @param f Fatura original
@@ -73,6 +76,7 @@ public class Fatura implements Serializable{
             this.atividadesAnteriores.add(s);
     	this.valor = f.getValor();
     }
+
     /**
      * Devolve o nif do emitente
      * @return nif
@@ -80,20 +84,23 @@ public class Fatura implements Serializable{
     public String getNIFEmitente(){
     	return this.nifEmitente;
     }
+
     /**
-     * Devolve a data da emissão 
+     * Devolve a data da emissão
      * @return data
      */
     public LocalDateTime getData(){
     	return this.data;
     }
+
     /**
      * Devolve o nif do cliente
      * @return nif
      */
 	public String getNIFCliente(){
     	return this.nifCliente;
-    }    
+    }
+
     /**
      * Devolve a descrição da fatura
      * @return descrição
@@ -101,6 +108,7 @@ public class Fatura implements Serializable{
     public String getDescricao(){
     	return this.descricao;
     }
+
     /**
      * Devolve a atividade económica
      * @return atividade económica
@@ -139,12 +147,65 @@ public class Fatura implements Serializable{
     }
 
     /**
-     * Verifica se esta pedente????????
-     * @return true se esta pendente, false se não estiver
+     * Define o nif do emitente
+     * @param nifEmitente
+     */
+    public void setNIFEmitente(String nifEmitente){
+    	this.nifEmitente = nifEmitente;
+    }
+
+    /**
+     * Define a data
+     * @param data
+     */
+    public void setData(LocalDateTime data){
+    	this.data = data;
+    }
+
+    /**
+     * Define o nif do cliente
+     * @param nifCliente
+     */
+    public void setNIFCliente(String nifCliente){
+    	this.nifCliente = nifCliente;
+    }
+
+    /**
+     * Define a descrição
+     * @param descrição
+     */
+    public void setDescricao(String descricao){
+    	this.descricao = descricao;
+    }
+
+    /**
+     * Define as atividades anteriores
+     * @param atividadesAnteriores
+     */
+    public void setAtividadesAnteriores(ArrayList<String> atividadesAnteriores){
+    	ArrayList<String> res = new ArrayList<String>(atividadesAnteriores.size());
+        for (String s: atividadesAnteriores)
+            res.add(s);
+
+        this.atividadesAnteriores = res;
+    }
+
+    /**
+     * Define o valor
+     * @param valor
+     */
+    public void setValor(double valor){
+    	this.valor = valor;
+    }
+
+    /**
+     * Diz se a fatura está pedente
+     * @return true se está pendente, false se não estiver
      */
     public boolean estaPendente(){
     	return this.atividade.equals("");
     }
+
     /**
      * Cria uma cópia do objecto
      * @return cópia do objeto
@@ -152,6 +213,7 @@ public class Fatura implements Serializable{
     public Fatura clone(){
     	return new Fatura(this);
     }
+
     /**
      * Verifica a igualdade de dois objectos
      * @param o
@@ -160,7 +222,7 @@ public class Fatura implements Serializable{
     public boolean equals(Object o){
     	if(this == o)
             return true;
-        
+
         if( (o == null) || (this.getClass() != o.getClass()))
             return false;
 
@@ -173,6 +235,7 @@ public class Fatura implements Serializable{
         	   this.valor == f.getValor());
 
     }
+
     /**
      * Contrói a fatura em String
      * @return fatura em String

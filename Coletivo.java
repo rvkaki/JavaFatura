@@ -4,7 +4,7 @@
  *
  * @author GC-JRI-RV
  * @version 24/04/2018
- */ 
+ */
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,6 +28,7 @@ public class Coletivo extends Entidade{
         this.informacaoAtividades = new ArrayList<String>();
         this.distrito = "";
     }
+
     /**
      * Construtor por parametro
      * @param nif
@@ -48,6 +49,7 @@ public class Coletivo extends Entidade{
             this.informacaoAtividades.add(s);
         this.distrito = distrito;
     }
+
     /**
      * Construtor por cópia
      * @param e Coletivo original
@@ -58,13 +60,15 @@ public class Coletivo extends Entidade{
         this.informacaoAtividades = e.getInformacaoAtividades();
         this.distrito = e.getDistrito();
     }
-    /** 
+
+    /**
      * Devolve a designacao do coletivo
      * @return a designacao
      */
     public String getDesignacao(){
         return this.designacao;
     }
+
     /**
      * Devolve a informação das atividades do coletivo
      * @return a informacao das atividades
@@ -92,13 +96,14 @@ public class Coletivo extends Entidade{
         return this.distrito;
     }
 
-    /** 
+    /**
      * Define a designação do coletivo
      * @param designacao
      */
     public void setDesignacao(String designacao){
         this.designacao = designacao;
     }
+
     /**
      * Define as informações de atividade
      * @param informacaoAtividades
@@ -128,17 +133,38 @@ public class Coletivo extends Entidade{
         else
             return "";
     }
+
     /** Devolve true se a Empresa for do interior
      * @return true se for do interior, false caso contrário
      */
     public boolean isInterior(){
         return(distritosInterior.contains(this.distrito.toLowerCase()));
     }
+
     /**
      * Cria uma cópia do objeto
-     * @return cópia do objeto 
+     * @return cópia do objeto
     */
     public Coletivo clone(){
         return new Coletivo(this);
+    }
+
+    /**
+     * Verifica a igualdade dos objetos
+     * @param o
+     * @return true se houver igualdade, false se não houver igualdade
+     */
+    public boolean equals(Object o){
+        if (this == o)
+            return true;
+
+        if ((o == null) || (this.getClass() != o.getClass()))
+            return false;
+
+        Coletivo c = (Coletivo) o;
+        return(super.equals(c) &&
+               this.designacao.equals(c.getDesignacao()) &&
+               this.informacaoAtividades.equals(c.getInformacaoAtividades()) &&
+               this.distrito.equals(c.getDistrito()));
     }
 }
