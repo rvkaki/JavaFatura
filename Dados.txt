@@ -29,6 +29,7 @@ Agregado Imperadeiro:
         144444444 Leonardo Imperadeiro
         155555555 Daniel Imperadeiro
         166666666 Miguel Imperadeiro
+        177777777 Lasca Imperadeiro
     Rendimento: 250000€
 
 Agregado Vieira:
@@ -57,4 +58,9 @@ Gonçalo Costa:
     NIF: 288888888
     Password: olaçnog
     Coeficiente: 1.7
+
+Lasca Imperadeiro:
+    NIF: 177777777
+    Password: acsal
+    Coeficiente: 2.0
 

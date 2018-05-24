@@ -19,6 +19,7 @@ import java.time.Month;
 import java.time.Year;
 import java.time.YearMonth;
 import java.util.Arrays;
+import java.util.Collections;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
@@ -378,11 +379,19 @@ public class Plataforma{
             numeroAgregado = lerInt("Escreva o número de elementos do seu agregado familiar (incluindo você)");
         } while (numeroAgregado <= 0);
         HashMap<String,Boolean> nifAgregado = new HashMap<String,Boolean>();
-        nifAgregado.put(e.getNIF(), false);
+
+        String x;
+        boolean isFilho = false;
+        do{
+            x = ler("É um dos filhos do agregado? (s/n)");
+        }while(!x.equals("s") && !x.equals("n"));
+        if(x.equals("s"))
+            isFilho = true;
+        nifAgregado.put(e.getNIF(), isFilho);
         if (numeroAgregado > 1) {
             int numeroFilhos;
             do{
-                numeroFilhos = lerInt("Escreva o número de filhos");
+                numeroFilhos = lerInt("Escreva o número de filhos (excluindo você se for esse o caso)");
             }while(numeroFilhos >= numeroAgregado);
 
         
@@ -1156,7 +1165,7 @@ public class Plataforma{
         }while(escolha != 1 && escolha != 2);
         System.out.println();
 
-        TreeMap<Integer,Fatura> res = null;
+        ArrayList<Fatura> res = null;
         if(escolha == 1){
             res = sortValor(nifE);
         }
@@ -1174,8 +1183,8 @@ public class Plataforma{
                 res = sortData(nifE, true);
         }
         
-        ///System.out.print('\u000C');
-        for(Fatura f: res.values())
+        System.out.print('\u000C');
+        for(Fatura f: res)
             System.out.println(f);
 
         pausaParaLer();
@@ -1220,7 +1229,7 @@ public class Plataforma{
         }while(escolha != 1 && escolha != 2);
         System.out.println();
 
-        TreeMap<Integer,Fatura> res = null;
+        ArrayList<Fatura> res = null;
         if(escolha == 1)
             res = sortValor(nifC);
         
@@ -1238,39 +1247,32 @@ public class Plataforma{
         }
 
         System.out.print('\u000C');
-        for(Fatura f: res.values())
+        for(Fatura f: res)
             System.out.println(f);
 
         pausaParaLer();
     }
-//.ololo
     /**
      * Método que ordena as faturas de uma entidade por valor (decrescente)
      * @param nif do cliente ou emissor
      * @return res TreeMap de faturas ordenado decrescentemente
      */
-    public TreeMap<Integer,Fatura> sortValor(String nif){
-            TreeMap<String, Double> myMap = new TreeMap<String, Double>(new Comparator<String>()
-            {
-                public int compare(String o1, String o2)
-                {
-                    return o1.compareTo(o2);
-                } s
-            });
-
-        TreeMap<Integer,Fatura> res = new TreeMap<Integer,Fatura>(Map.Entry<Integer,Fatura>o1,Map.Entry<Integer,Fatura>o2)) -> (int) (o2.getValue().getValor() - o1.getValue().getValor()));
+    public ArrayList<Fatura> sortValor(String nif){
+        ArrayList<Fatura> res = new ArrayList<Fatura>();
         if(this.utilizador instanceof Individual){
             for(int i: this.utilizador.getListaFaturas()){
                 if(this.totalFaturas.get(i).getNIFEmitente().equals(nif) || nif.equals("000000000"))
-                    res.put(i,this.totalFaturas.get(i));
+                    res.add(this.totalFaturas.get(i));
             }
         }
         else if(this.utilizador instanceof Coletivo){
             for(int i: this.utilizador.getListaFaturas()){
                 if(this.totalFaturas.get(i).getNIFCliente().equals(nif) || nif.equals("000000000"))
-                    res.put(i,this.totalFaturas.get(i));
+                    res.add(this.totalFaturas.get(i));
             }
         }
+
+        Collections.sort(res, (f1,f2) -> (int)(f2.getValor() - f1.getValor()));
 
         return res;
     }
@@ -1280,23 +1282,25 @@ public class Plataforma{
      * @param nif do cliente ou emissor
      * @return res TreeMap de faturas ordenado decrescentemente
      */
-    public TreeMap<Integer,Fatura> sortData(String nif, boolean decrescente){
-        TreeMap<Integer,Fatura> res = new TreeMap<Integer,Fatura>((f1,f2) -> f1.getData().compareTo(f2.getData()));
+    public ArrayList<Fatura> sortData(String nif, boolean decrescente){
+        ArrayList<Fatura> res = new ArrayList<Fatura>();
         if(this.utilizador instanceof Individual){
             for(int i: this.utilizador.getListaFaturas()){
                 if(this.totalFaturas.get(i).getNIFEmitente().equals(nif) || nif.equals("000000000"))
-                    res.put(i,this.totalFaturas.get(i));
+                    res.add(this.totalFaturas.get(i));
             }
         }
         else if(this.utilizador instanceof Coletivo){
             for(int i: this.utilizador.getListaFaturas()){
                 if(this.totalFaturas.get(i).getNIFCliente().equals(nif) || nif.equals("000000000"))
-                    res.put(i,this.totalFaturas.get(i));
+                    res.add(this.totalFaturas.get(i));
             }
         }
         
         if(decrescente)
-            res = (TreeMap<Integer,Fatura>) res.descendingMap();
+            Collections.sort(res, (f2,f1) -> (int)(f1.getData().compareTo(f2.getData())));
+        else
+        Collections.sort(res, (f1,f2) -> (int)(f1.getData().compareTo(f2.getData())));
         
         return res;
     }
