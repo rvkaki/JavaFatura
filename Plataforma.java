@@ -450,7 +450,7 @@ public class Plataforma{
         menu.append("               #         Designação:                        #              \n");
         menu.append("               #         Coeficiente Fiscal:                #              \n");
         menu.append("               #         Atividades Económicas:             #              \n");
-        menu.append("               #         Interior do país:                  #              \n");
+        menu.append("               #         Distrito:                          #              \n");
         menu.append("               #                                            #              \n");
         menu.append("               ##############################################              \n");
         System.out.print('\u000C');
@@ -460,19 +460,12 @@ public class Plataforma{
         double coeficiente = lerDouble("Escreva o coeficiente fiscal da empresa");
         ArrayList<String> informacaoAtividades = lerAtividadesColetivo();
 
-        String res;
-        do {
-            res = ler("É uma empresa do interior? (s/n)");
-        } while (!res.equals("s") && !res.equals("n"));
-
-        boolean interior = false;
-        if (res.equals("s"))
-            interior = true;
+        String distrito = ler("Escreva o seu distrito:");
 
         e.setDesignacao(designacao);
         e.setInformacaoAtividades(informacaoAtividades);
         e.setCoeficienteFiscal(coeficiente);
-        e.setInterior(interior);
+        e.setDistrito(distrito);
     }
 
     /**
@@ -1398,7 +1391,7 @@ public class Plataforma{
         double reducao = 0.0;
         if (this.utilizador instanceof Individual && isFamiliaNumerosa(this.utilizador.getNIF())) {
             reducao = this.agregados.get(((Individual) this.utilizador).getIndice()).getNumeroFilhos() * 0.05;
-        } else if (this.utilizador instanceof Coletivo && ((Coletivo) this.utilizador).getInterior()) {
+        } else if (this.utilizador instanceof Coletivo && ((Coletivo) this.utilizador).isInterior()) {
             reducao = 0.10;
         }
 

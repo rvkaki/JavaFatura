@@ -1,0 +1,57 @@
+000000000 Admin nimda
+
+Empresa Norte:
+    NIF: 511111111
+    Password: etron
+    Distrito: Braga
+    Atividade(s): Restauração e Alojamento, Educação, Transportes
+
+Empresa Centro:
+    NIF: 522222222
+    Password: ortnec
+    Distrito: Guarda
+    Atividade(s): Saúde, Outros
+
+Empresa Sul:
+    NIF: 533333333
+    Password: lus
+    Distrito: Faro
+    Atividade(s): Cabeleireiros
+
+Agregado Imperadeiro:
+    111111111 João Imperadeiro
+    122222222 Mariana Imperadeiro
+    Filhos:
+        133333333 Rafael Imperadeiro
+        144444444 Leonardo Imperadeiro
+        155555555 Daniel Imperadeiro
+        166666666 Miguel Imperadeiro
+    Rendimento: 250000€
+
+Agregado Vieira:
+    211111111 Ricardo Vieira
+    222222222 Lurdes Vieira
+    Filhos:
+        233333333 Guilherme Vieira
+    Rendimento: 8000€
+
+Agregado Costa:
+    288888888 Gonçalo Costa
+    299999999 Irina Costa
+    Rendimento: 20000€
+
+João Imperadeiro:
+    NIF: 111111111
+    Password: oaoj
+    Coeficiente: 2.0
+
+Ricardo Vieira:
+    NIF: 211111111
+    Password: odracir
+    Coeficiente: 1.2
+
+Gonçalo Costa:
+    NIF: 288888888
+    Password: olaçnog
+    Coeficiente: 1.7
+

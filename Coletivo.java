@@ -7,6 +7,7 @@
  */ 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Coletivo extends Entidade{
     /** Designação do coletivo */
@@ -15,8 +16,10 @@ public class Coletivo extends Entidade{
     private ArrayList<String> informacaoAtividades;
     /** Número do coeficiente fiscal */
     private double coeficienteFiscal;
-    /** Indica se a empresa é do interior */
-    private boolean interior;
+    /** Distritos de interior */
+    private static ArrayList<String> distritosInterior = new ArrayList<>(Arrays.asList("vila real","bragança","viseu","guarda","castelo branco", "portalegre", "évora","evora", "santarém","santarem", "beja"));
+    /** Distrito da Empresa */
+    private String distrito;
 
     /**
      * Construtor por omissão
@@ -26,7 +29,7 @@ public class Coletivo extends Entidade{
         this.designacao = "";
         this.informacaoAtividades = new ArrayList<String>();
         this.coeficienteFiscal = 0.0;
-        this.interior = false;
+        this.distrito = "";
     }
     /**
      * Construtor por parametro
@@ -39,16 +42,16 @@ public class Coletivo extends Entidade{
      * @param designacao
      * @param informacaoAtividade
      * @param coeficienteFiscal
-     * @param interior
+     * @param distrito
      */
-    public Coletivo(String nif, String email, String nome, String morada, String password, ArrayList<Integer> listaFaturas, String designacao, ArrayList<String> informacaoAtividades, double coeficienteFiscal, boolean interior){
+    public Coletivo(String nif, String email, String nome, String morada, String password, ArrayList<Integer> listaFaturas, String designacao, ArrayList<String> informacaoAtividades, double coeficienteFiscal, String distrito){
         super(nif, email, nome, morada, password, listaFaturas);
         this.designacao = designacao;
         this.informacaoAtividades = new ArrayList<String>(informacaoAtividades.size());
         for(String s: informacaoAtividades)
             this.informacaoAtividades.add(s);
         this.coeficienteFiscal = coeficienteFiscal;
-        this.interior = interior;
+        this.distrito = distrito;
     }
     /**
      * Construtor por cópia
@@ -59,7 +62,7 @@ public class Coletivo extends Entidade{
         this.designacao = e.getDesignacao();
         this.informacaoAtividades = e.getInformacaoAtividades();
         this.coeficienteFiscal = e.getCoeficienteFiscal();
-        this.interior = e.getInterior();
+        this.distrito = e.getDistrito();
     }
     /** 
      * Devolve a designacao do coletivo
@@ -96,11 +99,11 @@ public class Coletivo extends Entidade{
     }
 
     /**
-     * Devolve true se a empresa for do interior
-     * @return o coeficiente fiscal
+     * Devolve o distrito da empresa
+     * @return o distrito
      */
-    public boolean getInterior(){
-        return this.interior;
+    public String getDistrito(){
+        return this.distrito;
     }
 
     /** 
@@ -132,19 +135,25 @@ public class Coletivo extends Entidade{
      * Define se a empresa é do interior
      * @param interior
      */
-    public void setInterior(boolean interior){
-        this.interior = interior;
+    public void setDistrito(String distrito){
+        this.distrito = distrito;
     }
 
     /**
      * Devolve a atividade da empresa se só tiver uma associada ou uma String vazia, caso contrário
-     * @return 
+     * @return a atividade se for única, String vazia caso contrário
      */
     public String getAtividadeSeUnica() {
         if (this.informacaoAtividades.size() == 1)
             return this.informacaoAtividades.get(0);
         else
             return "";
+    }
+    /** Devolve true se a Empresa for do interior
+     * @return true se for do interior, false caso contrário
+     */
+    public boolean isInterior(){
+        return(distritosInterior.contains(this.distrito.toLowerCase()));
     }
     /**
      * Cria uma cópia do objeto
