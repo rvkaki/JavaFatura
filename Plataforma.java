@@ -1255,7 +1255,7 @@ public class Plataforma{
                 public int compare(String o1, String o2)
                 {
                     return o1.compareTo(o2);
-                } 
+                } s
             });
 
         TreeMap<Integer,Fatura> res = new TreeMap<Integer,Fatura>(Map.Entry<Integer,Fatura>o1,Map.Entry<Integer,Fatura>o2)) -> (int) (o2.getValue().getValor() - o1.getValue().getValor()));
