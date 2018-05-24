@@ -3,18 +3,21 @@
 Empresa Norte:
     NIF: 511111111
     Password: etron
+    Designação: Universdade
     Distrito: Braga
     Atividade(s): Restauração e Alojamento, Educação, Transportes
 
 Empresa Centro:
     NIF: 522222222
     Password: ortnec
+    Designação: Hospital
     Distrito: Guarda
     Atividade(s): Saúde, Outros
 
 Empresa Sul:
     NIF: 533333333
     Password: lus
+    Designação: Cabeleireiro
     Distrito: Faro
     Atividade(s): Cabeleireiros
 

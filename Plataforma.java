@@ -8,6 +8,8 @@
 
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.TreeMap;
+import java.util.Map;
 import java.util.TreeSet;
 import javafx.util.Pair;
 import java.util.HashMap;
@@ -1154,9 +1156,10 @@ public class Plataforma{
         }while(escolha != 1 && escolha != 2);
         System.out.println();
 
-        TreeSet<Fatura> res = null;
-        if(escolha == 1)
+        TreeMap<Integer,Fatura> res = null;
+        if(escolha == 1){
             res = sortValor(nifE);
+        }
         
         else if(escolha == 2){
             do{
@@ -1170,9 +1173,9 @@ public class Plataforma{
             else if(escolha == 2)
                 res = sortData(nifE, true);
         }
-
-        System.out.print('\u000C');
-        for(Fatura f: res)
+        
+        ///System.out.print('\u000C');
+        for(Fatura f: res.values())
             System.out.println(f);
 
         pausaParaLer();
@@ -1199,6 +1202,8 @@ public class Plataforma{
             for (Integer i: this.utilizador.getListaFaturas()) {
                 String nifContribuinte = this.totalFaturas.get(i).getNIFCliente();
                 String nomeContribuinte = this.totalEntidades.get(nifContribuinte).getNome();
+                if(nomeContribuinte.equals(""))
+                    nomeContribuinte = "(Contribuinte não registado)";
                 contribuintes.put(nifContribuinte, nomeContribuinte);
             }
             System.out.println("Tem faturas emitidas para os seguintes contribuintes:");
@@ -1215,7 +1220,7 @@ public class Plataforma{
         }while(escolha != 1 && escolha != 2);
         System.out.println();
 
-        TreeSet<Fatura> res = null;
+        TreeMap<Integer,Fatura> res = null;
         if(escolha == 1)
             res = sortValor(nifC);
         
@@ -1233,7 +1238,7 @@ public class Plataforma{
         }
 
         System.out.print('\u000C');
-        for(Fatura f: res)
+        for(Fatura f: res.values())
             System.out.println(f);
 
         pausaParaLer();
@@ -1242,20 +1247,28 @@ public class Plataforma{
     /**
      * Método que ordena as faturas de uma entidade por valor (decrescente)
      * @param nif do cliente ou emissor
-     * @return res TreeSet de faturas ordenado decrescentemente
+     * @return res TreeMap de faturas ordenado decrescentemente
      */
-    public TreeSet<Fatura> sortValor(String nif){
-        TreeSet<Fatura> res = new TreeSet<Fatura>((f1,f2) -> (int) (f2.getValor() - f1.getValor()));
+    public TreeMap<Integer,Fatura> sortValor(String nif){
+            TreeMap<String, Double> myMap = new TreeMap<String, Double>(new Comparator<String>()
+            {
+                public int compare(String o1, String o2)
+                {
+                    return o1.compareTo(o2);
+                } 
+            });
+
+        TreeMap<Integer,Fatura> res = new TreeMap<Integer,Fatura>(Map.Entry<Integer,Fatura>o1,Map.Entry<Integer,Fatura>o2)) -> (int) (o2.getValue().getValor() - o1.getValue().getValor()));
         if(this.utilizador instanceof Individual){
             for(int i: this.utilizador.getListaFaturas()){
                 if(this.totalFaturas.get(i).getNIFEmitente().equals(nif) || nif.equals("000000000"))
-                    res.add(this.totalFaturas.get(i));
+                    res.put(i,this.totalFaturas.get(i));
             }
         }
         else if(this.utilizador instanceof Coletivo){
             for(int i: this.utilizador.getListaFaturas()){
                 if(this.totalFaturas.get(i).getNIFCliente().equals(nif) || nif.equals("000000000"))
-                    res.add(this.totalFaturas.get(i));
+                    res.put(i,this.totalFaturas.get(i));
             }
         }
 
@@ -1265,25 +1278,25 @@ public class Plataforma{
     /**
      * Método que ordena as faturas de uma entidade por data (crescente se bool decrescente == false)
      * @param nif do cliente ou emissor
-     * @return res TreeSet de faturas ordenado decrescentemente
+     * @return res TreeMap de faturas ordenado decrescentemente
      */
-    public TreeSet<Fatura> sortData(String nif, boolean decrescente){
-        TreeSet<Fatura> res = new TreeSet<Fatura>((f1,f2) -> f1.getData().compareTo(f2.getData()));
+    public TreeMap<Integer,Fatura> sortData(String nif, boolean decrescente){
+        TreeMap<Integer,Fatura> res = new TreeMap<Integer,Fatura>((f1,f2) -> f1.getData().compareTo(f2.getData()));
         if(this.utilizador instanceof Individual){
             for(int i: this.utilizador.getListaFaturas()){
                 if(this.totalFaturas.get(i).getNIFEmitente().equals(nif) || nif.equals("000000000"))
-                    res.add(this.totalFaturas.get(i));
+                    res.put(i,this.totalFaturas.get(i));
             }
         }
         else if(this.utilizador instanceof Coletivo){
             for(int i: this.utilizador.getListaFaturas()){
                 if(this.totalFaturas.get(i).getNIFCliente().equals(nif) || nif.equals("000000000"))
-                    res.add(this.totalFaturas.get(i));
+                    res.put(i,this.totalFaturas.get(i));
             }
         }
         
         if(decrescente)
-            res = (TreeSet<Fatura>) res.descendingSet();
+            res = (TreeMap<Integer,Fatura>) res.descendingMap();
         
         return res;
     }
