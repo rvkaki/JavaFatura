@@ -1243,7 +1243,7 @@ public class Plataforma{
 
         pausaParaLer();
     }
-
+//.ololo
     /**
      * Método que ordena as faturas de uma entidade por valor (decrescente)
      * @param nif do cliente ou emissor
