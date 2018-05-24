@@ -765,7 +765,7 @@ public class Plataforma{
         int escolha;
         do{
             escolha = lerInt(null);
-        }while(escolha != 1 && escolha != 2 && escolha != 3 && escolha != 4 && escolha != 5);
+        }while(escolha != 1 && escolha != 2 && escolha != 3 && escolha != 4 && escolha != 5 && escolha != 6);
 
         if(escolha == 1)
             emitirFatura();
@@ -780,7 +780,7 @@ public class Plataforma{
             verValorFaturado();
         else if (escolha == 5){
             double imposto = getImpostoColetivo() * (1.0 - reducaoImposto());
-            System.out.println("O valor a pagar de imposto é: " + imposto);
+            System.out.println("O valor a pagar de imposto é " + imposto + "€");
             pausaParaLer();
         }
         else if (escolha == 6)
