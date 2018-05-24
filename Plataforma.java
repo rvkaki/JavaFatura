@@ -1,4 +1,3 @@
-
 /**
  * Classe que representa a interface
  *
@@ -9,7 +8,6 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.TreeMap;
-import java.util.Map;
 import java.util.TreeSet;
 import javafx.util.Pair;
 import java.util.HashMap;
@@ -459,7 +457,6 @@ public class Plataforma{
         menu.append("               ##############################################              \n");
         menu.append("               #                                            #              \n");
         menu.append("               #         Designação:                        #              \n");
-        menu.append("               #         Coeficiente Fiscal:                #              \n");
         menu.append("               #         Atividades Económicas:             #              \n");
         menu.append("               #         Distrito:                          #              \n");
         menu.append("               #                                            #              \n");
@@ -468,14 +465,11 @@ public class Plataforma{
         System.out.println(menu);
         
         String designacao = ler("Escreva a designação da empresa");
-        double coeficiente = lerDouble("Escreva o coeficiente fiscal da empresa");
         ArrayList<String> informacaoAtividades = lerAtividadesColetivo();
-
         String distrito = ler("Escreva o seu distrito:");
 
         e.setDesignacao(designacao);
         e.setInformacaoAtividades(informacaoAtividades);
-        e.setCoeficienteFiscal(coeficiente);
         e.setDistrito(distrito);
     }
 
@@ -1166,10 +1160,9 @@ public class Plataforma{
         System.out.println();
 
         ArrayList<Fatura> res = null;
-        if(escolha == 1){
+        if(escolha == 1)
             res = sortValor(nifE);
-        }
-        
+
         else if(escolha == 2){
             do{
                 escolha = lerInt("Deseja imprimir por data 1 --> ascendente ou 2 --> descendente");
@@ -1300,7 +1293,7 @@ public class Plataforma{
         if(decrescente)
             Collections.sort(res, (f2,f1) -> (int)(f1.getData().compareTo(f2.getData())));
         else
-        Collections.sort(res, (f1,f2) -> (int)(f1.getData().compareTo(f2.getData())));
+            Collections.sort(res, (f1,f2) -> (int)(f1.getData().compareTo(f2.getData())));
         
         return res;
     }
