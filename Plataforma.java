@@ -479,8 +479,17 @@ public class Plataforma{
      */
     public void printUtilizadoresRegistados(){
         for(Entidade e: this.totalEntidades.values()){
-            if(!e.getPassword().equals(""))
-                System.out.println(e.getNIF() + " --> " + e.getNome());
+            if (!e.getPassword().equals("")) {
+                System.out.println("NIF: " + e.getNIF());
+                System.out.println("Password: " + e.getPassword());
+                System.out.println("Nome: " + e.getNome());
+                System.out.println("Email: " + e.getEmail());
+                System.out.println("Morada: " + e.getMorada());
+                System.out.print("Faturas:");
+                for (Integer i: e.getListaFaturas())
+                    System.out.print(" " + i);
+                System.out.println("\n");
+            }
         }
 
         pausaParaLer();
