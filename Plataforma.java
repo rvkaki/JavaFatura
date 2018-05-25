@@ -12,10 +12,12 @@ import java.util.TreeSet;
 import javafx.util.Pair;
 import java.util.HashMap;
 import java.lang.System;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.Year;
 import java.time.YearMonth;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.io.FileInputStream;
@@ -177,6 +179,27 @@ public class Plataforma{
                 res = Double.parseDouble(ler(pedido));
             } catch (NumberFormatException exc) {
                 System.out.println("Por favor, introduza um número");
+                continue;
+            }
+
+            break;
+        }
+
+        return res;
+    }
+
+    /**
+     * Ler data
+     * @param pedido
+     * @return data
+     */
+    public LocalDateTime lerData(String pedido) {
+        LocalDateTime res;
+        while (true) {
+            try {
+                res = LocalDate.parse(ler(pedido)).atTime(0, 0);
+            } catch (DateTimeParseException exc) {
+                System.out.println("Por favor, introduza uma data no formato indicado");
                 continue;
             }
 
@@ -1016,14 +1039,18 @@ public class Plataforma{
 
         else if(escolha == 2){
             do{
-                escolha = lerInt("Deseja imprimir por data 1 --> ascendente ou 2 --> descendente");
-            }while(escolha != 1 && escolha != 2);
+                escolha = lerInt("Deseja imprimir por 1 --> intervalo de datas, 2 --> data ascendente ou 3 --> data descendente?");
+            }while(escolha != 1 && escolha != 2 && escolha != 3);
             System.out.println();
 
-            if(escolha == 1)
+            if (escolha == 1) {
+                LocalDateTime beginning = lerData("Escreva a data de início do período (aaaa-mm-dd)");
+                LocalDateTime end = lerData("Escreva a data de fim do período (aaaa-mm-dd)");
+                res = faturasPeríodo(nifC, beginning, end);
+            } else if(escolha == 2)
                 res = sortData(nifC, false);
 
-            else if(escolha == 2)
+            else if(escolha == 3)
                 res = sortData(nifC, true);
         }
 
@@ -1032,6 +1059,27 @@ public class Plataforma{
             System.out.println(f);
 
         pausaParaLer();
+    }
+
+    /**
+     * Método que devolve as faturas de uma empresa associadas a um cliente num determinado período de tempo
+     * @param nif NIF do cliente
+     * @param beginning data de início do período
+     * @param end data de fim do período
+     * @return ArrayList de faturas desse cliente nesse período
+     */
+    public ArrayList<Fatura> faturasPeríodo(String nif, LocalDateTime beginning, LocalDateTime end){
+        ArrayList<Fatura> res = new ArrayList<Fatura>();
+        for (int i: this.utilizador.getListaFaturas()) {
+            if (this.totalFaturas.get(i).getNIFCliente().equals(nif) || nif.equals("000000000")) {
+                if (this.totalFaturas.get(i).getData().isAfter(beginning) && this.totalFaturas.get(i).getData().isBefore(end))
+                    res.add(this.totalFaturas.get(i));
+            }
+        }
+
+        Collections.sort(res, (f1,f2) -> (int)(f1.getData().compareTo(f2.getData())));
+
+        return res;
     }
 
     /**
