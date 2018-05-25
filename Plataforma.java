@@ -1208,7 +1208,12 @@ public class Plataforma{
                 tentativa = ler("Escreva a password atual");
             } while (!this.utilizador.getPassword().equals(tentativa));
 
-            this.utilizador.setPassword(ler("Escreva a nova password"));
+            String novaPassword;
+            do {
+                novaPassword = ler("Escreva a nova password (não pode ser vazia)");
+            } while (novaPassword.isEmpty());
+
+            this.utilizador.setPassword(novaPassword);
         } else if (escolha == 5)
             return true;
 
@@ -1262,7 +1267,10 @@ public class Plataforma{
         e.setEmail(email);
         String morada = ler("Escreva a sua morada");
         e.setMorada(morada);
-        String password = ler("Escreva a sua password");
+        String password;
+        do {
+            password = ler("Escreva a sua password (não pode ser vazia)");
+        } while (password.isEmpty());
         e.setPassword(password);
 
         if(nif.charAt(0) == '1' || nif.charAt(0) == '2')
